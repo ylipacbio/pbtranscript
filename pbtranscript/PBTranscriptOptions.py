@@ -29,7 +29,7 @@ class BaseConstants(object):
 
     # these are all referenced in 2.3 pipeline scripts
     MIN_SEQ_LEN_ID = "pbtranscript.task_options.min_seq_len"
-    MIN_SEQ_LEN_DEFAULT = 300
+    MIN_SEQ_LEN_DEFAULT = 50
     #MIN_SCORE_ID = "pbtranscript.task_options.min_score"
     MIN_SCORE_DEFAULT = 10
     IGNORE_POLYA_ID = "pbtranscript.task_options.ignore_polya"
@@ -132,7 +132,7 @@ def add_classify_arguments(parser):
 
     chi_group = parser.add_argument_group("Chimera detection options")
 
-    helpstr = "Minimum sequence length to output (default: 300)"
+    helpstr = "Minimum sequence length to output (default: %s)" % BaseConstants.MIN_SEQ_LEN_DEFAULT
     chi_group.add_argument("--min_seq_len",
                            type=int,
                            dest="min_seq_len",
