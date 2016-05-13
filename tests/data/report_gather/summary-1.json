@@ -1,0 +1,61 @@
+{
+    "_changelist": "UNKNOWN", 
+    "_version": "0.3.10", 
+    "attributes": [
+        {
+            "id": "pbtranscript_classify.num_reads", 
+            "name": "Number of consensus reads", 
+            "value": 2
+        }, 
+        {
+            "id": "pbtranscript_classify.num_5_seen", 
+            "name": "Number of five prime reads", 
+            "value": 2
+        }, 
+        {
+            "id": "pbtranscript_classify.num_3_seen", 
+            "name": "Number of three prime reads", 
+            "value": 2
+        }, 
+        {
+            "id": "pbtranscript_classify.num_polya_seen", 
+            "name": "Number of poly-A reads", 
+            "value": 2
+        }, 
+        {
+            "id": "pbtranscript_classify.num_filtered_short_reads", 
+            "name": "Number of filtered short reads", 
+            "value": 0
+        }, 
+        {
+            "id": "pbtranscript_classify.num_nfl", 
+            "name": "Number of non-full-length reads", 
+            "value": 0
+        }, 
+        {
+            "id": "pbtranscript_classify.num_fl", 
+            "name": "Number of full-length reads", 
+            "value": 2
+        }, 
+        {
+            "id": "pbtranscript_classify.num_flnc", 
+            "name": "Number of full-length non-chimeric reads", 
+            "value": 2
+        }, 
+        {
+            "id": "pbtranscript_classify.num_flnc_bases",
+            "name": "Number of full-length non-chimeric bases",
+            "value": 2000
+        },
+        {
+            "id": "pbtranscript_classify.avg_flnc_len", 
+            "name": "Average full-length non-chimeric read length", 
+            "value": 1000
+        }
+    ], 
+    "dataset_uuids": [], 
+    "id": "pbtranscript_classify", 
+    "plotGroups": [], 
+    "tables": [], 
+    "title": "Report pbtranscript_classify"
+}

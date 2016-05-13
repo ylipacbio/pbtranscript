@@ -1,0 +1,2 @@
+Number of unpolished consensus isoforms=97
+Mean unpolished consensus isoforms read length=3945

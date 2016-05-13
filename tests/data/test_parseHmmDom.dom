@@ -1,0 +1,32 @@
+#                                                                                                                                  --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name        accession   tlen query name                                                                 accession   qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#------------------- ---------- -----                                                       -------------------- ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+F1                   -             31 m131018_081703_42161_c100585152550000001823088404281404_s1_p0/45/ccs_front -            100   1.5e-11   33.0  18.0   1   1   7.5e-12   1.5e-11   33.0  18.0     1    30     1    30     1    31 0.96 -
+R1                   -             25 m131018_081703_42161_c100585152550000001823088404281404_s1_p0/45/ccs_front -            100     1e-09   27.2  13.0   1   1   5.2e-10     1e-09   27.2  13.0     1    25     1    25     1    25 0.97 -
+F1                   -             31 m131018_081703_42161_c100585152550000001823088404281404_s1_p0/45/ccs_back -            100   8.3e-10   27.3  14.7   1   1   4.4e-10   8.7e-10   27.3  14.7     1    27     1    27     1    30 0.93 -
+R1                   -             25 m131018_081703_42161_c100585152550000001823088404281404_s1_p0/45/ccs_back -            100   9.1e-10   27.2  13.0   1   1   4.7e-10   9.4e-10   27.2  13.0     1    25     1    25     1    25 0.97 -
+#
+# Program:         phmmer
+# Version:         3.1b1 (May 2013)
+# Pipeline mode:   SEARCH
+# Query file:      output2/in.fasta_split0
+# Target file:     output2/primers.fasta
+# Option settings: phmmer --domtblout output2/hmmer.out_split0 --noali --popen 0.07 --pextend 0.07 --mxfile /home/UNIXHOME/yli/yliWorkspace/software/bioinformatics/tools/liz_cDNA_primer/cDNA_primer/scripts/PBMATRIX.txt --domE 1 output2/in.fasta_split0 output2/primers.fasta
+# Current dir:     /home/UNIXHOME/yli/yliWorkspace/software/bioinformatics/tools/liz_cDNA_primer/cDNA_primer/scripts
+# Date:            Thu Dec  5 18:23:15 2013
+# [ok]
+#                                                                                                                                  --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name        accession   tlen query name                                                                 accession   qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#------------------- ---------- -----                                                       -------------------- ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+R1                   -             25 m131018_081703_42161_c100585152550000001823088404281404_s1_p0/54/ccs_back -            100   3.6e-08   22.3  12.9   1   1   1.9e-08   3.7e-08   22.3  12.9     1    27     1    25     1    25 0.91 -
+F1                   -             31 m131018_081703_42161_c100585152550000001823088404281404_s1_p0/54/ccs_back -            100     4e-08   22.2  14.7   1   1   2.1e-08   4.2e-08   22.1  14.7     1    29     1    27     1    30 0.89 -
+#
+# Program:         phmmer
+# Version:         3.1b1 (May 2013)
+# Pipeline mode:   SEARCH
+# Query file:      output2/in.fasta_split1
+# Target file:     output2/primers.fasta
+# Option settings: phmmer --domtblout output2/hmmer.out_split1 --noali --popen 0.07 --pextend 0.07 --mxfile /home/UNIXHOME/yli/yliWorkspace/software/bioinformatics/tools/liz_cDNA_primer/cDNA_primer/scripts/PBMATRIX.txt --domE 1 output2/in.fasta_split1 output2/primers.fasta
+# Current dir:     /home/UNIXHOME/yli/yliWorkspace/software/bioinformatics/tools/liz_cDNA_primer/cDNA_primer/scripts
+# Date:            Thu Dec  5 18:23:15 2013
+# [ok]

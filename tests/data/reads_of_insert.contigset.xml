@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<pbds:ContigSet CreatedAt="2015-09-15T17:56:47" MetaType="PacBio.DataSet.ContigSet" Name="" Tags="" TimeStampedName="pacbio_dataset_contigset-150916_005647050" UniqueId="04299926-6016-3245-d311-715ed68cfc48" Version="3.0.0" xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource MetaType="PacBio.ContigFile.ContigFastaFile" ResourceId="reads_of_insert.fasta" TimeStampedName="pacbio_contigfile_contigfastafile-150916_005647049" UniqueId="9a92d685-65f8-483b-b2ae-11d5ff31470e">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.SamIndex" ResourceId="reads_of_insert.fasta.fai" TimeStampedName="pacbio_index_samindex-150916_005647049" UniqueId="1ed801d5-c834-4c24-929a-0292e9a9e32f"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>56883</pbds:TotalLength>
+		<pbds:NumRecords>22</pbds:NumRecords>
+		<pbds:Organism/>
+		<pbds:Ploidy/>
+		<pbds:Contigs>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="568" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/43/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="3970" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/45/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="2249" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/54/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="1202" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/83/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="3833" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/161/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="1528" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/194/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="4283" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/227/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="3685" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/293/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="1991" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/330/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="4027" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/495/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="2861" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/541/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="1295" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/637/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="4033" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/642/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="2282" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/676/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="336" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/731/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="688" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/734/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="4490" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/780/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="1933" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/847/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="4191" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/865/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="3869" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/888/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="1722" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/913/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="1847" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/970/ccs"/>
+		</pbds:Contigs>
+	</pbds:DataSetMetadata>
+</pbds:ContigSet>

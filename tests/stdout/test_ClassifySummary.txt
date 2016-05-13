@@ -1,0 +1,10 @@
+Number of consensus reads=100
+Number of five prime reads=90
+Number of three prime reads=70
+Number of poly-A reads=70
+Number of filtered short reads=10
+Number of non-full-length reads=50
+Number of full-length reads=40
+Number of full-length non-chimeric reads=39
+Number of full-length non-chimeric bases=10001
+Mean full-length non-chimeric read length=256

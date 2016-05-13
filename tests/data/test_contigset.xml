@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<pbds:ContigSet CreatedAt="2015-08-26T10:29:20" MetaType="PacBio.DataSet.ContigSet" Name="" Tags="" TimeStampedName="PacBio.DataSet.ContigSet-150826_172920" UniqueId="dc91877a-879c-c6c7-18e2-b83e48555c92" Version="3.0.0" xmlns="http://pacificbiosciences.com/PacBioDataModel.xsd" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:pbds="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource MetaType="PacBio.ContigFile.ContigFastaFile" ResourceId="test.fasta" TimeStampedName="PacBio.ContigFile.ContigFastaFile-150826_172920" UniqueId="f55366fd-c292-479a-9131-047f4dfe0053">
+			<pbbase:FileIndices>
+				<pbbase:FileIndex MetaType="PacBio.Index.SamIndex" ResourceId="test.fasta.fai" TimeStampedName="PacBio.Index.SamIndex-150826_172920" UniqueId="bf8264e6-340e-47ad-9189-a1bc50628646"/>
+			</pbbase:FileIndices>
+		</pbbase:ExternalResource>
+	</pbbase:ExternalResources>
+	<pbds:DataSetMetadata>
+		<pbds:TotalLength>6787</pbds:TotalLength>
+		<pbds:NumRecords>3</pbds:NumRecords>
+		<pbds:Organism/>
+		<pbds:Ploidy/>
+		<pbds:Contigs>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="568" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/43/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="3970" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/45/ccs"/>
+			<pbds:Contig Description="" Digest="DEPRECATED" Length="2249" Name="m131018_081703_42161_c100585152550000001823088404281404_s1_p0/54/ccs"/>
+		</pbds:Contigs>
+	</pbds:DataSetMetadata>
+</pbds:ContigSet>

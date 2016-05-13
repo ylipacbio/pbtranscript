@@ -1,0 +1,15 @@
+#                                                                                                                            --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name        accession   tlen query name                                                           accession   qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#------------------- ---------- -----                                                 -------------------- ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+F1                   -             31 m131018_081703_42161_c100585152550000001823088404281404_s1_p0/45/ccs -           3931   9.2e-10   23.8  18.6   1   1   4.8e-10   9.6e-10   23.7  18.6  2171  2201     1    31     1    31 0.95 -
+R1                   -             25 m131018_081703_42161_c100585152550000001823088404281404_s1_p0/45/ccs -           3931   1.7e-07   16.3  14.6   1   1   8.9e-08   1.8e-07   16.2  14.6  3907  3931     1    25     1    25 0.97 -
+#
+# Program:         phmmer
+# Version:         3.1b1 (May 2013)
+# Pipeline mode:   SEARCH
+# Query file:      tmp.fasta
+# Target file:     data/primers.fasta
+# Option settings: phmmer --domtblout tmp.dom --popen 0.07 --pextend 0.07 --mxfile data/PBMATRIX.txt --domE 10 tmp.fasta data/primers.fasta
+# Current dir:     /home/UNIXHOME/yli/yliWorkspace/software/bioinformatics/tools/pbtranscript/pbtools/pbtranscript
+# Date:            Thu Jan 23 12:18:27 2014
+# [ok]

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContigSet CreatedAt="2016-03-02T20:44:07" MetaType="PacBio.DataSet.ContigSet" Name="pacbio_dataset_contigset-160303_044407991" Tags="" TimeStampedName="pacbio_dataset_contigset-160303_044407991" UniqueId="493c1019-5a0c-f414-f3d3-d6e410487c2b" Version="3.0.1" xmlns="http://pacificbiosciences.com/PacBioDatasets.xsd" xmlns:pbbase="http://pacificbiosciences.com/PacBioBaseDataModel.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pacificbiosciences.com/PacBioDataModel.xsd">
+	<pbbase:ExternalResources>
+		<pbbase:ExternalResource MetaType="PacBio.ContigFile.ContigFastaFile" ResourceId="../test_DazzIDHandler/test_DazzIDHandler.fasta" TimeStampedName="pacbio_contigfile_contigfastafile-160303_044407990" UniqueId="4ad1b0d6-32d6-4355-8b3e-70bdce2b9983"/>
+		<pbbase:ExternalResource MetaType="PacBio.ContigFile.ContigFastaFile" ResourceId="another.fasta" TimeStampedName="pacbio_contigfile_contigfastafile-160303_044407990" UniqueId="9e0c971f-e47e-4a05-b1b2-b6d84310ebd8"/>
+	</pbbase:ExternalResources>
+	<DataSetMetadata>
+		<TotalLength>-1</TotalLength>
+		<NumRecords>-1</NumRecords>
+		<Organism/>
+		<Ploidy/>
+		<Contigs>
+			<Contig Description="" Digest="DEPRECATED" Length="497" Name="m54011_151222_002745/10944936/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="686" Name="m54011_151222_002745/11666330/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="723" Name="m54011_151222_002745/13173399/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="683" Name="m54011_151222_002745/13632396/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="579" Name="m54011_151222_002745/14680989/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="238" Name="m54011_151222_002745/14746262/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="681" Name="m54011_151222_002745/32310148/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="677" Name="m54011_151222_002745/46334611/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="668" Name="m54011_151222_002745/47121304/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="717" Name="m54011_151222_002745/48759222/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="689" Name="m54011_151222_002745/66323118/ccs"/>
+			<Contig Description="" Digest="DEPRECATED" Length="658" Name="m54011_151222_002745/66715851/ccs"/>
+			<Contig Description="strand=-;fiveseen=1;polyAseen=1;threeseen=1;fiveend=33;polyAend=637;threeend=676;primer=1;chimera=0" Digest="DEPRECATED" Length="604" Name="m54007_160109_025449/27394483/671_67_CCS"/>
+			<Contig Description="strand=-;fiveseen=1;polyAseen=1;threeseen=1;fiveend=31;polyAend=623;threeend=663;primer=1;chimera=0" Digest="DEPRECATED" Length="592" Name="m54007_160109_025449/27394562/661_69_CCS"/>
+			<Contig Description="strand=+;fiveseen=1;polyAseen=1;threeseen=1;fiveend=38;polyAend=729;threeend=816;primer=1;chimera=0" Digest="DEPRECATED" Length="691" Name="m54007_160109_025449/27394643/38_729_CCS"/>
+			<Contig Description="strand=+;fiveseen=1;polyAseen=1;threeseen=1;fiveend=32;polyAend=649;threeend=688;primer=1;chimera=0" Digest="DEPRECATED" Length="617" Name="m54007_160109_025449/27394736/32_649_CCS"/>
+		</Contigs>
+	</DataSetMetadata>
+</ContigSet>

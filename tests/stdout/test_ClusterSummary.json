@@ -1,0 +1,20 @@
+{
+    "_changelist": "UNKNOWN", 
+    "_version": "0.3.3", 
+    "attributes": [
+        {
+            "id": "pbtranscript_cluster.num_consensus_isoforms", 
+            "name": "Number of unpolished consensus isoforms", 
+            "value": 97
+        }, 
+        {
+            "id": "pbtranscript_cluster.avg_consensus_isoform_length", 
+            "name": "Average unpolished consensus isoforms read length", 
+            "value": 3945
+        }
+    ], 
+    "dataset_uuids": [], 
+    "id": "pbtranscript_cluster", 
+    "plotGroups": [], 
+    "tables": []
+}
