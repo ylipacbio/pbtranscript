@@ -61,10 +61,9 @@ class IceQuiver(IceFiles):
             errMsg = "Log dir {l} is not an existing directory.".\
                 format(l=self.log_dir)
         elif self.bas_fofn is None:
-            errMsg = "Please specify bas_fofn (e.g. input.fofn)."
+            errMsg = "Please specify subreads file (e.g., --bas_fofn=input.fofn|subreadset.xml)."
         elif not nfs_exists(self.bas_fofn):
-            errMsg = "bas_fofn {f} ".format(f=self.bas_fofn) + \
-                     "which specifies subreads does not exist."
+            errMsg = "Specified subreads file (bas_fofn={f}) does not exist.".format(f=self.bas_fofn)
         elif not nfs_exists(self.nfl_all_pickle_fn):
             #"output/map_noFL/noFL.ALL.partial_uc.pickle"):
             errMsg = "Pickle file {f} ".format(f=self.nfl_all_pickle_fn) + \
@@ -76,8 +75,8 @@ class IceQuiver(IceFiles):
                      "which assigns full-length non-chimeric reads to " + \
                      "isoforms does not exist."
 
-
-        if guess_file_format(self.bas_fofn) is not FILE_FORMATS.BAM:
+        if self.bas_fofn is not None and \
+            guess_file_format(self.bas_fofn) is not FILE_FORMATS.BAM:
             # No need to convert subreads.bam to fasta
             if self.fasta_fofn is None:
                 errMsg = "Please make sure ice_make_fasta_fofn has " + \
