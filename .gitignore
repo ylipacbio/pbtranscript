@@ -2,3 +2,5 @@ setuptools_cython*
 .eggs
 pbtranscript/ice/C/*.cpp
 pbtranscript/ice/C/*.c
+tests/out
+tests/regression/current-run

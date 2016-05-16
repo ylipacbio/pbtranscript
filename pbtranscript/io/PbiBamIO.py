@@ -1,37 +1,23 @@
-# pylint: disable=R0921
-# pylint: disable=W0223
-
+# pylint: disable=abstract-method
 """
 Defines classes for fetching data from a collection of original SMRTCell bam
 files, and for writing bam files.
 """
 
-__all__ = [ "PbiBamReader",
-            "BamCollection",
-            "BamHeader",
-            "BamWriter"]
-
-
 import os.path as op
-
 import numpy as np
 import pysam
 
-from pbcore.util.Process import backticks
-from pbcore.io import (DataSet, ReadSet, SubreadSet, ConsensusReadSet,
-                       ContigSet, FastaReader, openDataFile, openDataSet)
-from pbcore.io.dataset.DataSetMembers import Filters
+from pbcore.io import (SubreadSet, ConsensusReadSet,
+                       ContigSet, FastaReader, openDataFile, openDataSet, IndexedBamReader)
 from pbcore.io import BamAlignment
 
-from pbtranscript.Utils import get_files_from_file_or_fofn, \
-        guess_file_format, FILE_FORMATS
+from pbtranscript.Utils import get_files_from_file_or_fofn
 
 
-def _intersectRanges(r1, r2):
-    b1, e1 = r1
-    b2, e2 = r2
-    b, e = max(b1, b2), min(e1, e2)
-    return (b, e) if (b < e) else None
+__all__ = ["BamCollection",
+           "BamHeader",
+           "BamWriter"]
 
 
 class BamZmw(object):
@@ -39,20 +25,20 @@ class BamZmw(object):
     """Represent zmws in bam file, like Zmw in pbcore.io"""
 
     def __init__(self, bamRecords, isCCS):
-        if type(bamRecords) == list:
-            assert(len(bamRecords) > 0)
-            assert(isinstance(bamRecords[0], BamAlignment))
+        if isinstance(bamRecords, list):
+            assert len(bamRecords) > 0
+            assert isinstance(bamRecords[0], BamAlignment)
         else:
-            assert(isinstance(bamRecords, BamAlignment))
+            assert isinstance(bamRecords, BamAlignment)
             bamRecords = [bamRecords]
-        assert(len(bamRecords) >= 1)
+        assert len(bamRecords) >= 1
         self.bamRecords = bamRecords
         self._isCCS = isCCS
         if self._isCCS:
-            assert(len(bamRecords) == 1)
+            assert len(bamRecords) == 1
         if not all([b.holeNumber == self.holeNumber for b in bamRecords]):
             raise ValueError("%s's input reads must come from same zmw." %
-                              self.__class__.__name__)
+                             self.__class__.__name__)
 
     @property
     def holeNumber(self):
@@ -84,7 +70,7 @@ class BamZmw(object):
         contains subreads."""
         if not self.IsCCS:
             return None
-        assert(len(self.bamRecords) == 1)
+        assert len(self.bamRecords) == 1
         return BamCCSZmwRead(self, self.bamRecords[0], self.holeNumber)
 
     @property
@@ -124,8 +110,7 @@ def _findBamRecord(bamRecords, readStart, readEnd):
     return the first record which covers interval [readStart, readEnd).
     """
     for bamRecord in bamRecords:
-        if (bamRecord.qStart <= readStart and
-            bamRecord.qEnd   >= readEnd):
+        if bamRecord.qStart <= readStart and bamRecord.qEnd >= readEnd:
             return bamRecord
     return None
 
@@ -137,11 +122,11 @@ class BamZmwRead(object):
 
     def __init__(self, zmw, bamRecord, holeNumber,
                  readStart=None, readEnd=None):
-        assert(type(zmw) == BamZmw)
+        assert isinstance(zmw, BamZmw)
         self.zmw = zmw
         self.bamRecord = bamRecord
-        assert(type(self.bamRecord) == BamAlignment)
-        assert(holeNumber == self.zmw.holeNumber)
+        assert isinstance(self.bamRecord, BamAlignment)
+        assert holeNumber == self.zmw.holeNumber
         if readStart is not None:
             self.readStart = readStart
         else:
@@ -276,12 +261,12 @@ class BamZmwRead(object):
         ret.query_sequence = peer.query_sequence[s:e]
         ret.flag = peer.flag
 
-        assert(peer.reference_id == -1)
-        assert(peer.reference_start == -1)
-        assert(peer.cigartuples is None)
-        assert(peer.next_reference_id == -1)
-        assert(peer.next_reference_start == -1)
-        assert(peer.template_length == 0)
+        assert peer.reference_id == -1
+        assert peer.reference_start == -1
+        assert peer.cigartuples is None
+        assert peer.next_reference_id == -1
+        assert peer.next_reference_start == -1
+        assert peer.template_length == 0
 
         ret.reference_id = peer.reference_id
         ret.reference_start = peer.reference_start
@@ -300,9 +285,8 @@ class BamZmwRead(object):
         for index, (tag_name, tag_val) in enumerate(tags):
             if tag_name in QV_TAGS:
                 if self.__len__() != len(tag_val):
-                    raise ValueError ("%s's %s length %d ! = sequence length %d" %
-                                      (peer.query_name, tag_name,
-                                       len(tag_val), self.__len__()))
+                    raise ValueError("%s's %s length %d ! = sequence length %d" %
+                                     (peer.query_name, tag_name, len(tag_val), self.__len__()))
                 tags[index] = (tag_name, tag_val[s:e])
             elif tag_name == 'qs':
                 tags[index] = (tag_name, int(readStart))
@@ -312,15 +296,15 @@ class BamZmwRead(object):
         ret.tags = tags
         return ret
 
-    def __delitem__(self):
+    def __delitem__(self, dummy_name):
         raise NotImplementedError("%s.%s" % (self.__class__.__name__,
                                              "__delitem__"))
 
-    def __setitem__(self):
+    def __setitem__(self, dummy_index, dummy_name):
         raise NotImplementedError("%s.%s" % (self.__class__.__name__,
                                              "__setitem__"))
 
-    def __getitem__(self):
+    def __getitem__(self, key):
         raise NotImplementedError("%s.%s" % (self.__class__.__name__,
                                              "__getitem__"))
 
@@ -333,211 +317,15 @@ class BamCCSZmwRead(BamZmwRead):
         return "%s/ccs" % self.zmw.zmwName
 
 
-class ReaderAndRowNumber(object):
-
-    """Associate BamReader objects with row number."""
-    __slots__ = ["reader", "rowNumber", "bamRecord"]
-
-    def __init__(self, reader, rowNumber):
-        self.reader = reader
-        self.rowNumber = rowNumber
-
-    @property
-    def bamRecord(self):
-        """Return associated BamAlignment object."""
-        return self.reader[self.rowNumber]
-
-
-# FIXME this still assumes that individual .bam files contain reads from a
-# single movie.  It works anyway if we specify a movie ID (as is done from
-# BamCollection), but the code makes some assumptions about ZMW range.
-class PbiBamReader(object):
-    """
-    Wrapper for providing keyed retrieval of reads.  Input dataset may be
-    copied from another existing one, or read from a bam file or a fofn of bam
-    files, assuming all reads come from the same SMRTCell, and are of the same
-    type: either subreads or ccs.
-    e.g., *.subreads.bam,
-    *.1.subreads.bam, *.2.subreads.bam, *.3.subreads.bam, or
-    *.1.ccs.bam, *.2.ccs.bam and *.3.ccs.bam.
-
-        reader = PbiBamReader(bam)
-        zmw8 = reader[8]
-        subreads = zmw8.subreads
-        ccsread  = zwm8.ccsRead
-        read     = zwm8.read()
-        subreads[0].readName
-        subreads[0].basecalls()
-        subreads[0].InsertionQV()
-    """
-
-    def __init__(self, dataset, *args, **kwds):
-        if isinstance(dataset, DataSet):
-            self._dataset = dataset
-        else:
-            self._dataset = openDataFile(*([dataset]+list(args)))
-        if not isinstance(self._dataset, (SubreadSet, ConsensusReadSet)):
-            raise TypeError("Input must be a SubreadSet or ConsensusReadSet.")
-        self._movieName = kwds.get("movie_name", None)
-        #if guess_file_format(self.bamFileNames) != FILE_FORMATS.BAM:
-        #    raise IOError("%s can only read pacbio bam files or fofn" %
-        #                  self.__class__.__name__)
-
-        self._header = BamHeader(ignore_pg=True)
-        self._indexedReaders = []
-        self._hnranges = []
-
-        for i_r, reader in enumerate(self._dataset.resourceReaders()):
-            movie_ids = set([ rg.MovieName for rg in reader.readGroupTable ])
-            if self._movieName is None:
-                if len(movie_ids) > 1:
-                    raise RuntimeError("Multiple movies found in %s" %
-                        reader.filename)
-                self._movieName = list(movie_ids)[0]
-            else:
-                for rg in reader.readGroupTable:
-                    if rg.MovieName == self._movieName:
-                        break
-                else:
-                    continue
-            self._header.add(reader.peer.header)
-            self._indexedReaders.append(i_r)
-            # FIXME this seems risky
-            _hnrange = (min(reader.holeNumber), max(reader.holeNumber))
-            if any(_intersectRanges(_hnrange, hnr) is not None for hnr in self._hnranges):
-                raise ValueError ("%s's zmw range [%d, %d] should not " %
-                                  (reader.filename, _hnrange[0], _hnrange[1]) +
-                                  "intersect with another file.")
-            self._hnranges.append(_hnrange)
-
-    def _get_reader(self, i_reader):
-        """Return the i-th reader."""
-        return self._dataset.resourceReaders()[i_reader]
-
-    @property
-    def movieName(self):
-        """return movie name of smrtcells to read."""
-        return self._movieName
-
-    @property
-    def readType(self):
-        """CCS or SUBREAD?"""
-        if isinstance(self._dataset, ConsensusReadSet):
-            return "CCS"
-        else:
-            return "SUBREAD"
-
-    def hn2reader(self, hn):
-        """Return an IndexedBamReader in self._indexedReader which
-        contains zmw hole number.
-        self._indexedReaders should contain IndexedBamReaders for
-        [*.1.subreads.bam, *.2.subreads.bam, *.3.subreads.bam]. Typical
-        RS SMRTCell zmw ranges are:
-        [(0, 54493), (54494, 108987), (108988, 170000).
-        """
-        for index, hnr in enumerate(self._hnranges):
-            if hnr[0] <= hn and hnr[1] >= hn:
-                return self._get_reader(self._indexedReaders[index])
-
-    @property
-    def header(self):
-        """Merged bam header."""
-        return self._header
-
-    @property
-    def IsCCS(self):
-        """True if reads from a ccs bam."""
-        return self.readType == "CCS"
-
-    # FIXME note that this will probably blow away any attempted chunking by
-    # ZMW
-    def __iter__(self):
-        """Iterate over ZMWs"""
-        for _hn in sorted(set(self.holeNumber)):
-            yield self[_hn]
-
-    @property
-    def holeNumber(self):
-        """Return holeNumbers"""
-        readers = [ self._get_reader(i) for i in self._indexedReaders ]
-        return np.concatenate(tuple(ir.holeNumber for ir in readers))
-
-    def subreads(self):
-        """Iterate over all subreads of bam files."""
-        # bam with mixed ccs reads and subreads not supported.
-        if not self.IsCCS:
-            for _hn in self.holeNumber:
-                for subread in self._getitemScalar[_hn].subreads:
-                    yield subread
-
-    def ccsReads(self):
-        """Iterate over all ccs reads of bam files."""
-        if self.IsCCS:
-            for _hn in self.holeNumber:
-                yield self._getitemScalar(_hn).ccsRead
-
-    def __len__(self):
-        """Return total number of zmws."""
-        return len(self.holeNumber)
-
-    def _getitemScalar(self, hn):
-        """Return BamZmw given hole number."""
-        zmwName = "%s/%d" % (self.movieName, hn)
-        hnreader = self.hn2reader(hn)
-
-        if hn not in hnreader.holeNumber:
-            raise ValueError("Could not access %s" % zmwName)
-        else:
-            return BamZmw(hnreader.readsByName(zmwName), isCCS=self.IsCCS)
-
-    def __getitem__(self, holeNumbers):
-        if (isinstance(holeNumbers, int) or
-                issubclass(type(holeNumbers), np.integer)):
-            return self._getitemScalar(holeNumbers)
-        elif isinstance(holeNumbers, slice):
-            raise NotImplementedError("%s.__getitem__(slice)" %
-                                      self.__class__.__name__)
-        elif (isinstance(holeNumbers, list) or
-              isinstance(holeNumbers, np.ndarray)):
-            if len(holeNumbers) == 0:
-                return []
-            else:
-                entryType = type(holeNumbers[0])
-                if entryType == int or issubclass(entryType, np.integer):
-                    return [self._getitemScalar(r) for r in holeNumbers]
-                elif entryType == bool or issubclass(entryType, np.bool_):
-                    return [self._getitemScalar(r) for r in np.flatnonzero(holeNumbers)]
-        raise TypeError("Invalid type for %s slicing" %
-                        self.__class__.__name__)
-
-    def __delitem__(self):
-        raise NotImplementedError("%s.%s" % (self.__class__.__name__,
-                                             "__delitem__"))
-
-    def __setitem__(self):
-        raise NotImplementedError("%s.%s" % (self.__class__.__name__,
-                                             "__setitem__"))
-
-    def close(self):
-        """Close all bam readers."""
-        self._dataset.close()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
-
-    def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self.movieName)
-
-
 class BamCollection(object):
     """
-    Class representing a collection of `original` PacBio bam files.
+    Class wraps PacBio bam fofn or datasets.
 
     Can be initialized from a list of bam files, or an input.fofn
-    file containing a list of bam files
+    file containing a list of bam files, or a subreads dataset or a
+    ccs dataset.
+
+    Note that ALL bam files MUST have pbi index generated.
     """
 
     def __init__(self, *args):
@@ -546,139 +334,149 @@ class BamCollection(object):
         self._dataset = openDataFile(*args)
         # Implementation notes: find all the bam files, and group
         # them together by movieName
-        movies = set()
+        self._header = BamHeader(ignore_pg=True)
 
         for bam in self._dataset.resourceReaders():
+            if not isinstance(bam, IndexedBamReader):
+                raise ValueError("%s in %s must have pbi index generated",
+                                 bam.filename, str(self._dataset))
+            self._header.add(bam.peer.header)
             for rg in bam.peer.header["RG"]: #readGroupTable:
                 if rg['PL'] != "PACBIO":
-                    raise IOError("Could not process file %s, " %
-                        self.__class__.__name__ +
-                        "input files must be orignal PacBio bam movies.")
+                    raise IOError("Input BAM file %s for %s must be PacBio BAM.",
+                                  bam.filename, self.__class__.__name__)
             for rg in bam.readGroupTable:
-                movies.add(rg.MovieName)
                 assert rg.ReadType in ["CCS", "SUBREAD"]
-        self._movieDataSets = {}
-        for movie_id in movies:
-            ds2 = self._dataset.copy()
-            filt = Filters()
-            filt.addRequirement(movie=[('==', movie_id)])
-            ds2.addFilters(filt)
-            self._movieDataSets[movie_id] = PbiBamReader(ds2,
-                movie_name=movie_id)
 
     @property
     def movieNames(self):
         """Return movie names as a list of string."""
-        return self._movieDataSets.keys()
-
-    @property
-    def readers(self):
-        """Return all internal readers of this BamCollection."""
-        return self._movieDataSets
-
-    def _get_reader(self, movie_id):
-        """Return reader for movie = movie_id."""
-        ds = self._movieDataSets[movie_id]
-        assert ds.movieName == movie_id
-        return ds
+        return self._dataset.movieIds.keys()
 
     @property
     def header(self):
         """Return a BamHeader object which combines headers from
         all readers.
         """
-        return BamHeader([reader.header for reader in self.readers.values()])
+        return self._header
+
+    @property
+    def isCCS(self):
+        """Is CCS read set?"""
+        return isinstance(self._dataset, ConsensusReadSet)
+
+    @property
+    def isSubread(self):
+        """Is Subread read set?"""
+        return isinstance(self._dataset, SubreadSet)
 
     def __getitem__(self, key):
         """
         Slice by movie name, zmw name, or zmw range name, using standard
         PacBio naming conventions.  Examples:
 
-          - ["m110818_..._s1_p0"]             -> PbiBamReader
-          - ["m110818_..._s1_p0/24480"]       -> Zmw
+          - ["m110818_..._s1_p0"]             -> new dataset filtered on movie name
+          - ["m110818_..._s1_p0/24480"]       -> BamZmw
           - ["m110818_..._s1_p0/24480/20_67"] -> ZmwRead
           - ["m110818_..._s1_p0/24480/ccs"]   -> CCSZmwRead
         """
         if not isinstance(key, str):
-            raise KeyError("key %s is not a string." % key)
+            raise KeyError("%s key %s is not a string." % (self.__class__.__name__, key))
 
         indices = key.rstrip("/").split("/")
 
         if len(indices) < 1:
-            raise KeyError("Invalid slice of %s" % self.__class__.__name__)
+            raise KeyError("%s invalid slice: %s" % (self.__class__.__name__, key))
 
-        if len(indices) >= 1:
-            result = self._get_reader(indices[0])
-        if len(indices) >= 2:
-            result = result[int(indices[1])]
+        _movie = indices[0]
+        if len(indices) == 1:
+            ds2 = self._dataset.copy()
+            ds2.filters.addRequirement(movie=[('==', _movie)])
+            return ds2
+
+        _hn = int(indices[1])
+        # for efficiency: first select on hn, then movie name.
+        _reads = self._dataset[self._dataset.index.holeNumber == _hn]
+        _reads = [_read for _read in _reads if _read.movieName == _movie]
+        if len(_reads) == 0:
+            raise KeyError("Could not find %s in %s" % (key, str(self._dataset)))
+
+        _zmw = BamZmw(bamRecords=_reads, isCCS=self.isCCS)
+        if len(indices) == 2:
+            return _zmw
+
         if len(indices) >= 3:
             if indices[2].lower() == "ccs":
-                result = result.ccsRead
+                return _zmw.ccsRead
             else:
-                start, end = map(int, indices[2].split("_"))
-                result = result.read(start, end)
-        return result
+                start, end = (int(x) for x in indices[2].split("_"))
+                return _zmw.read(start, end)
 
-    #
-    # Iterators over Zmw, ZmwRead objects
-    #
+        raise KeyError("%s invalid slice: %s" % (self.__class__.__name__, key))
 
     def __iter__(self):
-        for reader in self.readers.values():
-            for zmw in reader:
-                yield zmw
+        """Iterators over Zmw, ZmwRead objects.
+        """
+        _qid_hns = np.unique(self._dataset.index[['qId', 'holeNumber']])
+        for _movie in self.movieNames:
+            ds2 = self._dataset.copy()
+            ds2.filters.addRequirement(movie=[('==', _movie)])
+            _movie_id = self._dataset.movieIds[_movie]
+            for (__movie_id, _hn) in _qid_hns:
+                if __movie_id == _movie_id:
+                    _reads = ds2[ds2.index.holeNumber == _hn]
+                    assert all([_read.movieName == _movie for _read in _reads])
+                    if len(_reads) > 0:
+                        yield BamZmw(bamRecords=_reads, isCCS=self.isCCS)
 
     def reads(self):
         """Iterate over all reads"""
-        for reader in self.readers.values():
-            for read in reader.reads():
-                yield read
+        for r in self._dataset:
+            yield r
 
     def subreads(self):
         """Iterate over all subreads."""
-        for reader in self.readers.values():
-            for read in reader.subreads():
-                yield read
+        if self.isSubread:
+            for r in self._dataset:
+                yield r
 
     def ccsReads(self):
         """Iterate over all ccs reads."""
-        for reader in self.readers.values():
-            for read in reader.ccsReads():
-                yield read
+        if self.isCCS:
+            for r in self._dataset:
+                yield r
 
     def __repr__(self):
         return "<%s of movies:\n%s>" % (self.__class__.__name__,
-                "\n".join(self.movieNames))
+                                        "\n".join(self.movieNames))
 
-    def __delitem__(self):
+    def __delitem__(self, dummy_name):
         raise NotImplementedError("%s.%s" % (self.__class__.__name__,
                                              "__delitem__"))
 
-    def __setitem__(self):
+    def __setitem__(self, dummy_index, dummy_name):
         raise NotImplementedError("%s.%s" % (self.__class__.__name__,
                                              "__setitem__"))
 
     def __len__(self):
         """Return total number of zmws in all movies."""
-        return sum([len(self.readers[m]) for m in self.movieNames])
+        return len(np.unique(self._dataset.index[['qId', 'holeNumber']]))
 
     def close(self):
         """Close all readers."""
-        for movie in self.movieNames:
-            self.readers[movie].close()
+        self._dataset.close()
 
     def __enter__(self):
         return self
 
-    def __exit__(self):
+    def __exit__(self, exception_type, exception_value, traceback):
         return self.close()
-
 
 HDHEADERTAG = 'HD'
 RGHEADERTAG = 'RG'
 SQHEADERTAG = 'SQ'
 PGHEADERTAG = 'PG'
-HEADERTAGS  = [HDHEADERTAG, RGHEADERTAG, SQHEADERTAG, PGHEADERTAG]
+HEADERTAGS = [HDHEADERTAG, RGHEADERTAG, SQHEADERTAG, PGHEADERTAG]
 
 
 class BamHeader(object):
@@ -694,7 +492,7 @@ class BamHeader(object):
         if headers is None:
             pass
         elif isinstance(headers, dict):
-            assert(all([tag in headers for tag in HEADERTAGS]))
+            assert all([tag in headers for tag in HEADERTAGS])
             self._dict = headers
         elif isinstance(headers, list):
             for _header in headers:
@@ -787,11 +585,10 @@ class BamHeader(object):
     def __repr__(self):
         maxn = 100
         return "<%s: %d RG, %d SN>\n" % (
-                self.__class__.__name__,
-                len(self.readGroups),
-                len(self.referenceSequences)) + \
-               "RGs [%s]\n" % (", ".join([rg['ID'] for rg in self.readGroups])[0:maxn]) + \
-               "SNs [%s]\n" % (", ".join([sn['SN'] for sn in self.referenceSequences])[0:maxn])
+            self.__class__.__name__, len(self.readGroups),
+            len(self.referenceSequences)) + \
+            "RGs [%s]\n" % (", ".join([rg['ID'] for rg in self.readGroups])[0:maxn]) + \
+            "SNs [%s]\n" % (", ".join([sn['SN'] for sn in self.referenceSequences])[0:maxn])
 
 
 class BamWriter(object):
@@ -906,15 +703,15 @@ class CCSInput(object):
                     n += len([r for r in rr])
                 return n
 
-    def __delitem__(self):
+    def __delitem__(self, dummy_name):
         raise NotImplementedError("%s.%s" % (self.__class__.__name__,
                                              "__delitem__"))
 
-    def __setitem__(self):
+    def __setitem__(self, dummy_index, dummy_name):
         raise NotImplementedError("%s.%s" % (self.__class__.__name__,
                                              "__setitem__"))
 
-    def __getitem__(self):
+    def __getitem__(self, key):
         raise NotImplementedError("%s.%s" % (self.__class__.__name__,
                                              "__getitem__"))
 
