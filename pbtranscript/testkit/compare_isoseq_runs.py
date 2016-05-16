@@ -70,6 +70,25 @@ def calc_sim_matrix(uc1, uc2):
     return S, keys1, keys2, m, n
 
 
+def get_seq_similarity(lhs_seq, rhs_seq):
+    """Return percentage sequence similarity."""
+    lhs_tmp_f = 'lhs_%s.fasta' % (lhs_seq.name.split(' ')[0].replace('/', '_'))
+    rhs_tmp_f = 'rhs_%s.fasta' % (rhs_seq.name.split(' ')[0].replace('/', '_'))
+
+    with FastaWriter(lhs_tmp_f) as writer:
+        writer.writeRecord(lhs_seq.name.split(' ')[0], lhs_seq.sequence)
+
+    with FastaWriter(rhs_tmp_f) as writer:
+        writer.writeRecord(rhs_seq.name.split(' ')[0], rhs_seq.sequence)
+
+    cmd = "blasr %s %s -m 4 -bestn 1 2>/dev/null |cut -f 4 -d ' ' " % (lhs_tmp_f, rhs_tmp_f)
+    o, c, e = backticks(cmd)
+    assert c==0
+
+    backticks('rm %s %s' % (lhs_tmp_f, rhs_tmp_f))
+    return float(o[0])
+
+
 class Compare_Isoseq_Runs(object):
     """Compare two isoseq runs, including
     init.uc.pickle
@@ -178,7 +197,7 @@ class Compare_Isoseq_Runs(object):
         rhs_ref_seqs = [r.sequence for r in FastaReader(rhs_ref_consensus)]
 
         OK = (lhs_ref_seqs == rhs_ref_seqs)
-        print "Q: Unpolished cluster sequences in ref_consensus identical?"
+        print "Q: Unpolished cluster sequences in output/final.consensus.fasta identical?"
         print "A: %s (%d vs %d)" % (OK, len(lhs_ref_seqs), len(rhs_ref_seqs))
         self._submit(OK)
         return OK
@@ -214,8 +233,8 @@ class Compare_Isoseq_Runs(object):
             rhs_filtered_seqs.sort(lambda a,b: cmp(a.name, b.name))
         OK = True
         for i in range(0, min(len(lhs_filtered_seqs), len(rhs_filtered_seqs))):
-            lhs_seq, rhs_seq = lhs_filtered_seqs[i].sequence, rhs_filtered_seqs[i].sequence
-            seq_similarity = difflib.SequenceMatcher(None, lhs_seq.lower(), rhs_seq.lower()).ratio()
+            lhs_seq, rhs_seq = lhs_filtered_seqs[i], rhs_filtered_seqs[i]
+            seq_similarity = get_seq_similarity(lhs_seq, rhs_seq)
             if (seq_similarity < min_seq_similarity):
                 OK = False
                 print "sequence similarity between lhs (%s) and rhs (%s): %f" % \
