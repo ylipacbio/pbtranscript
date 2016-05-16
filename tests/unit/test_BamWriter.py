@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """Test classes defined within pbtranscript.io.PbiBamIO."""
 import unittest
 import os.path as op
@@ -12,7 +14,7 @@ from pbcore.util.Process import backticks
 
 def compareBamRecords(this, other):
     """Compare this (a BamAlignment object) with other
-      (a PbiBamReader.BamZmwRead object)"""
+      (a BamZmwRead object)"""
     assert(isinstance(this, BamAlignment) and
            isinstance(other, BamZmwRead))
     return (this.readName == other.readName    and

@@ -1,6 +1,6 @@
 import sys
 from pbcore.io import BasH5Reader
-from pbtranscript.io import PbiBamReader
+from pbtranscript.io import BamCollection 
 from cpython cimport bool
 from libc.math cimport pow
 from libcpp.deque cimport deque
@@ -19,11 +19,15 @@ cpdef precache_helper(char * bas_file, list seqids, list QV_names, dict qv_dict)
     cdef char strand
     cdef double qv
 
+    cdef bool is_bam
+
+    is_bam = False
     # qv_dict = {} # seqid --> qv_name --> list of qv (transformed to prob)
     if (bas_file.endswith("h5")):
         bas = BasH5Reader(bas_file)
     elif bas_file.endswith("bam") or bas_file.endswith("xml"):
-        bas = PbiBamReader(bas_file)
+        bas = BamCollection(bas_file)
+        is_bam = True
     else:
         raise IOError("Unable to precache QV for %s" % bas_file)
 
@@ -48,7 +52,11 @@ cpdef precache_helper(char * bas_file, list seqids, list QV_names, dict qv_dict)
 
         qv_dict[seqid] = {}
         for qv_name in QV_names:
-            zmw = bas[hn]
+            zmw = None
+            if not is_bam:
+                zmw = bas[hn]
+            else:
+                zmw = bas["%s/%s" % (movie, hn)]
             if is_CCS:
                 if zmw.ccsRead is not None:
                     qvs = zmw.ccsRead.qv(qv_name)[s:e]
