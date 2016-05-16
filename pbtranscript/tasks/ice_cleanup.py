@@ -15,6 +15,7 @@ from pbcommand.models import FileTypes
 from pbcommand.utils import setup_log
 
 from pbtranscript.Utils import execute
+from pbtranscript.ice.IceFiles import IceFiles
 from pbtranscript.PBTranscriptOptions import get_base_contract_parser
 from pbtranscript.tasks.TPickles import ChunkTasksPickle, ClusterChunkTask
 
@@ -69,10 +70,17 @@ def resolved_tool_contract_runner(rtc):
     sentinel_out = rtc.task.output_files[0]
     with open(sentinel_out, 'w') as writer:
         for task in p:
-            tmp_dir = op.join(task.cluster_out_dir, "tmp")
-            log.info("Cleaning up, removing task.cluster_out_dir %s", tmp_dir)
+            icef = IceFiles(prog_name="ice_cleanup",
+                            root_dir=task.cluster_out_dir)
+            tmp_dir = icef.tmp_dir
+            log.info("Cleaning up, removing %s", tmp_dir)
             writer.write("removing %s\n" % tmp_dir)
             execute("rm -rf %s" % tmp_dir)
+
+            quivered_dir = icef.quivered_dir
+            log.info("Cleaning up, removing %s", quivered_dir)
+            writer.write("removing %s\n" % quivered_dir)
+            execute("rm -rf %s" % quivered_dir)
 
 
 def main():

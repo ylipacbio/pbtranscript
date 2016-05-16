@@ -51,7 +51,7 @@ class BamZmw(object):
         return self.bamRecords[0].qName.split("/")[0]
 
     @property
-    def IsCCS(self):
+    def isCCS(self):
         """True if this zmw has ccs reads; False otherwise."""
         return self._isCCS
 
@@ -68,7 +68,7 @@ class BamZmw(object):
     def ccsRead(self):
         """Return ccs read of this zmw. None if this zmw only
         contains subreads."""
-        if not self.IsCCS:
+        if not self.isCCS:
             return None
         assert len(self.bamRecords) == 1
         return BamCCSZmwRead(self, self.bamRecords[0], self.holeNumber)
@@ -76,7 +76,7 @@ class BamZmw(object):
     @property
     def subreads(self):
         """Return a list of subreads of this zmw."""
-        if self.IsCCS:
+        if self.isCCS:
             return []
         return [BamZmwRead(self, _record, self.holeNumber)
                 for _record in self.bamRecords]
@@ -95,7 +95,7 @@ class BamZmw(object):
             else:
                 _record = self.bamRecords[0]
                 readStart, readEnd = 0, _record.qLen
-                if not self.IsCCS:
+                if not self.isCCS:
                     readStart, readEnd = _record.qStart, _record.qEnd
         else:
             _record = _findBamRecord(self.bamRecords, readStart, readEnd)
