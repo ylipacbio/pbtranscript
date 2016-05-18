@@ -49,14 +49,15 @@ def check_blasr(required_min_version=5.1):
     if _c == 0:
         try:
             v = float('.'.join(_o[0].split()[1].split('.')[0:2]))
-            assert(v >= required_min_version)
+            if v < required_min_version:
+                succeed = False
         except Exception:
             succeed = False
     else:
         succeed = False
 
     if not succeed:
-        msg = "blasr not installed or version %s < %s" % (v, required_min_version)
+        msg = "blasr not installed or version < %s" % (required_min_version)
         logging.error(msg)
         raise RuntimeError(msg)
 
