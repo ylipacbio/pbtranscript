@@ -67,11 +67,11 @@ def choose_template_by_blasr(fasta_filename, out_filename, nproc=8,
     """
     fd = FastaRandomReader(fasta_filename)
 
-    cmd = "blasr -nproc {nproc} ".format(nproc=nproc) + \
-          "-maxScore {score} ".format(score=maxScore) + \
-          "-maxLCPLength 15 -bestn 10 -nCandidates 50 " + \
+    cmd = "blasr --nproc {nproc} ".format(nproc=nproc) + \
+          "--maxScore {score} ".format(score=maxScore) + \
+          "--maxLCPLength 15 --bestn 10 --nCandidates 50 " + \
           "-m 1 {fa} {fa} ".format(fa=fasta_filename) + \
-          "-out {out} ".format(out=out_filename) + \
+          "--out {out} ".format(out=out_filename) + \
           "1>/dev/null 2>/dev/null"
 
     out, code, msg = backticks(cmd)
@@ -134,9 +134,9 @@ def make_aln_input_to_ref(fasta_filename, ref_filename,
     tmp_out = "{out}.tmp".format(out=out_filename)
 
     cmd = "blasr {infa} ".format(infa=fasta_filename) + \
-          "{ref} -bestn 1 ".format(ref=ref_filename) + \
-          "-nproc {nproc} ".format(nproc=nproc) + \
-          "-m 5 -out {out} ".format(out=tmp_out) + \
+          "{ref} --bestn 1 ".format(ref=ref_filename) + \
+          "--nproc {nproc} ".format(nproc=nproc) + \
+          "-m 5 --out {out} ".format(out=tmp_out) + \
           "1>/dev/null 2>/dev/null"
 
     out, code, msg = backticks(cmd)

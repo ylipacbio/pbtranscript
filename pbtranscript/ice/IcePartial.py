@@ -221,12 +221,11 @@ def build_uc_from_partial(input_fasta, ref_fasta, out_pickle,
     out_pickle = realpath(out_pickle)
 
     cmd = "blasr {i} ".format(i=real_upath(input_fasta)) + \
-          "{r} -bestn 5 ".format(r=real_upath(_get_fasta_path(ref_fasta))) + \
-          "-nproc {n} -m 5 ".format(n=blasr_nproc) + \
-          "-maxScore -1000 -minPctIdentity 85 " + \
-          "-out {o} ".format(o=real_upath(m5_file))
-
-    cmd += "1>/dev/null 2>/dev/null"
+          "{r} --bestn 5 ".format(r=real_upath(_get_fasta_path(ref_fasta))) + \
+          "--nproc {n} -m 5 ".format(n=blasr_nproc) + \
+          "--maxScore -1000 --minPctIdentity 85 " + \
+          "--out {o} ".format(o=real_upath(m5_file)) + \
+          "1>/dev/null 2>/dev/null"
 
     execute(cmd)
 
@@ -387,5 +386,5 @@ def add_ice_partial_one_arguments(parser):
 # ToDo: comment OUT BLASR-related arguments; using DALIGNER
     arg_parser.add_argument("--blasr_nproc", dest="blasr_nproc",
                             type=int, default=12,
-                            help="blasr -nproc, number of CPUs [default: 12]")
+                            help="blasr --nproc, number of CPUs [default: 12]")
     return parser

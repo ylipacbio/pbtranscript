@@ -17,7 +17,7 @@ from pbtranscript.ice.IceInit import IceInit
 from pbtranscript.ice.IceIterative import IceIterative
 from pbtranscript.ice.IceUtils import fafn2fqfn, ice_fa2fq, \
         set_probqv_from_ccs, set_probqv_from_fq, set_probqv_from_model, \
-        sanity_check_daligner
+        check_blasr, sanity_check_daligner
 from pbtranscript.__init__ import get_version
 
 
@@ -171,6 +171,7 @@ class Cluster(IceFiles):
             self.add_log(errMsg, level=logging.ERROR)
             raise ValueError(errMsg)
 
+        check_blasr(required_min_version=5.1)
         sanity_check_daligner(self.script_dir)
 
     @property

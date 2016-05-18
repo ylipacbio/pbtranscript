@@ -80,7 +80,7 @@ class IceIterative(IceFiles):
             max_sge_jobs : maximum number of gcon jobs submitted
             unique_id   : unique qsub job id, important that this
                          DOES NOT CONFLICT!
-            blasr_nproc : blasr -nproc param, number of threads per cpu.
+            blasr_nproc : blasr --nproc param, number of threads per cpu.
 
         tmp_dir --- directory to save temporary files.
         """
@@ -863,11 +863,11 @@ class IceIterative(IceFiles):
 
             cmd = "blasr {qfa} ".format(qfa=real_upath(self.fasta_filename)) + \
                   "{tfa} ".format(tfa=real_upath(self.refConsensusFa)) + \
-                  "-m 5 -bestn 100 -nCandidates 100 -maxLCPLength 15 " + \
-                  "-nproc {n} ".format(n=self.blasr_nproc) + \
-                  "-maxScore {s} ".format(s=self.ice_opts.maxScore) + \
-                  "-sa {sa} ".format(sa=real_upath(saFN)) + \
-                  "-out {o} ".format(o=real_upath(blasrFN)) + \
+                  "-m 5 --bestn 100 --nCandidates 100 --maxLCPLength 15 " + \
+                  "--nproc {n} ".format(n=self.blasr_nproc) + \
+                  "--maxScore {s} ".format(s=self.ice_opts.maxScore) + \
+                  "--sa {sa} ".format(sa=real_upath(saFN)) + \
+                  "--out {o} ".format(o=real_upath(blasrFN)) + \
                   "1>/dev/null 2>/dev/null"
             msg = "Calling blasr to align input fasta file to ref_consensus"
             self.add_log(msg, level=logging.INFO)
@@ -1384,11 +1384,11 @@ class IceIterative(IceFiles):
             out = self.selfBlasrFN(fasta_filename)
             if op.exists(out):  # clean out the blasr file from the last run
                 os.remove(out)
-            cmd = "blasr {i} {i} -sa {i}.sa ".format(i=real_upath(fasta_filename)) + \
-                  "-bestn 20 -nCandidates 100 -minPctIdentity 95 -maxLCPLength 15 -m 5 " + \
-                  "-maxScore {s} ".format(s=self.ice_opts.maxScore) + \
-                  "-nproc {cpu} ".format(cpu=self.blasr_nproc) + \
-                  "-out {o} ".format(o=real_upath(out)) + \
+            cmd = "blasr {i} {i} --sa {i}.sa ".format(i=real_upath(fasta_filename)) + \
+                  "--bestn 20 --nCandidates 100 --minPctIdentity 95 --maxLCPLength 15 -m 5 " + \
+                  "--maxScore {s} ".format(s=self.ice_opts.maxScore) + \
+                  "--nproc {cpu} ".format(cpu=self.blasr_nproc) + \
+                  "--out {o} ".format(o=real_upath(out)) + \
                   "1>/dev/null 2>/dev/null"
             self.add_log("Calling blasr to self align " + fasta_filename)
             self.run_cmd_and_log(cmd)

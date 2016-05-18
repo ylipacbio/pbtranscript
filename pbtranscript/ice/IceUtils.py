@@ -40,6 +40,24 @@ GCON_OUT_FA = op.join(dataDir, "gcon_out.fasta")
 random.seed(0)
 
 
+def check_blasr(required_min_version=5.1):
+    """
+    blasr version >= 5.1
+    """
+    _o, _c, _e = backticks('blasr -version')
+    if _c == 0:
+        try:
+            v = float('.'.join(_o[0].split()[1].split('.')[0:2]))
+            assert(v >= required_min_version)
+        except Exception:
+            logging.error("blasr version %s < %s" % (v, required_min_version))
+            return False
+    else:
+        logging.error("blasr -version failed")
+        return False
+    return True
+
+
 def sanity_check_daligner(scriptDir, testDirName="daligner_test_dir"):
     """
     Run daligner on gcon_in.fa, but don't care about results.
@@ -767,10 +785,10 @@ def blasr_for_quiver(query_fn, ref_fasta, out_fn, bam=False,
     """
     cmd = "blasr {i} ".format(i=real_upath(query_fn)) + \
           "{r} ".format(r=real_upath(ref_fasta)) + \
-          "-nproc {n} ".format(n=blasr_nproc) + \
-          "-bestn 5 -nCandidates 10 " + \
-          ("-sam -clipping soft " if not bam else "-bam ") + \
-          "-out {o} ".format(o=real_upath(out_fn)) + \
+          "--nproc {n} ".format(n=blasr_nproc) + \
+          "--bestn 5 --nCandidates 10 " + \
+          ("--sam --clipping soft " if not bam else "--bam ") + \
+          "--out {o} ".format(o=real_upath(out_fn)) + \
           "1>/dev/null 2>/dev/null"
     if run_cmd:
         execute(cmd)
