@@ -172,11 +172,7 @@ class Cluster(IceFiles):
             self.add_log(errMsg, level=logging.ERROR)
             raise ValueError(errMsg)
 
-        if not check_blasr(required_min_version=5.1):
-            errMsg = "blasr version must >= 5.1"
-            self.add_log(errMsg, level=logging.ERROR)
-            raise RuntimeError(errMsg)
-
+        check_blasr(required_min_version=5.1)
         sanity_check_daligner(self.script_dir)
 
     @property
