@@ -167,11 +167,16 @@ class Cluster(IceFiles):
             if self.nfl_fa is None:
                 errMsg = "Non-full-length reads are required for polishing " + \
                          "consensus isoforms using quiver."
+
         if errMsg != "":
             self.add_log(errMsg, level=logging.ERROR)
             raise ValueError(errMsg)
 
-        check_blasr(required_min_version=5.1)
+        if not check_blasr(required_min_version=5.1):
+            errMsg = "blasr version must >= 5.1"
+            self.add_log(errMsg, level=logging.ERROR)
+            raise RuntimeError(errMsg)
+
         sanity_check_daligner(self.script_dir)
 
     @property
