@@ -81,7 +81,7 @@ def get_seq_similarity(lhs_seq, rhs_seq):
     with FastaWriter(rhs_tmp_f) as writer:
         writer.writeRecord(rhs_seq.name.split(' ')[0], rhs_seq.sequence)
 
-    cmd = "blasr %s %s -m 4 -bestn 1 2>/dev/null |cut -f 4 -d ' ' " % (lhs_tmp_f, rhs_tmp_f)
+    cmd = "blasr %s %s -m 4 --bestn 1 2>/dev/null |cut -f 4 -d ' ' " % (lhs_tmp_f, rhs_tmp_f)
     o, c, e = backticks(cmd)
     assert c==0
 

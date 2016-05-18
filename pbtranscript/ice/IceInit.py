@@ -42,11 +42,11 @@ class IceInit(object):
         else:
             cmd = "blasr {q} ".format(q=real_upath(queryFa)) + \
                   "{t} ".format(t=real_upath(targetFa)) + \
-                  "-m 5 -maxLCPLength 15 " + \
-                  "-nproc {cpu} ".format(cpu=sge_opts.blasr_nproc) + \
-                  "-maxScore {score} ".format(score=ice_opts.maxScore) + \
-                  "-bestn {n} -nCandidates {n} ".format(n=ice_opts.bestn) + \
-                  "-out {o} ".format(o=real_upath(outFN)) + \
+                  "-m 5 --maxLCPLength 15 " + \
+                  "--nproc {cpu} ".format(cpu=sge_opts.blasr_nproc) + \
+                  "--maxScore {score} ".format(score=ice_opts.maxScore) + \
+                  "--bestn {n} --nCandidates {n} ".format(n=ice_opts.bestn) + \
+                  "--out {o} ".format(o=real_upath(outFN)) + \
                   "1>/dev/null 2>/dev/null"
             logging.info("Calling {cmd}".format(cmd=cmd))
             execute(cmd)
