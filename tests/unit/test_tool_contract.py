@@ -95,31 +95,30 @@ class TestIcePartial(pbcommand.testkit.PbTestApp):
 # TODO ice_quiver_postprocess
 
 
-#@unittest.skipUnless(op.isdir(MNT_DATA), "Missing %s" % MNT_DATA)
-@unittest.skip("GMAP disabled")
-class TestGMAP(pbcommand.testkit.core.PbTestApp):
-    DRIVER_BASE = "python -m pbtranscript.tasks.gmap"
-    INPUT_FILES = [
-        op.join(MNT_DATA, "sa3", "nfl.contigset.xml"),
-        "/pbi/dept/secondary/siv/references/rat_UCSC/rat_UCSC.referenceset.xml",
-    ]
-    MAX_NPROC = 4
-    RESOLVED_NPROC = 4
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestGMAP, cls).setUpClass()
-        # XXX workaround for hardcoded paths in gmap_build
-        if not "_SMRT_GMAP_BIN" in os.environ:
-            top_dir = op.dirname(op.dirname(op.dirname(ROOT_DIR)))
-            prebuilt_dir = op.join(top_dir, "prebuilt.out")
-            if op.exists(prebuilt_dir):
-                gmap_dir = op.join(prebuilt_dir,
-                                   "gmap/gmap-2014-12-21/ubuntu-1404/gmap_home/bin")
-                os.environ["_SMRT_GMAP_BIN"] = gmap_dir
-                os.environ["PATH"] = ":".join([os.environ["PATH"], gmap_dir])
-            else:
-                raise OSError("Need to define _SMRT_GMAP_BIN")
+#@unittest.skip("GMAP disabled")
+#class TestGMAP(pbcommand.testkit.core.PbTestApp):
+#    DRIVER_BASE = "python -m pbtranscript.tasks.gmap"
+#    INPUT_FILES = [
+#        op.join(MNT_DATA, "sa3", "nfl.contigset.xml"),
+#        "/pbi/dept/secondary/siv/references/rat_UCSC/rat_UCSC.referenceset.xml",
+#    ]
+#    MAX_NPROC = 4
+#    RESOLVED_NPROC = 4
+#
+#    @classmethod
+#    def setUpClass(cls):
+#        super(TestGMAP, cls).setUpClass()
+#        # XXX workaround for hardcoded paths in gmap_build
+#        if not "_SMRT_GMAP_BIN" in os.environ:
+#            top_dir = op.dirname(op.dirname(op.dirname(ROOT_DIR)))
+#            prebuilt_dir = op.join(top_dir, "prebuilt.out")
+#            if op.exists(prebuilt_dir):
+#                gmap_dir = op.join(prebuilt_dir,
+#                                   "gmap/gmap-2014-12-21/ubuntu-1404/gmap_home/bin")
+#                os.environ["_SMRT_GMAP_BIN"] = gmap_dir
+#                os.environ["PATH"] = ":".join([os.environ["PATH"], gmap_dir])
+#            else:
+#                raise OSError("Need to define _SMRT_GMAP_BIN")
 
 
 ########################################################################
@@ -160,17 +159,17 @@ class TestScatterContigSet(ContigSetScatterBase,
         self.assertEqual(d['$chunk.ccsset_id'], self.INPUT_FILES[2])
 
 
-@unittest.skip("GMAP disabled")
-class TestScatterContigSetGMAP(ContigSetScatterBase,
-                               pbcommand.testkit.core.PbTestScatterApp):
-    DRIVER_BASE = "python -m pbtranscript.tasks.scatter_contigset_gmap"
-    INPUT_FILES = [  # identical to TestIcePartial inputs
-        op.join(MNT_DATA, "sa3", "nfl.contigset.xml"),
-        "/pbi/dept/secondary/siv/references/rat_UCSC/rat_UCSC.referenceset.xml",
-    ]
-
-    def _check_unchunked_files(self, d):
-        self.assertEqual(d['$chunk.reference_id'], self.INPUT_FILES[1])
+#@unittest.skip("GMAP disabled")
+#class TestScatterContigSetGMAP(ContigSetScatterBase,
+#                               pbcommand.testkit.core.PbTestScatterApp):
+#    DRIVER_BASE = "python -m pbtranscript.tasks.scatter_contigset_gmap"
+#    INPUT_FILES = [  # identical to TestIcePartial inputs
+#        op.join(MNT_DATA, "sa3", "nfl.contigset.xml"),
+#        "/pbi/dept/secondary/siv/references/rat_UCSC/rat_UCSC.referenceset.xml",
+#    ]
+#
+#    def _check_unchunked_files(self, d):
+#        self.assertEqual(d['$chunk.reference_id'], self.INPUT_FILES[1])
 
 
 @unittest.skipUnless(op.isdir(MNT_DATA), "Missing %s" % MNT_DATA)
