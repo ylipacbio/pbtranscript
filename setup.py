@@ -19,7 +19,9 @@ ext_modules = [Extension("pbtranscript.findECE",
                Extension("pbtranscript.ice.ProbModel",
                          ["pbtranscript/ice/C/ProbModel.pyx"], language="c++"),
                Extension("pbtranscript.io.c_basQV",
-                         ["pbtranscript/ice/C/c_basQV.pyx"], language="c++")
+                         ["pbtranscript/ice/C/c_basQV.pyx"], language="c++"),
+               Extension("pbtranscript.io.SAMReaders",
+                         ["pbtranscript/io/C/SAMReaders.pyx"], language="c++")
               ]
 
 
