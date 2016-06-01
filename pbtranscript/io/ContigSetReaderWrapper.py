@@ -17,7 +17,10 @@ and
 
 import logging
 import itertools
-from pbcore.io import FastaReader, FastqReader, ContigSet
+from pbcore.io import (FastaReader, FastqReader, ContigSet,
+                       FastaRecord, FastqRecord,
+                       FastaWriter, FastqWriter)
+from pbcore.io.FastaIO import IndexedFastaRecord
 
 __author__ = 'yli@pacificbiosciences.com'
 
@@ -99,11 +102,67 @@ class ContigSetReaderWrapper(object):
     def next(self):
         """Return the next FastaRecord or FastqRecord."""
         try:
-            record = self.it.next()
-            yield record
+            return self.it.next()
         except StopIteration:
             self.reader_index += 1
             if self.reader_index < len(self.readers):
                 self.it = self.readers[self.reader_index].__iter__()
             else:
                 raise StopIteration
+
+    def consolidate(self, out_prefix):
+        """Consolidate ContigSet to FASTA/FASTQ file, return path to output file."""
+        try:
+            r0 = self.next()
+        except StopIteration:
+            raise ValueError("No records to consolidate")
+        if isinstance(r0, FastaRecord) or isinstance(r0, IndexedFastaRecord):
+            out_fn = out_prefix + ".fasta"
+            with FastaWriter(out_fn) as writer:
+                writer.writeRecord(r0.name, r0.sequence[:])
+                while True:
+                    try:
+                        r = self.next()
+                    except StopIteration:
+                        break
+                    if not (isinstance(r, FastaRecord) or isinstance(r, IndexedFastaRecord)):
+                        raise ValueError("Not able to consolidate records of mixed types.")
+                    writer.writeRecord(r.name, r.sequence)
+            return out_fn
+        elif isinstance(r0, FastqRecord):
+            out_fn = out_prefix + ".fastq"
+            with FastqWriter(out_fn) as writer:
+                writer.writeRecord(r0)
+                while True:
+                    try:
+                        r = self.next()
+                    except StopIteration:
+                        break
+                    if not isinstance(r, FastqRecord):
+                        raise ValueError("Not able to consolidate records of mixed types.")
+                    writer.writeRecord(r)
+            return out_fn
+        else:
+            raise ValueError("Files must only contain FASTA/FASTQ records.")
+
+    @staticmethod
+    def name_to_len_dict(args):
+        """Return dict {read_name: read_length}."""
+        with ContigSetReaderWrapper(args) as reader:
+            return dict({r.name.split()[0]: len(r.sequence[:]) for r in reader})
+
+    @staticmethod
+    def check_ids_unique(input_filename):
+        """
+        Confirm that a FASTA/FASTQ file has all unique IDs
+        (used probably by collapse or fusion finding script)
+
+        Parameters:
+          input_filename - an input FASTA/FASTQ or contigset dataset xml
+        """
+        reader = ContigSetReaderWrapper(input_filename)
+        seen = set()
+        for r in reader:
+            if r.name in seen:
+                raise ValueError("Duplicate id {0} detected. Abort!".format(r.name))
+            seen.add(r.name)
