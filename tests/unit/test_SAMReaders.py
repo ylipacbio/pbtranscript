@@ -7,9 +7,9 @@ import unittest
 import os.path as op
 
 from pbtranscript.io.SAMReaders import GMAPSAMReader, SAMRecordBase, Interval, SAMflag
+from test_setpath import DATA_DIR, OUT_DIR, SIV_DATA_DIR
 
-MNT_DATA = "/pbi/dept/secondary/siv/testdata/pbtranscript-unittest/data"
-GMAP_SAM = op.join(MNT_DATA, "gmap-output.sam")
+GMAP_SAM = op.join(SIV_DATA_DIR, 'test_SAMReader', "gmap-output.sam")
 
 def construct_SAMRecord(qID, sID, qStart, qEnd, sStart, sEnd, qLen, sLen,
                         cigar, flag, segments,
@@ -28,7 +28,7 @@ def construct_SAMRecord(qID, sID, qStart, qEnd, sStart, sEnd, qLen, sLen,
     return obj
 
 
-@unittest.skipUnless(op.isdir(MNT_DATA), "missing %s" % MNT_DATA)
+@unittest.skipUnless(op.isdir(SIV_DATA_DIR), "missing %s" % SIV_DATA_DIR)
 class TestSAMReaders(unittest.TestCase):
 
     def test_header(self):
