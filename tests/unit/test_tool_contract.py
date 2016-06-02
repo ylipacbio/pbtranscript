@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 """
 Test tool contract interfaces.  This also doubles as a test for dataset support
 for both .bam and .fasta inputs.
@@ -25,6 +25,7 @@ SUBREADS_DATASET = "m131018_081703_42161_c100585152550000001823088404281404_s1_p
 CCS_DATASET = "m131018_081703_42161_c100585152550000001823088404281404_s1_p0.1.consensusreadset.xml"
 FLNC_DATASET = "isoseq_flnc.contigset.xml"
 NFL_DATASET = "isoseq_nfl.contigset.xml"
+GMAP_INPUT_DATASET = "gmap-input.fastq.contigset.xml"
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -223,6 +224,21 @@ class TestSeparateFLNC(pbcommand.testkit.PbTestApp):
             assert 'sorted_keys' in result.keys()
             assert 'key_to_file' in result.keys()
             assert [op.exists(f) for f in result['key_to_file'].values()]
+
+
+@unittest.skipUnless(op.isdir(MNT_DATA), "Missing %s" % MNT_DATA)
+class TestMapIsoforms(pbcommand.testkit.PbTestApp):
+    """Call python -m pbtranscript.tasks.map_isoforms --resolved-tool-contract rtc.json"""
+    DRIVER_BASE = "python -m pbtranscript.tasks.map_isoforms"
+    INPUT_FILES = [op.join(MNT_DATA, "test_collapsing", GMAP_INPUT_DATASET)]
+
+    def run_after(self, rtc, output_dir):
+        gmap_sam_out = rtc.task.output_files[0]
+        assert op.exists(gmap_sam_out)
+        from pbtranscript.io import GMAPSAMReader
+        with GMAPSAMReader(gmap_sam_out) as reader:
+            reads = [r for r in reader]
+            assert(len(reads) == 984)
 
 
 if __name__ == "__main__":
