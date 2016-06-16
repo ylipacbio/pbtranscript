@@ -9,6 +9,8 @@ from pbtranscript.io.PbiBamIO import BamHeader
 
 # __author__ = "etseng@pacificbiosciences.com"
 
+__all__ = ["GMAPSAMReader", "GMAPSAMRecord", "iter_gmap_sam"]
+
 Interval = namedtuple('Interval', ['start', 'end'])
 
 
