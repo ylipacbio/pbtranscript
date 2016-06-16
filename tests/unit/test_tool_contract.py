@@ -7,15 +7,16 @@ for both .bam and .fasta inputs.
 import unittest
 import logging
 import cPickle
-import re
 import os.path as op
 import os
+import filecmp
 
 
 from pbcommand.pb_io.common import load_pipeline_chunks_from_json
 from pbcommand.pb_io.report import load_report_from_json
 import pbcommand.testkit.core
-from pbcore.io import ContigSet
+from pbcore.io import ContigSet, FastaReader
+from test_setpath import SIV_STD_DIR
 
 TEST_DIR = op.dirname(op.dirname(__file__))
 ROOT_DIR = op.dirname(TEST_DIR)
@@ -25,7 +26,9 @@ SUBREADS_DATASET = "m131018_081703_42161_c100585152550000001823088404281404_s1_p
 CCS_DATASET = "m131018_081703_42161_c100585152550000001823088404281404_s1_p0.1.consensusreadset.xml"
 FLNC_DATASET = "isoseq_flnc.contigset.xml"
 NFL_DATASET = "isoseq_nfl.contigset.xml"
-GMAP_INPUT_DATASET = "gmap-input.fastq.contigset.xml"
+GMAP_INPUT_DATASET = op.join(MNT_DATA, "test_collapsing", "gmap-input.fastq.contigset.xml")
+SORTED_GMAP_OUTPUT = op.join(MNT_DATA, "test_branch", "sorted-gmap-output.sam")
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -230,7 +233,7 @@ class TestSeparateFLNC(pbcommand.testkit.PbTestApp):
 class TestMapIsoforms(pbcommand.testkit.PbTestApp):
     """Call python -m pbtranscript.tasks.map_isoforms --resolved-tool-contract rtc.json"""
     DRIVER_BASE = "python -m pbtranscript.tasks.map_isoforms"
-    INPUT_FILES = [op.join(MNT_DATA, "test_collapsing", GMAP_INPUT_DATASET)]
+    INPUT_FILES = [GMAP_INPUT_DATASET]
 
     def run_after(self, rtc, output_dir):
         gmap_sam_out = rtc.task.output_files[0]
@@ -239,6 +242,42 @@ class TestMapIsoforms(pbcommand.testkit.PbTestApp):
         with GMAPSAMReader(gmap_sam_out) as reader:
             reads = [r for r in reader]
             assert(len(reads) == 984)
+
+
+@unittest.skipUnless(op.isdir(MNT_DATA), "Missing %s" % MNT_DATA)
+class TestCollapseIsoforms(pbcommand.testkit.PbTestApp):
+    """Call python -m pbtranscript.tasks.collapse_isoforms --resolved-tool-contract rtc.json"""
+    DRIVER_BASE = "python -m pbtranscript.tasks.collapse_isoforms"
+    INPUT_FILES = [GMAP_INPUT_DATASET, SORTED_GMAP_OUTPUT]
+
+    def run_after(self, rtc, output_dir):
+        collapsed_isoform_ds = rtc.task.output_files[0]
+        gff_out = rtc.task.output_files[1]
+        group_out = rtc.task.output_files[2]
+        print collapsed_isoform_ds
+        print gff_out
+        print group_out
+        assert op.exists(collapsed_isoform_ds)
+        assert op.exists(gff_out)
+        assert op.exists(group_out)
+
+        std_collapsed_isoform = op.join(SIV_STD_DIR, "test_branch", "test_branch.collapsed.fasta")
+        std_good_gff_fn = op.join(SIV_STD_DIR, "test_branch", "test_branch" + ".good.gff.fuzzy")
+        std_group_fn = op.join(SIV_STD_DIR, "test_branch", "test_branch" + ".group.txt.fuzzy")
+
+        reads = [r for r in ContigSet(collapsed_isoform_ds)]
+        expected_reads = [r for r in FastaReader(std_collapsed_isoform)]
+        assert len(reads) == len(expected_reads)
+
+        for r, expected_r in zip(reads, expected_reads):
+            assert r.name == expected_r.name
+            assert r.sequence[:] == expected_r.sequence[:]
+
+        print "Comparing %s and %s" % (gff_out, std_good_gff_fn)
+        assert filecmp.cmp(gff_out, std_good_gff_fn)
+
+        print "Comparing %s and %s" % (group_out, std_group_fn)
+        assert filecmp.cmp(group_out, std_group_fn)
 
 
 if __name__ == "__main__":

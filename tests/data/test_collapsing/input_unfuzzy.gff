@@ -1,0 +1,16 @@
+SIRV2	PacBio	transcript	1036	5910	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	1036	1661	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	1742	1853	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	1974	2064	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	2675	2802	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	2882	3010	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	3106	3325	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	3666	3825	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	3967	4094	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	4339	4479	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	4688	4800	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	exon	5789	5910	.	-	.	gene_id "PB.4"; transcript_id "PB.4.2";
+SIRV2	PacBio	transcript	3648	4218	.	-	.	gene_id "PB.4"; transcript_id "PB.4.4";
+SIRV2	PacBio	exon	3648	3825	.	-	.	gene_id "PB.4"; transcript_id "PB.4.4";
+SIRV2	PacBio	exon	3967	4218	.	-	.	gene_id "PB.4"; transcript_id "PB.4.4";
+S
