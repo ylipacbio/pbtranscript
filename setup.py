@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 from distutils.extension import Extension
 import os.path
 import sys
+import numpy
 
 # icedagcon has been replaced by pbdagcon since SMRTAnalysis 2.3.
 # The pseudo namespace 'pbtools' has been removed and the main entry
@@ -21,7 +22,14 @@ ext_modules = [Extension("pbtranscript.findECE",
                Extension("pbtranscript.io.c_basQV",
                          ["pbtranscript/ice/C/c_basQV.pyx"], language="c++"),
                Extension("pbtranscript.io.SAMReaders",
-                         ["pbtranscript/io/C/SAMReaders.pyx"], language="c++")
+                         ["pbtranscript/io/C/SAMReaders.pyx"], language="c++"),
+               Extension("pbtranscript.collapsing.intersection_unique",
+                         ["pbtranscript/collapsing/C/intersection_unique.pyx"], language="c++"),
+               Extension("pbtranscript.collapsing.intersection",
+                         ["pbtranscript/collapsing/C/intersection.pyx"], language="c++"),
+               Extension("pbtranscript.collapsing.c_branch",
+                         ["pbtranscript/collapsing/C/c_branch.pyx"], language="c++",
+                         include_dirs=[numpy.get_include()])
               ]
 
 
@@ -82,6 +90,7 @@ setup(
     author_email='devnet@pacificbiosciences.com',
     license='LICENSE.txt',
     ext_modules = ext_modules,
+    include_dirs=[numpy.get_include()],
     scripts=['pbtranscript/ice_pbdagcon.py',
              'pbtranscript/ice_partial.py',
              'pbtranscript/ice_quiver.py',
