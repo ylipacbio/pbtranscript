@@ -50,26 +50,27 @@ class ContigSetReaderWrapper(object):
         self.reader_index = 0
         self.it = self.readers[self.reader_index].__iter__()
 
-    def get_file_type(self, input_filename):
+    @classmethod
+    def get_file_type(cls, input_filename):
         """Return file type: FASTA, FASTQ, CONTIGSET"""
         if not input_filename.rfind('.') >= 0:
             raise IOError("Could not recoginize file type of %s" % input_filename)
         else:
             suffix = input_filename[input_filename.rfind('.') + 1:].upper()
-            return self.FILE_TYPE[suffix]
+            return ContigSetReaderWrapper.FILE_TYPE[suffix]
 
     def _open_files(self, *input_filenames):
         """Open file handers and return."""
         readers = []
         for fn in input_filenames:
-            if self.get_file_type(fn) == "FASTA":
+            if ContigSetReaderWrapper.get_file_type(fn) == "FASTA":
                 readers.append(FastaReader(fn))
-            elif self.get_file_type(fn) == "FASTQ":
+            elif ContigSetReaderWrapper.get_file_type(fn) == "FASTQ":
                 readers.append(FastqReader(fn))
-            elif self.get_file_type(fn) == "CONTIGSET":
+            elif ContigSetReaderWrapper.get_file_type(fn) == "CONTIGSET":
                 readers.append(ContigSet(fn))
             else:
-                raise IOError("Could not read %s as FASTA/FASTQ file." % fn)
+                raise IOError("Could not read %s as FASTA/FASTQ/CONTIGSET file." % fn)
         return readers
 
     def __iter__(self):

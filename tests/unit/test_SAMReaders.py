@@ -6,10 +6,25 @@ Test SAMReaders
 import unittest
 import os.path as op
 
-from pbtranscript.io.SAMReaders import GMAPSAMReader, SAMRecordBase, Interval, SAMflag
+from pbtranscript.Utils import rmpath
+from pbtranscript.io import ContigSetReaderWrapper
+from pbtranscript.io.SAMReaders import GMAPSAMReader, SAMRecordBase, Interval, SAMflag, iter_gmap_sam
 from test_setpath import DATA_DIR, OUT_DIR, SIV_DATA_DIR
 
 GMAP_SAM = op.join(SIV_DATA_DIR, 'test_SAMReader', "gmap-output.sam")
+SORTED_GMAP_SAM = op.join(SIV_DATA_DIR, 'test_SAMReader', "sorted-gmap-output.sam")
+READS_DS = op.join(SIV_DATA_DIR, 'test_SAMReader', 'gmap-input.fastq')
+
+
+def _get_sam_groups(ignored_ids_writer=None):
+    """Returns grouped sam records read from SORTED_GMAP_SAM and READS_DS."""
+    query_len_dict = ContigSetReaderWrapper.name_to_len_dict(READS_DS)
+    groups = [g for g in iter_gmap_sam(sam_filename=SORTED_GMAP_SAM,
+                                       query_len_dict=query_len_dict,
+                                       min_aln_coverage=0.99, min_aln_identity=0.85,
+                                       ignored_ids_writer=ignored_ids_writer)]
+    return groups
+
 
 def construct_SAMRecord(qID, sID, qStart, qEnd, sStart, sEnd, qLen, sLen,
                         cigar, flag, segments,
@@ -87,6 +102,50 @@ class TestSAMReaders(unittest.TestCase):
         self.assertEqual(reads[0], expected_r0)
         self.assertEqual(reads[973], expected_r973)
         self.assertEqual(reads[981], expected_r981)
+
+
+    def test_iter_gmap_sam(self):
+        """
+        test iter_gmap_sam, which takes a sorted gmap sam file as input, and
+        iterates over a group of overlapping sam records (which supposed to belong
+        to the same isoform family.)
+        """
+        ignored_ids_txt = op.join(OUT_DIR, 'iter_gmap_sam.ignored.txt')
+        rmpath(ignored_ids_txt)
+        ignored_ids_writer = open(ignored_ids_txt, 'w')
+        groups = _get_sam_groups(ignored_ids_writer)
+        ignored_ids_writer.close()
+
+        self.assertTrue(op.exists(ignored_ids_txt))
+        ignored_ids = [line.split(' ')[0] for line in open(ignored_ids_txt, 'r')]
+        self.assertEqual(len(ignored_ids), 108)
+
+        self.assertEqual(len(groups), 9)
+        expected_plus_lens = [10, 2, 129, 31, 0, 0, 348, 141, 0]
+        self.assertEqual([len(g["+"]) for g in groups], expected_plus_lens)
+
+        expected_minus_lens = [77, 36, 11, 0, 6, 9, 2, 2, 72]
+        self.assertEqual([len(g["-"]) for g in groups], expected_minus_lens)
+
+        self.assertTrue(all([r.sID == 'SIRV1' for r in groups[0]["+"]]))
+        self.assertTrue(all([r.sID == 'SIRV2' for r in groups[1]["+"]]))
+        self.assertTrue(all([r.sID == 'SIRV3' for r in groups[2]["+"]]))
+        self.assertTrue(all([r.sID == 'SIRV4' for r in groups[3]["+"]]))
+        self.assertTrue(all([r.sID == 'SIRV4' for r in groups[4]["-"]]))
+        self.assertTrue(all([r.sID == 'SIRV4' for r in groups[5]["-"]]))
+        self.assertTrue(all([r.sID == 'SIRV5' for r in groups[6]["+"]]))
+        self.assertTrue(all([r.sID == 'SIRV6' for r in groups[7]["+"]]))
+        self.assertTrue(all([r.sID == 'SIRV7' for r in groups[8]["-"]]))
+
+        expected_g0_plus_sStart = [10710, 10712, 10712, 10712, 10712, 10712, 10712, 10713, 10713, 10715]
+        expected_g0_plus_sEnd = [11641, 11641, 11638, 11640, 11641, 11641, 11638, 11641, 11640, 11641]
+        self.assertTrue(expected_g0_plus_sStart, [r.sStart for r in groups[0]["+"]])
+        self.assertTrue(expected_g0_plus_sEnd, [r.sEnd for r in groups[0]["+"]])
+
+        expected_g4_minus_sStart = [3640, 3640, 3642, 3642, 3642, 3644]
+        expected_g4_minus_sEnd = [5157, 5157, 5157, 5157, 3829, 5157]
+        self.assertTrue(expected_g0_plus_sStart, [r.sStart for r in groups[4]["-"]])
+        self.assertTrue(expected_g0_plus_sEnd, [r.sEnd for r in groups[4]["-"]])
 
 
 if __name__ == "__main__":

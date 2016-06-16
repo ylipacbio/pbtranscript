@@ -3,6 +3,7 @@ Define classes to represent SAM records and read SAM records.
 """
 from collections import namedtuple
 import pysam
+import logging
 
 from pbtranscript.io.PbiBamIO import BamHeader
 
@@ -253,13 +254,7 @@ class GMAPSAMRecord(SAMRecordBase):
          self.num_ins, self.num_del, self.num_mat_or_sub,
          self.qStart, self.qEnd) = parse_cigar(cigar=self.cigar, offset=self.sStart)
 
-        #print 'qStart, qEnd = %s, %s' % (self.qStart, self.qEnd)
-        #assert self.qStart == alnseg.query_alignment_start
-        #assert self.qEnd == alnseg.query_alignment_end
-
-        #print 'infer_query_length = %s ' % alnseg.infer_query_length()
         self.sEnd = self.segments[-1].end
-        #print 'sStart, sEnd = %s, %s' % (self.sStart, self.sEnd)
 
         if ref_len_dict is not None:
             self.sCoverage = (self.sEnd - self.sStart) * 1. / ref_len_dict[self.sID]
@@ -324,3 +319,74 @@ class GMAPSAMReader(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._sam_file.close()
+
+
+def iter_gmap_sam(sam_filename, query_len_dict,
+                  min_aln_coverage, min_aln_identity, ignored_ids_writer):
+    """
+    Iterates over a SORTED GMAP SAM file, yields a collection of 
+    GMAPSAMRecords that overlap by at least 1 base in the format:
+    {'+': list of GMAPSAMRecords,
+     '-': list of GMAPSAMRecords}
+
+    Parameters:
+      query_len_dict -- {query_read: query_read_len}, used for computing qCoverage
+      ignored_ids_writer -- file handler writing ignored SAM record.
+      min_aln_coverage -- ignore records of which qCoverage < min_aln_coverage 
+      min_aln_identity -- ignore records of which identity < min_aln_identity
+    """
+    def sep_by_strand(records):
+        """
+        Returns {'+': list of + strand SAM records,
+                 '-': list of - strand SAM record}
+        """
+        output = {'+':[], '-':[]}
+        for r in records:
+            output[r.flag.strand].append(r)
+        return output
+
+    def write_ignored_ids(msg):
+        """Write ignored ids to ignored_ids_writer unless writer is None."""
+        if ignored_ids_writer is not None:
+            ignored_ids_writer.write(msg)
+
+    records = None # holds the current set of records that overlap in coordinates
+
+    with GMAPSAMReader(sam_filename, query_len_dict=query_len_dict) as reader:
+        first_record = None
+        for r in reader:
+            if r.sID == '*':
+                write_ignored_ids("{0}\tUnmapped.\n".format(r.qID))
+                #ignored_ids_writer.write("{0}\tUnmapped.\n".format(r.qID))
+            elif r.qCoverage < min_aln_coverage:
+                #ignored_ids_writer.write("{0}\tCoverage {1:.3f} too low.\n".format(r.qID, r.qCoverage))
+                write_ignored_ids("{0}\tCoverage {1:.3f} too low.\n".format(r.qID, r.qCoverage))
+            elif r.identity < min_aln_identity:
+                #ignored_ids_writer.write("{0}\tIdentity {1:.3f} too low.\n".format(r.qID, r.identity))
+                write_ignored_ids("{0}\tIdentity {1:.3f} too low.\n".format(r.qID, r.identity))
+            else:
+                first_record = r
+                break
+        if first_record is not None:
+            records = [first_record]
+        else:
+            logging.warn("No valid records from %s!", sam_filename)
+            return
+
+        # The very first valid SAM record has been added to records,
+        # continue to append remaining records and yield
+        for r in reader:
+            if r.sID == records[0].sID and r.sStart < records[-1].sStart:
+                raise ValueError("SAM file %s is NOT sorted. ABORT!" % sam_filename)
+            if r.qCoverage < min_aln_coverage:
+                #ignored_ids_writer.write("{0}\tCoverage {1:.3f} too low.\n".format(r.qID, r.qCoverage))
+                write_ignored_ids("{0}\tCoverage {1:.3f} too low.\n".format(r.qID, r.qCoverage))
+            elif r.identity < min_aln_identity:
+                #ignored_ids_writer.write("{0}\tIdentity {1:.3f} too low.\n".format(r.qID, r.identity))
+                write_ignored_ids("{0}\tIdentity {1:.3f} too low.\n".format(r.qID, r.identity))
+            elif r.sID != records[0].sID or r.sStart > max(x.sEnd for x in records):
+                yield sep_by_strand(records)
+                records = [r]
+            else:
+                records.append(r)
+        yield sep_by_strand(records)

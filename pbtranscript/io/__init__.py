@@ -10,4 +10,4 @@ from .PbiBamIO import *
 from .LA4IceReader import *
 from .DazzIDHandler import DazzIDHandler
 from .ContigSetReaderWrapper import ContigSetReaderWrapper
-from .SAMReaders import GMAPSAMReader, GMAPSAMRecord
+from .SAMReaders import GMAPSAMReader, GMAPSAMRecord, iter_gmap_sam
