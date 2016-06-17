@@ -6,6 +6,8 @@ Map isoforms to reference genomes and sort.
 import sys
 import logging
 
+from pbcore.io import GmapReferenceSet
+
 from pbcommand.cli.core import pbparser_runner
 from pbcommand.models import FileTypes
 from pbcommand.utils import setup_log
@@ -55,6 +57,9 @@ def add_gmap_arguments(arg_parser):
     arg_parser.add_argument("--gmap_db", type=str,
                             default=Constants.GMAP_DB_DEFAULT, help=helpstr)
 
+    helpstr = "GMAP Reference Set file to overwrite GMAP DB name and location."
+    arg_parser.add_argument("--gmap_ds", type=str, default=None, help=helpstr)
+
     helpstr = "GMAP nproc (default: %s)" % Constants.GMAP_NPROC_DEFAULT
     arg_parser.add_argument("--gmap_nproc", type=int,
                             default=Constants.GMAP_NPROC_DEFAULT, help=helpstr)
@@ -62,36 +67,46 @@ def add_gmap_arguments(arg_parser):
     return arg_parser
 
 
+def gmap_db_and_name_from_ds(gmap_ds_filename):
+    """Return gmap db dir and gmap db name"""
+    gmap_ds = GmapReferenceSet(gmap_ds_filename)
+    return (gmap_ds.gmap.resourceId, gmap_ds.gmap.name)
+
+
 def args_runner(args):
-    """Run given input args"""
-    try:
-        map_isoforms_and_sort(input_filename=args.input_filename,
-                              sam_filename=args.sam_filename,
-                              gmap_db_dir=args.gmap_db,
-                              gmap_db_name=args.gmap_name,
-                              gmap_nproc=args.gmap_nproc)
-    except Exception as e:
-        raise RuntimeError("%s failed: %s" % (__file__, str(e)))
+    """Run given input args.
+    e.g.,
+    map_isoforms.py hq_isoforms.contigset.xml out.sam --gmap_db=<path-to-db> --gmap_name=<name>
+    map_isoforms.py hq_isoforms.contigset.xml out.sam --gmap_ds=<path-to-xml>
+    """
+    gmap_db_dir, gmap_db_name = args.gmap_db, args.gmap_name
+    if args.gmap_ds is not None:
+        gmap_db_dir, gmap_db_name = gmap_db_and_name_from_ds(args.gmap_ds)
+
+    map_isoforms_and_sort(input_filename=args.input_filename,
+                          sam_filename=args.sam_filename,
+                          gmap_db_dir=gmap_db_dir,
+                          gmap_db_name=gmap_db_name,
+                          gmap_nproc=args.gmap_nproc)
     return 0
 
 
 def resolved_tool_contract_runner(rtc):
     """Run given a resolved tool contract"""
-    try:
-        map_isoforms_and_sort(input_filename=rtc.task.input_files[0],
-                              sam_filename=rtc.task.output_files[0],
-                              gmap_db_dir=rtc.task.options[Constants.GMAP_DB_ID],
-                              gmap_db_name=rtc.task.options[Constants.GMAP_NAME_ID],
-                              gmap_nproc=rtc.task.options[Constants.GMAP_NPROC_ID])
-    except Exception as e:
-        raise RuntimeError("%s failed: %s" % (__file__, str(e)))
+    gmap_db_dir, gmap_db_name = gmap_db_and_name_from_ds(rtc.task.input_files[1])
+    map_isoforms_and_sort(input_filename=rtc.task.input_files[0],
+                          sam_filename=rtc.task.output_files[0],
+                          gmap_db_dir=gmap_db_dir,
+                          gmap_db_name=gmap_db_name,
+                          gmap_nproc=rtc.task.options[Constants.GMAP_NPROC_ID])
     return 0
 
 
 def get_contract_parser():
     """Get tool contract parser.
     Input:
-        idx 0 - gmap input contigset
+        idx 0 - HQ isoforms contigset as gmap input
+        idx 1 - gmap reference set
     Output:
         idx 0 - gmap output SAM
     """
@@ -103,20 +118,15 @@ def get_contract_parser():
 
     # tool contract parser
     tcp = p.tool_contract_parser
-    tcp.add_input_file_type(FileTypes.DS_CONTIG, "gmap_input_ds", "ContigSet In",
-                            "Gmap input ContigSet file") # input 0
+    tcp.add_input_file_type(FileTypes.DS_CONTIG, "hq_isoforms_ds", "ContigSet In",
+                            "HQ isoforms ContigSet file as gmap input") # input 0
+
+    tcp.add_input_file_type(FileTypes.DS_CONTIG, "gmap_referenceset", "GmapReferenceSet In",
+                            "Gmap reference set file") # input 1
 
     tcp.add_output_file_type(FileTypes.SAM, "gmap_output_sam",
                              name="SAM file", description="Gmap output sam",
                              default_name="gmap_output")
-
-    tcp.add_str(option_id=Constants.GMAP_DB_ID, option_str="gmap_db",
-                default=Constants.GMAP_DB_DEFAULT,
-                name="GMAP DB Path", description="GMAP DB root directory")
-
-    tcp.add_str(option_id=Constants.GMAP_NAME_ID, option_str="gmap_name",
-                default=Constants.GMAP_NAME_DEFAULT,
-                name="GMAP DB Name", description="GMAP DB Name")
 
     tcp.add_int(option_id=Constants.GMAP_NPROC_ID, option_str="gmap_nproc",
                 default=Constants.GMAP_NPROC_DEFAULT,

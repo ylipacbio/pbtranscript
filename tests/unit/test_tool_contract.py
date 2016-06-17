@@ -27,6 +27,7 @@ CCS_DATASET = "m131018_081703_42161_c100585152550000001823088404281404_s1_p0.1.c
 FLNC_DATASET = "isoseq_flnc.contigset.xml"
 NFL_DATASET = "isoseq_nfl.contigset.xml"
 GMAP_INPUT_DATASET = op.join(MNT_DATA, "test_collapsing", "gmap-input.fastq.contigset.xml")
+GMAP_REF_DATASET = op.join(MNT_DATA, "test_map_isoforms", "sirv.gmapreferenceset.xml")
 SORTED_GMAP_OUTPUT = op.join(MNT_DATA, "test_branch", "sorted-gmap-output.sam")
 
 
@@ -233,7 +234,7 @@ class TestSeparateFLNC(pbcommand.testkit.PbTestApp):
 class TestMapIsoforms(pbcommand.testkit.PbTestApp):
     """Call python -m pbtranscript.tasks.map_isoforms --resolved-tool-contract rtc.json"""
     DRIVER_BASE = "python -m pbtranscript.tasks.map_isoforms"
-    INPUT_FILES = [GMAP_INPUT_DATASET]
+    INPUT_FILES = [GMAP_INPUT_DATASET, GMAP_REF_DATASET]
 
     def run_after(self, rtc, output_dir):
         gmap_sam_out = rtc.task.output_files[0]

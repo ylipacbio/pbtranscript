@@ -18,6 +18,9 @@
   $ map_isoforms.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_name=SIRV --gmap_db=/pbi/dept/secondary/siv/testdata/pbtranscript-unittest/data/gmap_db --gmap_nproc=10 && echo $?
   0
 
+  $ map_isoforms.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_ds=$SIVDATDIR/test_map_isoforms/sirv.gmapreferenceset.xml --gmap_nproc=10 && echo $?
+  0
+
 # Test collapse_isoforms
   $ collapse_isoforms.py --quiet $ISOFORM_FA $SORTED_GMAP_OUTPUT $OD/fa_in.fasta && echo $?
   0
