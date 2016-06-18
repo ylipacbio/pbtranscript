@@ -22,6 +22,7 @@ from pbtranscript.collapsing import c_branch, IntervalTree
 __all__ = ["ContiVec",
            "copy_sam_header",
            "map_isoforms_and_sort",
+           "concatenate_sam",
            "transfrag_to_contig",
            "exons_match_sam_record",
            "compare_exon_matrix",
@@ -94,6 +95,39 @@ def map_isoforms_and_sort(input_filename, sam_filename,
 
     # remove intermediate unsorted sam file.
     rmpath(unsorted_sam_filename)
+
+
+def concatenate_sam(in_sam_files, sam_out):
+    """Concatenate input sam files to sam_out."""
+    if sam_out in in_sam_files:
+        raise IOError("Can not overwrite input sam file %s as output file." % sam_out)
+
+    # First save sam headers in c_header
+    c_header = []
+    has_hd = False
+    for in_sam in in_sam_files:
+        with open(in_sam, 'r') as reader:
+            for r in reader:
+                r = r.strip()
+                if r.startswith("@"):
+                    if r.startswith("@HD") and not has_hd:
+                        has_hd = True
+                        c_header.append(r)
+                    else:
+                        if r not in c_header:
+                            c_header.append(r)
+                else:
+                    break
+
+    # Start to write
+    with open(sam_out, 'w') as writer:
+        writer.write("\n".join(c_header) + "\n")
+        for in_sam in in_sam_files:
+            with open(in_sam, 'r') as reader:
+                for r in reader:
+                    r = r.strip()
+                    if not r.startswith("@"):
+                        writer.write("%s\n" % r)
 
 
 INTINF = 999999

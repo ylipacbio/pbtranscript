@@ -76,8 +76,8 @@ def gmap_db_and_name_from_ds(gmap_ds_filename):
 def args_runner(args):
     """Run given input args.
     e.g.,
-    map_isoforms.py hq_isoforms.contigset.xml out.sam --gmap_db=<path-to-db> --gmap_name=<name>
-    map_isoforms.py hq_isoforms.contigset.xml out.sam --gmap_ds=<path-to-xml>
+    map_isoforms.py hq_isoforms.fastq out.sam --gmap_db=<path-to-db> --gmap_name=<name>
+    map_isoforms.py hq_isoforms.fastq out.sam --gmap_ds=<path-to-xml>
     """
     gmap_db_dir, gmap_db_name = args.gmap_db, args.gmap_name
     if args.gmap_ds is not None:
@@ -105,7 +105,7 @@ def resolved_tool_contract_runner(rtc):
 def get_contract_parser():
     """Get tool contract parser.
     Input:
-        idx 0 - HQ isoforms contigset as gmap input
+        idx 0 - HQ isoforms fastq as gmap input
         idx 1 - gmap reference set
     Output:
         idx 0 - gmap output SAM
@@ -118,12 +118,10 @@ def get_contract_parser():
 
     # tool contract parser
     tcp = p.tool_contract_parser
-    tcp.add_input_file_type(FileTypes.DS_CONTIG, "hq_isoforms_ds", "ContigSet In",
-                            "HQ isoforms ContigSet file as gmap input") # input 0
-
-    tcp.add_input_file_type(FileTypes.DS_CONTIG, "gmap_referenceset", "GmapReferenceSet In",
+    tcp.add_input_file_type(FileTypes.FASTQ, "hq_isoforms_fastq", "FASTQ In",
+                            "HQ isoforms FASTQ file") # input 0
+    tcp.add_input_file_type(FileTypes.DS_GMAP_REF, "gmap_referenceset", "GmapReferenceSet In",
                             "Gmap reference set file") # input 1
-
     tcp.add_output_file_type(FileTypes.SAM, "gmap_output_sam",
                              name="SAM file", description="Gmap output sam",
                              default_name="gmap_output")

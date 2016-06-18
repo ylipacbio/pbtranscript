@@ -4,7 +4,8 @@ import os.path as op
 from pbtranscript.Utils import rmpath, mkdir
 from pbtranscript.io import CollapseGffReader, CollapseGffRecord
 from pbtranscript.collapsing.CollapsingUtils import copy_sam_header, map_isoforms_and_sort, \
-        can_merge, compare_fuzzy_junctions, collapse_fuzzy_junctions
+        concatenate_sam, can_merge, compare_fuzzy_junctions, collapse_fuzzy_junctions
+import filecmp
 from test_setpath import DATA_DIR, OUT_DIR, SIV_DATA_DIR
 
 _SIV_DIR_ = op.join(SIV_DATA_DIR, "test_collapsing")
@@ -74,6 +75,15 @@ class TEST_CollapsingUtils(unittest.TestCase):
                               gmap_db_name=GMAP_NAME,
                               gmap_nproc=10)
         self.assertTrue(op.exists(out_fn))
+
+    def test_concatenate_sam(self):
+        """Test concatenate_sam(in_sam_files, out_sam)"""
+        in_sam_files = [op.join(_SIV_DIR_, f)
+                        for f in ["chunk0.sam", "chunk1.sam"]]
+        out_sam = op.join(_OUT_DIR_, 'concatenated.sam')
+        expected_sam = op.join(_SIV_DIR_, "sorted-gmap-output.sam")
+        concatenate_sam(in_sam_files, out_sam)
+        self.assertTrue(filecmp.cmp(out_sam, expected_sam))
 
     def test_collapse_fuzzy_junctions(self):
         """Test collapse_fuzzy_junctions, can_merge and compare_fuzzy_junctions."""
