@@ -1,4 +1,4 @@
-#Test map_isoforms.py and collapse_isoforms.py.
+#Test map_isoforms_to_genome.py and collapse_mapped_isoforms.py.
 
   $ . $TESTDIR/setup.sh
 
@@ -15,33 +15,33 @@
   $ rm -rf $OD && mkdir -p $OD
 
 # Test map_isoforms
-  $ map_isoforms.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_name=SIRV --gmap_db=/pbi/dept/secondary/siv/testdata/pbtranscript-unittest/data/gmap_db --gmap_nproc=10 && echo $?
+  $ map_isoforms_to_genome.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_name=SIRV --gmap_db=/pbi/dept/secondary/siv/testdata/pbtranscript-unittest/data/gmap_db --gmap_nproc=10 && echo $?
   0
 
-  $ map_isoforms.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_ds=$SIVDATDIR/test_map_isoforms/sirv.gmapreferenceset.xml --gmap_nproc=10 && echo $?
+  $ map_isoforms_to_genome.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_ds=$SIVDATDIR/test_map_isoforms/sirv.gmapreferenceset.xml --gmap_nproc=10 && echo $?
   0
 
-# Test collapse_isoforms
-  $ collapse_isoforms.py --quiet $ISOFORM_FA $SORTED_GMAP_OUTPUT $OD/fa_in.fasta && echo $?
+# Test collapse_mapped_isoforms
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA $SORTED_GMAP_OUTPUT $OD/fa_in.fasta && echo $?
   0
 
-  $ collapse_isoforms.py --quiet $ISOFORM_FA $SORTED_GMAP_OUTPUT $OD/fa_in.contigset.xml && echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA $SORTED_GMAP_OUTPUT $OD/fa_in.contigset.xml && echo $?
   0
 
-  $ collapse_isoforms.py --quiet $ISOFORM_FQ $SORTED_GMAP_OUTPUT $OD/fq_in.fasta && echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ $SORTED_GMAP_OUTPUT $OD/fq_in.fasta && echo $?
   0
 
-  $ collapse_isoforms.py --quiet $ISOFORM_FQ $SORTED_GMAP_OUTPUT $OD/fq_in.contigset.xml && echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ $SORTED_GMAP_OUTPUT $OD/fq_in.contigset.xml && echo $?
   0
 
-  $ collapse_isoforms.py --quiet $ISOFORM_FA_DS $SORTED_GMAP_OUTPUT $OD/fa_ds_in.fasta && echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA_DS $SORTED_GMAP_OUTPUT $OD/fa_ds_in.fasta && echo $?
   0
 
-  $ collapse_isoforms.py --quiet $ISOFORM_FA_DS $SORTED_GMAP_OUTPUT $OD/fa_ds_in.contigset.xml && echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA_DS $SORTED_GMAP_OUTPUT $OD/fa_ds_in.contigset.xml && echo $?
   0
 
-  $ collapse_isoforms.py --quiet $ISOFORM_FQ_DS $SORTED_GMAP_OUTPUT $OD/fq_ds_in.fastq && echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ_DS $SORTED_GMAP_OUTPUT $OD/fq_ds_in.fastq && echo $?
   0
 
-  $ collapse_isoforms.py --quiet $ISOFORM_FQ_DS $SORTED_GMAP_OUTPUT $OD/fq_ds_in.contigset.xml & echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ_DS $SORTED_GMAP_OUTPUT $OD/fq_ds_in.contigset.xml & echo $?
   0

@@ -232,8 +232,8 @@ class TestSeparateFLNC(pbcommand.testkit.PbTestApp):
 
 @unittest.skipUnless(op.isdir(MNT_DATA), "Missing %s" % MNT_DATA)
 class TestMapIsoforms(pbcommand.testkit.PbTestApp):
-    """Call python -m pbtranscript.tasks.map_isoforms --resolved-tool-contract rtc.json"""
-    DRIVER_BASE = "python -m pbtranscript.tasks.map_isoforms"
+    """Call python -m pbtranscript.tasks.map_isoforms_to_genome --resolved-tool-contract rtc.json"""
+    DRIVER_BASE = "python -m pbtranscript.tasks.map_isoforms_to_genome"
     INPUT_FILES = [GMAP_INPUT_DATASET, GMAP_REF_DATASET]
 
     def run_after(self, rtc, output_dir):
@@ -247,8 +247,8 @@ class TestMapIsoforms(pbcommand.testkit.PbTestApp):
 
 @unittest.skipUnless(op.isdir(MNT_DATA), "Missing %s" % MNT_DATA)
 class TestCollapseIsoforms(pbcommand.testkit.PbTestApp):
-    """Call python -m pbtranscript.tasks.collapse_isoforms --resolved-tool-contract rtc.json"""
-    DRIVER_BASE = "python -m pbtranscript.tasks.collapse_isoforms"
+    """Call python -m pbtranscript.tasks.collapse_mapped_isoforms --resolved-tool-contract rtc.json"""
+    DRIVER_BASE = "python -m pbtranscript.tasks.collapse_mapped_isoforms"
     INPUT_FILES = [GMAP_INPUT_DATASET, SORTED_GMAP_OUTPUT]
 
     def run_after(self, rtc, output_dir):

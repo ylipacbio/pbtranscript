@@ -7,7 +7,7 @@ which have merge-able fuzzy junctions.
 Input:
     0 - A FASTA/FASTQ/ContigSet file containing uncollapsed isoforms (hq_polished)
     1 - A SORTED GMAP SAM file containing alignments mapping uncollapsed
-        isoforms to reference genomes (produced by map_isoforms)
+        isoforms to reference genomes (produced by map_isoforms_to_genome)
 Output:
     0 - A GFF file containing good collapsed transcripts with fuzzy junctions merged.
 """

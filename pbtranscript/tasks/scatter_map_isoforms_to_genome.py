@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 """
-Scatter inputs of map_isoforms.
+Scatter inputs of map_isoforms_to_genome.
 
-map_isoforms takes two inputs:
+map_isoforms_to_genome takes two inputs:
     idx-0 HQ isoforms FASTQ
     idx-1 GMAP reference dataset
-scatter_map_isoforms chunks HQ isoforms and copies GMAP
+scatter_map_isoforms_to_genome chunks HQ isoforms and copies GMAP
 reference dataset to chunk.json.
 """
 
@@ -27,8 +27,8 @@ log = logging.getLogger(__name__)
 
 
 class Constants(object):
-    """Constants used in pbtranscript.tasks.scatter_map_isoforms"""
-    TOOL_ID = "pbtranscript.tasks.scatter_map_isoforms"
+    """Constants used in pbtranscript.tasks.scatter_map_isoforms_to_genome"""
+    TOOL_ID = "pbtranscript.tasks.scatter_map_isoforms_to_genome"
     DEFAULT_NCHUNKS = 24
     VERSION = "0.1.0"
     DRIVER_EXE = "python -m %s --resolved-tool-contract " % TOOL_ID
@@ -57,7 +57,7 @@ def get_contract_parser():
     p.add_output_file_type(FileTypes.CHUNK, "cjson_out",
                            "Chunk JSON Map Isoforms Tasks",
                            "Chunked JSON Map Isoforms Tasks",
-                           "map_isoforms.chunked")
+                           "map_isoforms_to_genome.chunked")
     # max nchunks for this specific task
     p.add_int("pbsmrtpipe.task_options.dev_scatter_max_nchunks", "max_nchunks",
               Constants.DEFAULT_NCHUNKS,
@@ -86,7 +86,7 @@ def run_main(fastq_file, gmap_ref_file, output_json_file, max_nchunks):
     # Writing chunk.json
     chunks = []
     for i, fastq_file in enumerate(fastq_files):
-        chunk_id = "_".join(["map_isoforms_chunk", str(i)])
+        chunk_id = "_".join(["map_isoforms_to_genome_chunk", str(i)])
         d = {Constants.CHUNK_KEYS[0]: fastq_file,
              Constants.CHUNK_KEYS[1]: gmap_ref_file}
         c = PipelineChunk(chunk_id, **d)

@@ -38,7 +38,7 @@ log = logging.getLogger(__name__)
 
 class Constants(object):
     """Constants used in tool contract."""
-    TOOL_ID = "pbtranscript.tasks.collapse_isoforms"
+    TOOL_ID = "pbtranscript.tasks.collapse_mapped_isoforms"
     DRIVER_EXE = "python -m %s --resolved-tool-contract " % TOOL_ID
     PARSER_DESC = __doc__
 

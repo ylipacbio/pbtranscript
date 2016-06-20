@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 class Constants(object):
     """Constants used in tool contract."""
-    TOOL_ID = "pbtranscript.tasks.map_isoforms"
+    TOOL_ID = "pbtranscript.tasks.map_isoforms_to_genome"
     DRIVER_EXE = "python -m %s --resolved-tool-contract " % TOOL_ID
     PARSER_DESC = __doc__
 
@@ -76,8 +76,8 @@ def gmap_db_and_name_from_ds(gmap_ds_filename):
 def args_runner(args):
     """Run given input args.
     e.g.,
-    map_isoforms.py hq_isoforms.fastq out.sam --gmap_db=<path-to-db> --gmap_name=<name>
-    map_isoforms.py hq_isoforms.fastq out.sam --gmap_ds=<path-to-xml>
+    map_isoforms_to_genome.py hq_isoforms.fastq out.sam --gmap_db=<path-to-db> --gmap_name=<name>
+    map_isoforms_to_genome.py hq_isoforms.fastq out.sam --gmap_ds=<path-to-xml>
     """
     gmap_db_dir, gmap_db_name = args.gmap_db, args.gmap_name
     if args.gmap_ds is not None:

@@ -104,8 +104,8 @@ setup(
         'filter_sam.py = pbtranscript.io.filter_sam:main',
         'ice_polish.py = pbtranscript.Polish:main',
         'ice_make_input_fasta_fofn.py = pbtranscript.ice.make_input_fasta_fofn:main',
-        'map_isoforms.py = pbtranscript.tasks.map_isoforms:main',
-        'collapse_isoforms.py = pbtranscript.tasks.collapse_isoforms:main'
+        'map_isoforms_to_genome.py = pbtranscript.tasks.map_isoforms_to_genome:main',
+        'collapse_mapped_isoforms.py = pbtranscript.tasks.collapse_mapped_isoforms:main'
         ]},
     package_dir={'pbtranscript': 'pbtranscript'},
     package_data={'pbtranscript':
