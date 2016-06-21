@@ -236,6 +236,7 @@ class GMAPSAMRecord(SAMRecordBase):
 
         self.qID = alnseg.query_name
         if alnseg.reference_id == -1: # means no match! STOP here
+            self.sID = None
             return
         else:
             self.sID = alnseg.reference_name
@@ -283,6 +284,11 @@ class GMAPSAMRecord(SAMRecordBase):
             self.num_nonmatches = alnseg.get_tag('NM')
             self.identity = 1. - (self.num_nonmatches * 1. /
                                   (self.num_del + self.num_ins + self.num_mat_or_sub))
+
+    @property
+    def is_mapped(self):
+        """Returns True if this SAM record is mapped (i.e., sID is neither None nor *)."""
+        return self.sID is not None and self.sID != "*"
 
 
 class GMAPSAMReader(object):
@@ -357,7 +363,7 @@ def iter_gmap_sam(sam_filename, query_len_dict,
     with GMAPSAMReader(sam_filename, query_len_dict=query_len_dict) as reader:
         first_record = None
         for r in reader:
-            if r.sID == '*':
+            if not r.is_mapped:
                 write_ignored_ids("{0}\tUnmapped.\n".format(r.qID))
                 #ignored_ids_writer.write("{0}\tUnmapped.\n".format(r.qID))
             elif r.qCoverage < min_aln_coverage:
