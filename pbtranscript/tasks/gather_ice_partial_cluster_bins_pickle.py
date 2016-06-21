@@ -66,7 +66,7 @@ def resolved_tool_contract_runner(rtc):
     with open(rtc.task.output_files[0], 'w') as writer:
         for i, group in groupby(p, lambda x: x.cluster_bin_index):
             gs = [g for g in group]
-            nfl_pickles_of_bin_i = [g.nfl_pickle for g in group]
+            nfl_pickles_of_bin_i = [g.nfl_pickle for g in gs]
             out_pickle = IceFiles(prog_name="", root_dir=gs[0].cluster_out_dir,
                                   no_log_f=True).nfl_all_pickle_fn
             log.info("Combining nfl pickles of cluster bin %s.", str(i))
