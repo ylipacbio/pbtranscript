@@ -58,9 +58,12 @@ class Constants(object):
                               "(default: %s bp)" % MAX_FUZZY_JUNCTION_DEFAULT
 
     MIN_FLNC_COVERAGE_DEFAULT = 2
+    MIN_FLNC_COVERAGE_DESC = "Minimum number of FLNC reads (default: %s), " % \
+                             MIN_FLNC_COVERAGE_DEFAULT + \
+                             "only used for aligned FLNC reads, otherwise, result undefined."
 
     ALLOW_EXTRA_5EXON_ID = "pbtranscript.task_options.allow_extra_5exon"
-    ALLOW_EXTRA_5EXON_DEFAULT = True
+    ALLOW_EXTRA_5EXON_DEFAULT = False
     ALLOW_EXTRA_5EXON_DESC = "True: Collapse shorter 5' transcripts. " + \
                              "False: Don't collapse shorter 5' transcripts " + \
                              "(default: %s)" % ALLOW_EXTRA_5EXON_DEFAULT

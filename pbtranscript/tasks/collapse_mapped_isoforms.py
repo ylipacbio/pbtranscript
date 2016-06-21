@@ -54,16 +54,13 @@ def add_collapse_isoforms_arguments(arg_parser):
                             default=Constants.MAX_FUZZY_JUNCTION_DEFAULT,
                             type=int, help=Constants.MAX_FUZZY_JUNCTION_DESC)
 
-    helpstr = "Minimum num of FLNC reads (default: %s), " % \
-               Constants.MIN_FLNC_COVERAGE_DEFAULT + \
-              "only used for aligned FLNC reads, otherwise, result undefined."
-
     arg_parser.add_argument("--flnc_coverage", dest="min_flnc_coverage", type=int,
-                            default=Constants.MIN_FLNC_COVERAGE_DEFAULT, help=helpstr)
+                            default=Constants.MIN_FLNC_COVERAGE_DEFAULT,
+                            help=Constants.MIN_FLNC_COVERAGE_DESC)
 
-    arg_parser.add_argument("--dun-merge-5-shorter", dest="allow_extra_5exon",
+    arg_parser.add_argument("--merge-5-shorter", dest="allow_extra_5exon",
                             default=Constants.ALLOW_EXTRA_5EXON_DEFAULT,
-                            action="store_false", help=Constants.ALLOW_EXTRA_5EXON_DESC)
+                            action="store_true", help=Constants.ALLOW_EXTRA_5EXON_DESC)
 
     helpstr = "Skip alternative 5' exons."
     arg_parser.add_argument("--skip_5_exon_alt", dest="skip_5_exon_alt",
