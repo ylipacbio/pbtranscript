@@ -62,29 +62,29 @@ class CombinedFiles(object):
 
 
 def combined_prefix(cluster_bin_index, isoform_type, sample_name):
-    """Return i{cluster_bin_index}_{isoform_type}_{sample_name}|"""
+    """Return i{cluster_bin_index}_{isoform_type}_{sample_name}"""
     assert isoform_type in ["HQ", "LQ", "ICE"]
-    return "i{i}_{t}_{s}|".format(i=cluster_bin_index, t=isoform_type, s=sample_name)
+    return "i{i}_{t}_{s}".format(i=cluster_bin_index, t=isoform_type, s=sample_name)
 
 
 def combined_cid_ice_name(name, cluster_bin_index, sample_name):
     """e.g., c1 --> i0_ICE_sample1|c1
     """
-    return "{p}{n}".format(p=combined_prefix(cluster_bin_index=cluster_bin_index,
+    return "{p}|{n}".format(p=combined_prefix(cluster_bin_index=cluster_bin_index,
                                              isoform_type="ICE",
                                              sample_name=sample_name), n=name)
 
 def combined_cid_hq_name(name, cluster_bin_index, sample_name):
     """e.g., c1 --> i0_HQ_sample1|c1
     """
-    return "{p}{n}".format(p=combined_prefix(cluster_bin_index=cluster_bin_index,
+    return "{p}|{n}".format(p=combined_prefix(cluster_bin_index=cluster_bin_index,
                                              isoform_type="HQ",
                                              sample_name=sample_name), n=name)
 
 def combined_cid_lq_name(name, cluster_bin_index, sample_name):
     """e.g., c1 --> i0_LQ_sample1|c1
     """
-    return "{p}{n}".format(p=combined_prefix(cluster_bin_index=cluster_bin_index,
+    return "{p}|{n}".format(p=combined_prefix(cluster_bin_index=cluster_bin_index,
                                              isoform_type="LQ",
                                              sample_name=sample_name), n=name)
 
