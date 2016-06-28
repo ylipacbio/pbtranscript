@@ -106,7 +106,8 @@ setup(
         'separate_flnc.py = pbtranscript.tasks.separate_flnc:main',
         'map_isoforms_to_genome.py = pbtranscript.tasks.map_isoforms_to_genome:main',
         'collapse_mapped_isoforms.py = pbtranscript.tasks.collapse_mapped_isoforms:main',
-        'make_abundance.py = pbtranscript.tasks.make_abundance:main'
+        'make_abundance.py = pbtranscript.tasks.make_abundance:main',
+        'filter_by_count.py = pbtranscript.tasks.filter_by_count:main',
         ]},
     package_dir={'pbtranscript': 'pbtranscript'},
     package_data={'pbtranscript':
