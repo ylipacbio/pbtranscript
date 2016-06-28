@@ -7,9 +7,9 @@ read mapping abundance file.
 import os.path as op
 from collections import defaultdict
 from cPickle import load
-from csv import DictReader
+#from csv import DictReader
 from pbtranscript.io import GroupReader, MapStatus, ReadStatRecord, \
-        ReadStatReader, ReadStatWriter
+        ReadStatReader, ReadStatWriter, AbundanceRecord, AbundanceWriter
 
 
 __author__ = 'etseng@pacificbiosciences.com'
@@ -193,9 +193,11 @@ def output_read_count_FL(cid_info, prefix_pickle_filename_tuples, output_filenam
 def output_read_count_nFL(cid_info, prefix_pickle_filename_tuples, output_filename,
                           output_mode='w', restricted_movies=None):
     """
-    Given cid_info, prefix_pickle_filename_tuples, output read status of nFL CCS reads in restricted_movies.
+    Output read status of nFL CCS reads in restricted_movies.
 
     Parameters:
+        cid_info -- a dict read from group file, seq_or_ice_cluster --> collapsed cluster ID
+        prefix_pickle_filename_tuples -- a list of (sample prefix, nfl.partial_uc.pickle) tuples
         output_filename -- a tab delimited file reporting nFL reads status
 
     If restricted_movies is None, all nonFL reads are output.
@@ -316,32 +318,25 @@ def make_abundance_file(read_stat_filename, output_filename, given_total=None,
         use_total_nfl = len(total_ids['fl']) + len(total_ids['nfl'])
         use_total_nfl_amb = len(total_ids['fl']) + len(total_ids['nfl']) + len(total_ids['nfl_amb'])
 
-    f = open(output_filename, 'w')
+    comments = None
     if write_header_comments:
-        f.write("#\n")
-        f.write("# -----------------\n")
-        f.write("# Field explanation\n")
-        f.write("# -----------------\n")
-        f.write("# count_fl: Number of associated FL reads\n")
-        f.write("# count_nfl: Number of associated FL + unique nFL reads\n")
-        f.write("# count_nfl_amb: Number of associated FL + unique nFL + weighted ambiguous nFL reads\n")
-        f.write("# norm_fl: count_fl / total number of FL reads\n")
-        f.write("# norm_nfl: count_nfl / total number of FL + unique nFL reads\n")
-        f.write("# norm_nfl_amb: count_nfl_amb / total number of all reads\n")
-        f.write("# Total Number of FL reads: {0}\n".format(use_total_fl))
-        f.write("# Total Number of FL + unique nFL reads: {0}\n".format(use_total_nfl))
-        f.write("# Total Number of all reads: {0}\n".format(use_total_nfl_amb))
-        f.write("#\n")
-    f.write("pbid\tcount_fl\tcount_nfl\tcount_nfl_amb\tnorm_fl\tnorm_nfl\tnorm_nfl_amb\n")
+        comments = AbundanceWriter.make_comments(total_fl=use_total_fl, total_nfl=use_total_nfl,
+                                                 total_nfl_amb=use_total_nfl_amb)
+    writer = AbundanceWriter(output_filename, comments=comments)
 
+    #("pbid\tcount_fl\tcount_nfl\tcount_nfl_amb\tnorm_fl\tnorm_nfl\tnorm_nfl_amb\n")
     keys = tally.keys()
     keys.sort(key=lambda x: map(int, x.split('.')[1:])) # sort by PB.1, PB.2....
-    for k in keys:
-        v = tally[k]
-        a = v['fl']
-        b = a + v['nfl']
-        c = b + v['nfl_amb']
-        f.write("{0}\t{1}\t{2}\t{3}\t".format(k, a, b, c))
-        f.write("{0:.4e}\t{1:.4e}\t{2:.4e}\n".format(a*1./use_total_fl, b*1./use_total_nfl,
-                                                     c*1./use_total_nfl_amb))
-    f.close()
+    for pbid in keys:
+        v = tally[pbid]
+        count_fl = v['fl']
+        count_nfl = count_fl + v['nfl']
+        count_nfl_amb = count_nfl + v['nfl_amb']
+        norm_fl = count_fl*1./use_total_fl
+        norm_nfl = count_nfl*1./use_total_nfl
+        norm_nfl_amb = count_nfl_amb*1./use_total_nfl_amb
+        record = AbundanceRecord(pbid=pbid, count_fl=count_fl, count_nfl=count_nfl,
+                                 count_nfl_amb=count_nfl_amb, norm_fl=norm_fl,
+                                 norm_nfl=norm_nfl, norm_nfl_amb=norm_nfl_amb)
+        writer.writeRecord(record)
+    writer.close()
