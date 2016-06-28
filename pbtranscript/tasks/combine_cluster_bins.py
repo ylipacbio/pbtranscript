@@ -53,6 +53,7 @@ def get_contract_parser():
         idx 4 - hq_isoforms.fq
         idx 5 - lq_isoforms.contigset.xml
         idx 6 - lq_isoforms.fq
+        idx 7 - hq_lq_prefix_dict.pickle
     """
     p = get_base_contract_parser(Constants, default_level="DEBUG")
     p.add_input_file_type(FileTypes.PICKLE, "cluster_chunks_pickle", "Pickle In",
@@ -73,6 +74,12 @@ def get_contract_parser():
     # output idx 3, hq_isoforms_fa, idx 4, hq_isoforms_fq,
     # idx 5 lq_isoforms_fa, idx 6 lq_isoforms_fq
     add_ice_post_quiver_hq_lq_arguments(p)
+
+    # output idx 7, hq_lq_prefix_dict.pickle
+    p.add_output_file_type(FileTypes.PICKLE, "hq_lq_prefix_dict",
+                           name="Pickle",
+                           description="Pickle mapping HQ (LQ) sample prefixes with ICE dir",
+                           default_name="hq_lq_prefix_dict")
 
     # user specified sample name.
     p.add_str(option_id=Constants.SAMPLE_NAME_ID, option_str="sample_name",
@@ -104,6 +111,7 @@ def resolved_tool_contract_runner(rtc):
     out_hq_fq = rtc.task.output_files[4]
     out_lq_cs = rtc.task.output_files[5]
     out_lq_fq = rtc.task.output_files[6]
+    out_hq_lq_prefix_dict_pickle = rtc.task.output_files[7]
 
     assert out_consensus_isoforms_cs.endswith(".contigset.xml")
     assert out_hq_cs.endswith(".contigset.xml")
@@ -133,7 +141,6 @@ def resolved_tool_contract_runner(rtc):
     combined_dir = op.join(op.dirname(op.dirname(cluster_out_dirs[0])), "combined")
     mkdir(combined_dir)
     combined_files = CombinedFiles(combined_dir)
-    out_hq_lq_prefix_dict_pickle = op.join(combined_dir, "hq_lq_prefix_dict.pickle")
     log.info("Combining results of all cluster bins to %s.", combined_dir)
     log.info("Merging HQ|LQ isoforms from all cluster bins.")
     log.info("HQ isoforms are: %s.", ",".join(hq_fq_fns))

@@ -48,20 +48,22 @@ def add_map_isoforms_io_arguments(arg_parser):
 
 def add_gmap_arguments(arg_parser):
     """Add gmap arguments"""
+    gmap_group = arg_parser.add_argument_group("GMAP arguments")
+
     helpstr = "GMAP DB name (default: %s)" % Constants.GMAP_NAME_DEFAULT
-    arg_parser.add_argument("--gmap_name", type=str,
+    gmap_group.add_argument("--gmap_name", type=str,
                             default=Constants.GMAP_NAME_DEFAULT,
                             help=helpstr)
 
     helpstr = "GMAP DB location (default: %s)" % Constants.GMAP_DB_DEFAULT
-    arg_parser.add_argument("--gmap_db", type=str,
+    gmap_group.add_argument("--gmap_db", type=str,
                             default=Constants.GMAP_DB_DEFAULT, help=helpstr)
 
     helpstr = "GMAP Reference Set file to overwrite GMAP DB name and location."
-    arg_parser.add_argument("--gmap_ds", type=str, default=None, help=helpstr)
+    gmap_group.add_argument("--gmap_ds", type=str, default=None, help=helpstr)
 
     helpstr = "GMAP nproc (default: %s)" % Constants.GMAP_NPROC_DEFAULT
-    arg_parser.add_argument("--gmap_nproc", type=int,
+    gmap_group.add_argument("--gmap_nproc", type=int,
                             default=Constants.GMAP_NPROC_DEFAULT, help=helpstr)
 
     return arg_parser

@@ -24,8 +24,8 @@ class Constants(object):
     PARSER_DESC = __doc__
 
 
-def add_make_abundance_arguments(arg_parser):
-    """Add parser argument."""
+def add_make_abundance_io_arguments(arg_parser):
+    """Add io arguments to parser."""
     helpstr = "Input group file which associates collapsed isoforms with reads."
     arg_parser.add_argument("group_filename", type=str, help=helpstr)
 
@@ -55,12 +55,13 @@ def args_runner(args):
 
 def resolved_tool_contract_runner(rtc):
     """Run given a resolved tool contract"""
-    c = CountRunner(group_filename=rtc.task.input_files[0],
-                    pickle_filename=rtc.task.input_files[1],
-                    output_read_stat_filename=rtc.task.output_files[0],
-                    output_abundance_filename=rtc.task.output_files[1])
-    c.run()
-    return 0
+    raise NotImplementedError() # Merged to post_mapping_to_genome
+#    c = CountRunner(group_filename=rtc.task.input_files[0],
+#                    pickle_filename=rtc.task.input_files[1],
+#                    output_read_stat_filename=rtc.task.output_files[0],
+#                    output_abundance_filename=rtc.task.output_files[1])
+#    c.run()
+#    return 0
 
 
 def get_contract_parser():
@@ -75,7 +76,7 @@ def get_contract_parser():
     p = get_base_contract_parser(Constants, default_level="DEBUG")
 
     # argument parser
-    add_make_abundance_arguments(p.arg_parser.parser)
+    add_make_abundance_io_arguments(p.arg_parser.parser)
 
     # tool contract parser
     tcp = p.tool_contract_parser
@@ -83,7 +84,7 @@ def get_contract_parser():
                             "Group file associating isoforms with reads") # input 0
     tcp.add_input_file_type(FileTypes.PICKLE, "hq_lq_pre_dict", "PICKLE In",
                             "Pickle file containing dicts mapping HQ (LQ) " +
-                            "sample prefixes to cluster output directories ") # input 1
+                            "sample prefixes to ICE cluster output directories") # input 1
     tcp.add_output_file_type(FileTypes.TXT, "read_stat_txt",
                              name="TXT file", description="Read status of FL and nFL reads",
                              default_name="output_mapped_read_stat")
