@@ -492,7 +492,6 @@ class BamHeader(object):
         if headers is None:
             pass
         elif isinstance(headers, dict):
-            assert all([tag in headers for tag in HEADERTAGS])
             self._dict = headers
         elif isinstance(headers, list):
             for _header in headers:
@@ -500,6 +499,10 @@ class BamHeader(object):
         else:
             raise ValueError("<%s, __init__> does not support input type %s." %
                              (self.__class__.__name__, type(headers)))
+
+        for tag in HEADERTAGS:
+            if tag not in self._dict:
+                self._dict[tag] = []
 
     @property
     def headerLine(self):
@@ -532,6 +535,12 @@ class BamHeader(object):
     def header(self):
         """Return this BamHeader as a dict"""
         return self._dict
+
+    @property
+    def referenceLengthsDict(self):
+        """Return {reference_name: reference_length} as a dict"""
+        return dict({refseq['SN']:refseq['LN']
+                     for refseq in self.referenceSequences})
 
     def containReadGroup(self, readGroupId):
         """Return whether or not contain this object contains
@@ -568,6 +577,7 @@ class BamHeader(object):
             if not isinstance(other, dict):
                 raise TypeError("<%s, add> does not support type %s" %
                                 (self.__class__.__name__, type(other)))
+            _toadd = BamHeader(other).header
 
         if len(self.headerLine) == 0:
             self._dict[HDHEADERTAG] = _toadd[HDHEADERTAG]
@@ -578,7 +588,6 @@ class BamHeader(object):
         if not self.ignore_pg:
             for pg in _toadd[PGHEADERTAG]:
                 self._addPG(pg)
-
         for sq in _toadd[SQHEADERTAG]:
             self._addSQ(sq)
 

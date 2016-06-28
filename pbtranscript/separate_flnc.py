@@ -8,18 +8,16 @@ import logging
 import os
 import os.path as op
 import sys
-import argparse
 from cPickle import dump, load
 from collections import defaultdict
-from pbcommand.models import FileTypes
 from pbtranscript.Utils import realpath, mkdir, as_contigset
 from pbtranscript.io.ContigSetReaderWrapper import ContigSetReaderWrapper
-from pbtranscript.PBTranscriptOptions import add_flnc_fa_argument, _wrap_parser
 
 
 __author__ = "etseng@pacificbiosciences.com"
 
-#logger = logging.getLogger(op.basename(__file__))
+__all__ = ["SeparateFLNCRunner"]
+
 
 class SeparateFLNCBase(object):
     """
@@ -416,117 +414,41 @@ class SeparateFLNCBySize(SeparateFLNCBase):
             b = self.size_bins.which_bin_contains(len(r.sequence))
             p = read_counter_in_each_bin[b] % self.size_bins_parts[b]
             read_counter_in_each_bin[b] += 1
-
             self.handles[(b, p)].write(">{0}\n{1}\n".format(r.name, r.sequence[:]))
 
 
-class Constants(object):
-    """Constants used in tool contract."""
-    TOOL_ID = "pbtranscript.tasks.separate_flnc"
-    DRIVER_EXE = "python -m pbtranscript.tasks.separate_flnc --resolved-tool-contract"
-    PARSER_DESC = __doc__
+class SeparateFLNCRunner(object):
+    """Runner to either bin by primer, by manual or by size kb."""
+    def __init__(self, flnc_fa, root_dir, out_pickle,
+                 bin_size_kb, bin_by_primer, bin_manual, max_base_limit_MB):
+        self.flnc_fa = flnc_fa
+        self.root_dir = root_dir
+        self.out_pickle = out_pickle
+        self.bin_size_kb = bin_size_kb
+        self.bin_by_primer = bool(bin_by_primer)
+        self.bin_manual = bin_manual
+        self.max_base_limit_MB = int(max_base_limit_MB)
 
-    BIN_BY_PRIMER_ID = "pbtranscript.task_options.bin_by_primer"
-    BIN_BY_PRIMER_DEFAULT = False
-
-    BIN_SIZE_KB_ID = "pbtranscript.task_options.bin_size_kb"
-    BIN_SIZE_KB_DEFAULT = 1
-
-    BIN_MANUAL_ID = "pbtranscript.task_options.bin_manual"
-    BIN_MANUAL_DEFAULT = "[]"
-
-
-def add_separate_flnc_arguments(parser):
-    """
-    This expects the PbParser object
-    provided by pbcommand, not an argparse.ArgumentParser, and it will add
-    most options separately to the internal tool contract parser and argparser
-    (they are grouped here for clarity).
-    """
-    tcp = parser.tool_contract_parser
-    arg_parser = parser.arg_parser.parser
-
-    add_flnc_fa_argument(parser, positional=True)
-
-    arg_parser.add_argument("root_dir", type=str,
-                            help="A directory to store separated reads.")
-
-    helpstr = "Python pickle file of how flnc reads are separated"
-    arg_parser.add_argument("--out_pickle", default=None, type=str, help=helpstr)
-    tcp.add_output_file_type(FileTypes.PICKLE, "out_pickle",
-                             default_name="separate_flnc",
-                             name="Pickle file", description=helpstr)
-
-    helpstr = "Bin size by kb (default: 1)"
-    arg_parser.add_argument("--bin_size_kb", default=1, type=int, help=helpstr)
-    tcp.add_int(Constants.BIN_SIZE_KB_ID, "bin_size_kb",
-                default=Constants.BIN_SIZE_KB_DEFAULT,
-                name="Bin by read length in KB", description=helpstr)
-
-    helpstr = "Bin manual (ex: (1,2,3,5)), overwrites bin_size_kb"
-    arg_parser.add_argument("--bin_manual", default=None, help=helpstr)
-    tcp.add_str(Constants.BIN_MANUAL_ID, "bin_manual",
-                default=Constants.BIN_MANUAL_DEFAULT,
-                name="Bin by read length manually", description=helpstr)
-
-    helpstr = "Instead of binning by size, bin by primer " + \
-              "(overwrites --bin_size_kb and --bin_manual)"
-    arg_parser.add_argument("--bin_by_primer", default=False, action="store_true", help=helpstr)
-    tcp.add_boolean(Constants.BIN_BY_PRIMER_ID, "bin_by_primer",
-                    default=Constants.BIN_BY_PRIMER_DEFAULT,
-                    name="Bin by primer", description=helpstr)
-
-    helpstr = "Maximum number of bases per partitioned bin, in MB (default: 600)"
-    arg_parser.add_argument("--max_base_limit_MB", default=600, type=int, help=helpstr)
-    #arg_parser.add_argument("--version", action='version',
-    #                        version=('%(prog)s ' + str(get_version())))
-    return parser
-
-
-def args_runner(args):
-    """Run given input args"""
-    try:
-        if args.bin_by_primer is True:
+    def run(self):
+        """Run"""
+        if self.bin_by_primer is True:
             logging.warning("Separate FLNC reads by primers, overwrite bin_manual and bin_size_kb.")
-            with SeparateFLNCByPrimer(flnc_filename=args.flnc_fa,
-                                      root_dir=args.root_dir,
-                                      out_pickle=args.out_pickle) as obj:
+            with SeparateFLNCByPrimer(flnc_filename=self.flnc_fa,
+                                      root_dir=self.root_dir,
+                                      out_pickle=self.out_pickle) as obj:
                 obj.run()
         else:
             bin_manual = None
-            if args.bin_manual is not None:
-                tmp = "".join([x for x in str(args.bin_manual) if x.isdigit() or x == ','])
+            if self.bin_manual is not None:
+                tmp = "".join([x for x in str(self.bin_manual) if x.isdigit() or x == ','])
                 if len(tmp) > 0:
                     logging.info("Converting bin_manual %s to a list of integers.", tmp)
                     bin_manual = sorted([int(x) for x in tmp.split(',')])
                     logging.info("converted bin_manual=%s", bin_manual)
-            with SeparateFLNCBySize(flnc_filename=args.flnc_fa, root_dir=args.root_dir,
-                                    bin_size_kb=args.bin_size_kb,
+            with SeparateFLNCBySize(flnc_filename=self.flnc_fa, root_dir=self.root_dir,
+                                    bin_size_kb=self.bin_size_kb,
                                     bin_manual=bin_manual,
-                                    max_base_limit_MB=args.max_base_limit_MB,
-                                    out_pickle=args.out_pickle) as obj:
+                                    max_base_limit_MB=self.max_base_limit_MB,
+                                    out_pickle=self.out_pickle) as obj:
                 obj.run()
-    except Exception as e:
-        logging.exception("Exiting with return code 1.")
-        logging.exception(str(e))
-        return 1
-    return 0
-
-
-def get_arg_parser():
-    """Return args parser of type argparse.ArugmentParser."""
-    parser = argparse.ArgumentParser(prog='separate_flnc')
-    p = add_separate_flnc_arguments(_wrap_parser(parser)).arg_parser.parser
-    assert isinstance(p, argparse.ArgumentParser)
-    return p
-
-
-def main(args=sys.argv[1:]):
-    """Main"""
-    m = get_arg_parser().parse_args(args)
-    return args_runner(m)
-
-
-if __name__ == "__main__":
-    sys.exit(main())
-
+        return 0

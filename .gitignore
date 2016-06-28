@@ -1,6 +1,8 @@
 setuptools_cython*
 *.pyc
 .eggs
+*.o
+*.so
 pbtranscript/ice/C/*.cpp
 pbtranscript/ice/C/*.c
 tests/out

@@ -1,0 +1,17 @@
+# -----------------
+# Field explanation
+# -----------------
+# count_fl: Number of associated FL reads
+# count_nfl: Number of associated FL + unique nFL reads
+# count_nfl_amb: Number of associated FL + unique nFL + weighted ambiguous nFL reads
+# norm_fl: count_fl / total number of FL reads
+# norm_nfl: count_nfl / total number of FL + unique nFL reads
+# norm_nfl_amb: count_nfl_amb / total number of all reads
+# Total Number of FL reads: 4712
+# Total Number of FL + unique nFL reads: 9879
+# Total Number of all reads: 10064
+#
+pbid	count_fl	count_nfl	count_nfl_amb	norm_fl	norm_nfl	norm_nfl_amb
+PB.1.1	30	30	30.83	6.3667e-03	3.0367e-03	3.0637e-03
+PB.2.1	9	9	9.39	1.9100e-03	9.1102e-04	9.3331e-04
+PB.2.2	59	67	76.70	1.2521e-02	6.7821e-03	7.6212e-03

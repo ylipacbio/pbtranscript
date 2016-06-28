@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 from distutils.extension import Extension
 import os.path
 import sys
+import numpy
 
 # icedagcon has been replaced by pbdagcon since SMRTAnalysis 2.3.
 # The pseudo namespace 'pbtools' has been removed and the main entry
@@ -19,7 +20,16 @@ ext_modules = [Extension("pbtranscript.findECE",
                Extension("pbtranscript.ice.ProbModel",
                          ["pbtranscript/ice/C/ProbModel.pyx"], language="c++"),
                Extension("pbtranscript.io.c_basQV",
-                         ["pbtranscript/ice/C/c_basQV.pyx"], language="c++")
+                         ["pbtranscript/ice/C/c_basQV.pyx"], language="c++"),
+               Extension("pbtranscript.io.SAMReaders",
+                         ["pbtranscript/io/C/SAMReaders.pyx"], language="c++"),
+               Extension("pbtranscript.collapsing.intersection_unique",
+                         ["pbtranscript/collapsing/C/intersection_unique.pyx"], language="c++"),
+               Extension("pbtranscript.collapsing.intersection",
+                         ["pbtranscript/collapsing/C/intersection.pyx"], language="c++"),
+               Extension("pbtranscript.collapsing.c_branch",
+                         ["pbtranscript/collapsing/C/c_branch.pyx"], language="c++",
+                         include_dirs=[numpy.get_include()])
               ]
 
 
@@ -80,19 +90,25 @@ setup(
     author_email='devnet@pacificbiosciences.com',
     license='LICENSE.txt',
     ext_modules = ext_modules,
+    include_dirs=[numpy.get_include()],
     scripts=['pbtranscript/ice_pbdagcon.py',
              'pbtranscript/ice_partial.py',
              'pbtranscript/ice_quiver.py',
              'pbtranscript/ice_fa2fq.py',
              'pbtranscript/ice_fa2fq.py',
-             'pbtranscript/separate_flnc.py',
             ],
     entry_points={'console_scripts': [
         'pbtranscript = pbtranscript.PBTranscriptRunner:main',
         'fasta_splitter.py = pbtranscript.io.FastaSplitter:main',
         'filter_sam.py = pbtranscript.io.filter_sam:main',
         'ice_polish.py = pbtranscript.Polish:main',
-        'ice_make_input_fasta_fofn.py = pbtranscript.ice.make_input_fasta_fofn:main'
+        'ice_make_input_fasta_fofn.py = pbtranscript.ice.make_input_fasta_fofn:main',
+        'separate_flnc.py = pbtranscript.tasks.separate_flnc:main',
+        'map_isoforms_to_genome.py = pbtranscript.tasks.map_isoforms_to_genome:main',
+        'collapse_mapped_isoforms.py = pbtranscript.tasks.collapse_mapped_isoforms:main',
+        'make_abundance.py = pbtranscript.tasks.make_abundance:main',
+        'filter_by_count.py = pbtranscript.tasks.filter_by_count:main',
+        'post_mapping_to_genome.py = pbtranscript.tasks.post_mapping_to_genome:main'
         ]},
     package_dir={'pbtranscript': 'pbtranscript'},
     package_data={'pbtranscript':

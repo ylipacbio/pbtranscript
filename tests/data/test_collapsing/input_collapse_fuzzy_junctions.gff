@@ -1,0 +1,17 @@
+SIRV2	PacBio	transcript	3648	4218	.	-	.	gene_id "PB.4"; transcript_id "PB.4.4";
+SIRV2	PacBio	exon	3648	3825	.	-	.	gene_id "PB.4"; transcript_id "PB.4.4";
+SIRV2	PacBio	exon	3967	4218	.	-	.	gene_id "PB.4"; transcript_id "PB.4.4";
+SIRV2	PacBio	transcript	3671	5894	.	-	.	gene_id "PB.4"; transcript_id "PB.4.5";
+SIRV2	PacBio	exon	3671	3825	.	-	.	gene_id "PB.4"; transcript_id "PB.4.5";
+SIRV2	PacBio	exon	3967	4094	.	-	.	gene_id "PB.4"; transcript_id "PB.4.5";
+SIRV2	PacBio	exon	4339	4479	.	-	.	gene_id "PB.4"; transcript_id "PB.4.5";
+SIRV2	PacBio	exon	4688	4800	.	-	.	gene_id "PB.4"; transcript_id "PB.4.5";
+SIRV2	PacBio	exon	5752	5894	.	-	.	gene_id "PB.4"; transcript_id "PB.4.5";
+SIRV3	PacBio	transcript	1945	8292	.	+	.	gene_id "PB.5"; transcript_id "PB.5.1";
+SIRV3	PacBio	exon	1945	2005	.	+	.	gene_id "PB.5"; transcript_id "PB.5.1";
+SIRV3	PacBio	exon	4004	4080	.	+	.	gene_id "PB.5"; transcript_id "PB.5.1";
+SIRV3	PacBio	exon	6058	8292	.	+	.	gene_id "PB.5"; transcript_id "PB.5.1";
+SIRV3	PacBio	transcript	1945	8289	.	+	.	gene_id "PB.5"; transcript_id "PB.5.2";
+SIRV3	PacBio	exon	1945	2005	.	+	.	gene_id "PB.5"; transcript_id "PB.5.2";
+SIRV3	PacBio	exon	4003	4080	.	+	.	gene_id "PB.5"; transcript_id "PB.5.2";
+SIRV3	PacBio	exon	6058	8289	.	+	.	gene_id "PB.5"; transcript_id "PB.5.2";

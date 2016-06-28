@@ -61,8 +61,7 @@ class IceFiles(object):
         self.no_log_f = no_log_f
         if not no_log_f:
             self.log_f = open(self.log_fn, 'w', 0)
-
-        self.add_log(msg="{p} initialized.".format(p=self.prog_name))
+            self.add_log(msg="{p} initialized.".format(p=self.prog_name))
 
     @property
     def tmp_dir(self):

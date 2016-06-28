@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 """
 Test tool contract interfaces.  This also doubles as a test for dataset support
 for both .bam and .fasta inputs.
@@ -7,15 +7,16 @@ for both .bam and .fasta inputs.
 import unittest
 import logging
 import cPickle
-import re
 import os.path as op
 import os
+import filecmp
 
 
 from pbcommand.pb_io.common import load_pipeline_chunks_from_json
 from pbcommand.pb_io.report import load_report_from_json
 import pbcommand.testkit.core
-from pbcore.io import ContigSet
+from pbcore.io import ContigSet, FastaReader
+from test_setpath import SIV_STD_DIR
 
 TEST_DIR = op.dirname(op.dirname(__file__))
 ROOT_DIR = op.dirname(TEST_DIR)
@@ -25,6 +26,10 @@ SUBREADS_DATASET = "m131018_081703_42161_c100585152550000001823088404281404_s1_p
 CCS_DATASET = "m131018_081703_42161_c100585152550000001823088404281404_s1_p0.1.consensusreadset.xml"
 FLNC_DATASET = "isoseq_flnc.contigset.xml"
 NFL_DATASET = "isoseq_nfl.contigset.xml"
+GMAP_INPUT_DATASET = op.join(MNT_DATA, "test_collapsing", "gmap-input.fastq.contigset.xml")
+GMAP_REF_DATASET = op.join(MNT_DATA, "test_map_isoforms", "sirv.gmapreferenceset.xml")
+SORTED_GMAP_OUTPUT = op.join(MNT_DATA, "test_branch", "sorted-gmap-output.sam")
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -223,6 +228,21 @@ class TestSeparateFLNC(pbcommand.testkit.PbTestApp):
             assert 'sorted_keys' in result.keys()
             assert 'key_to_file' in result.keys()
             assert [op.exists(f) for f in result['key_to_file'].values()]
+
+
+@unittest.skipUnless(op.isdir(MNT_DATA), "Missing %s" % MNT_DATA)
+class TestMapIsoforms(pbcommand.testkit.PbTestApp):
+    """Call python -m pbtranscript.tasks.map_isoforms_to_genome --resolved-tool-contract rtc.json"""
+    DRIVER_BASE = "python -m pbtranscript.tasks.map_isoforms_to_genome"
+    INPUT_FILES = [GMAP_INPUT_DATASET, GMAP_REF_DATASET]
+
+    def run_after(self, rtc, output_dir):
+        gmap_sam_out = rtc.task.output_files[0]
+        assert op.exists(gmap_sam_out)
+        from pbtranscript.io import GMAPSAMReader
+        with GMAPSAMReader(gmap_sam_out) as reader:
+            reads = [r for r in reader]
+            assert(len(reads) == 984)
 
 
 if __name__ == "__main__":

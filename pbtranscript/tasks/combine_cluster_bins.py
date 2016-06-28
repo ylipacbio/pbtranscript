@@ -12,7 +12,7 @@ from pbcommand.cli.core import pbparser_runner
 from pbcommand.models import FileTypes
 from pbcommand.utils import setup_log
 
-from pbtranscript.Utils import as_contigset, mkdir, get_sample_name
+from pbtranscript.Utils import as_contigset, mkdir, get_sample_name, ln
 from pbtranscript.PBTranscriptOptions import (BaseConstants,
                                               get_base_contract_parser,
                                               add_cluster_summary_report_arguments,
@@ -53,6 +53,7 @@ def get_contract_parser():
         idx 4 - hq_isoforms.fq
         idx 5 - lq_isoforms.contigset.xml
         idx 6 - lq_isoforms.fq
+        idx 7 - hq_lq_prefix_dict.pickle
     """
     p = get_base_contract_parser(Constants, default_level="DEBUG")
     p.add_input_file_type(FileTypes.PICKLE, "cluster_chunks_pickle", "Pickle In",
@@ -73,6 +74,12 @@ def get_contract_parser():
     # output idx 3, hq_isoforms_fa, idx 4, hq_isoforms_fq,
     # idx 5 lq_isoforms_fa, idx 6 lq_isoforms_fq
     add_ice_post_quiver_hq_lq_arguments(p)
+
+    # output idx 7, hq_lq_prefix_dict.pickle
+    p.add_output_file_type(FileTypes.PICKLE, "hq_lq_prefix_dict",
+                           name="Pickle",
+                           description="Pickle mapping HQ (LQ) sample prefixes with ICE dir",
+                           default_name="hq_lq_prefix_dict")
 
     # user specified sample name.
     p.add_str(option_id=Constants.SAMPLE_NAME_ID, option_str="sample_name",
@@ -104,6 +111,7 @@ def resolved_tool_contract_runner(rtc):
     out_hq_fq = rtc.task.output_files[4]
     out_lq_cs = rtc.task.output_files[5]
     out_lq_fq = rtc.task.output_files[6]
+    out_hq_lq_prefix_dict_pickle = rtc.task.output_files[7]
 
     assert out_consensus_isoforms_cs.endswith(".contigset.xml")
     assert out_hq_cs.endswith(".contigset.xml")
@@ -133,7 +141,6 @@ def resolved_tool_contract_runner(rtc):
     combined_dir = op.join(op.dirname(op.dirname(cluster_out_dirs[0])), "combined")
     mkdir(combined_dir)
     combined_files = CombinedFiles(combined_dir)
-    out_hq_lq_prefix_dict_pickle = op.join(combined_dir, "hq_lq_prefix_dict.pickle")
     log.info("Combining results of all cluster bins to %s.", combined_dir)
     log.info("Merging HQ|LQ isoforms from all cluster bins.")
     log.info("HQ isoforms are: %s.", ",".join(hq_fq_fns))
@@ -148,19 +155,11 @@ def resolved_tool_contract_runner(rtc):
                               hq_lq_prefix_dict_pickle=combined_files.hq_lq_prefix_dict_pickle,
                               sample_name=sample_name)
 
-    def _cp(in_f, out_f, desc):
-        log.info("Copying %s %s to %s", str(desc), str(in_f), str(out_f))
-        shutil.copyfile(in_f, out_f)
-        #if out_f.endswith('.fasta'):
-        #    out_xml = out_f.replace('.fasta', '.contigset.xml')
-        #    as_contigset(out_f, out_xml)
-
-    _cp(in_f=combined_files.all_hq_fa, out_f=out_hq_fa, desc='HQ isoforms')
-    _cp(in_f=combined_files.all_hq_fq, out_f=out_hq_fq, desc='HQ isoforms')
-    _cp(in_f=combined_files.all_lq_fa, out_f=out_lq_fa, desc='LQ isoforms')
-    _cp(in_f=combined_files.all_lq_fq, out_f=out_lq_fq, desc='LQ isoforms')
-    _cp(in_f=combined_files.hq_lq_prefix_dict_pickle,
-        out_f=out_hq_lq_prefix_dict_pickle, desc="hq_lq_prefix dict pickle")
+    ln(combined_files.all_hq_fa, out_hq_fa) #'HQ isoforms'
+    ln(combined_files.all_hq_fq, out_hq_fq) #'HQ isoforms'
+    ln(combined_files.all_lq_fa, out_lq_fa) #'LQ isoforms'
+    ln(combined_files.all_lq_fq, out_lq_fq) #'LQ isoforms'
+    ln(combined_files.hq_lq_prefix_dict_pickle, out_hq_lq_prefix_dict_pickle)
 
     as_contigset(out_hq_fa, out_hq_cs)
     as_contigset(out_lq_fa, out_lq_cs)
@@ -170,8 +169,8 @@ def resolved_tool_contract_runner(rtc):
                                split_files=split_consensus_isoforms,
                                combined_consensus_isoforms_fa=combined_files.all_consensus_isoforms_fa,
                                sample_name=sample_name)
-    _cp(in_f=combined_files.all_consensus_isoforms_fa,
-        out_f=out_consensus_isoforms_fa, desc="consensus isoforms")
+    ln(combined_files.all_consensus_isoforms_fa, out_consensus_isoforms_fa)
+    #consensus isoforms
     as_contigset(out_consensus_isoforms_fa, out_consensus_isoforms_cs)
 
     log.info("Writing cluster summary to %s", combined_files.all_cluster_summary_fn)
@@ -179,7 +178,7 @@ def resolved_tool_contract_runner(rtc):
                           isoforms_fa=out_consensus_isoforms_cs,
                           hq_fa=out_hq_fa,
                           lq_fa=out_lq_fa)
-    _cp(in_f=combined_files.all_cluster_summary_fn, out_f=out_summary, desc="cluster summary")
+    ln(combined_files.all_cluster_summary_fn, out_summary) # "cluster summary"
 
     log.info("Writing cluster report to %s", combined_files.all_cluster_report_fn)
     write_combined_cluster_report(split_indices=cluster_bin_indices,
@@ -187,7 +186,7 @@ def resolved_tool_contract_runner(rtc):
                                   split_partial_uc_pickles=split_partial_uc_pickles,
                                   report_fn=combined_files.all_cluster_report_fn,
                                   sample_name=sample_name)
-    _cp(in_f=combined_files.all_cluster_report_fn, out_f=out_report, desc="cluster report")
+    ln(combined_files.all_cluster_report_fn, out_report) # "cluster report"
 
 
 def main():
