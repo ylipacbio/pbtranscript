@@ -14,3 +14,4 @@ from .SAMReaders import GMAPSAMReader, GMAPSAMRecord, iter_gmap_sam
 from .GroupIO import *
 from .GffIO import *
 from .ReadStatIO import *
+from .AbundanceIO import *
