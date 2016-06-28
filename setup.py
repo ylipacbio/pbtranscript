@@ -96,7 +96,6 @@ setup(
              'pbtranscript/ice_quiver.py',
              'pbtranscript/ice_fa2fq.py',
              'pbtranscript/ice_fa2fq.py',
-             'pbtranscript/separate_flnc.py',
             ],
     entry_points={'console_scripts': [
         'pbtranscript = pbtranscript.PBTranscriptRunner:main',
@@ -104,6 +103,7 @@ setup(
         'filter_sam.py = pbtranscript.io.filter_sam:main',
         'ice_polish.py = pbtranscript.Polish:main',
         'ice_make_input_fasta_fofn.py = pbtranscript.ice.make_input_fasta_fofn:main',
+        'separate_flnc.py = pbtranscript.tasks.separate_flnc:main',
         'map_isoforms_to_genome.py = pbtranscript.tasks.map_isoforms_to_genome:main',
         'collapse_mapped_isoforms.py = pbtranscript.tasks.collapse_mapped_isoforms:main',
         'make_abundance.py = pbtranscript.tasks.make_abundance:main'
