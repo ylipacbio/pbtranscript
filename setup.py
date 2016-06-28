@@ -108,6 +108,7 @@ setup(
         'collapse_mapped_isoforms.py = pbtranscript.tasks.collapse_mapped_isoforms:main',
         'make_abundance.py = pbtranscript.tasks.make_abundance:main',
         'filter_by_count.py = pbtranscript.tasks.filter_by_count:main',
+        'post_mapping_to_genome.py = pbtranscript.tasks.post_mapping_to_genome:main'
         ]},
     package_dir={'pbtranscript': 'pbtranscript'},
     package_data={'pbtranscript':
