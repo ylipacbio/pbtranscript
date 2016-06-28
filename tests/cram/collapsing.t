@@ -22,26 +22,17 @@
   0
 
 # Test collapse_mapped_isoforms
-  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA $SORTED_GMAP_OUTPUT $OD/fa_in.fasta && echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA $SORTED_GMAP_OUTPUT $OD/fa_in && echo $?
   0
 
-  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA $SORTED_GMAP_OUTPUT $OD/fa_in.contigset.xml && echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ $SORTED_GMAP_OUTPUT $OD/fq_in --collapsed_isoforms=$OD/output_fq_in.fastq && echo $?
+  0
+  $ cat $OD/output_fq_in.fastq | wc -l
+  240
+
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA_DS $SORTED_GMAP_OUTPUT $OD/fa_ds_in && echo $?
   0
 
-  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ $SORTED_GMAP_OUTPUT $OD/fq_in.fasta && echo $?
+  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ_DS $SORTED_GMAP_OUTPUT $OD/fq_ds_in --collapsed_isoforms=$OD/output_fq_ds_in.fastq & echo $?
   0
-
-  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ $SORTED_GMAP_OUTPUT $OD/fq_in.contigset.xml && echo $?
-  0
-
-  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA_DS $SORTED_GMAP_OUTPUT $OD/fa_ds_in.fasta && echo $?
-  0
-
-  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA_DS $SORTED_GMAP_OUTPUT $OD/fa_ds_in.contigset.xml && echo $?
-  0
-
-  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ_DS $SORTED_GMAP_OUTPUT $OD/fq_ds_in.fastq && echo $?
-  0
-
-  $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ_DS $SORTED_GMAP_OUTPUT $OD/fq_ds_in.contigset.xml & echo $?
-  0
+# Strangely, $OD/output_fq_ds_in.fastq (a soft link output) can not be accessed within this cram test, even with sleep 10.

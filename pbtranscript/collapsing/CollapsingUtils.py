@@ -14,9 +14,9 @@ from collections import defaultdict
 import numpy as np
 from pbcore.io import FastaWriter, FastqWriter, ContigSet
 from pbtranscript.Utils import execute, rmpath, as_contigset
-from pbtranscript.io import ContigSetReaderWrapper, FastaRandomReader, FastqRandomReader
-from pbtranscript.io.GffIO import CollapseGffRecord, CollapseGffReader, CollapseGffWriter
-from pbtranscript.io.GroupIO import GroupRecord, GroupReader, GroupWriter
+from pbtranscript.io import ContigSetReaderWrapper, FastaRandomReader, FastqRandomReader, \
+    CollapseGffRecord, CollapseGffReader, CollapseGffWriter, \
+    GroupRecord, GroupReader, GroupWriter, parse_ds_filename
 from pbtranscript.collapsing import c_branch, IntervalTree
 
 __all__ = ["ContiVec",
@@ -657,12 +657,13 @@ def pick_rep(isoform_filename, gff_filename,
     """
     fd = None
     is_fq = False
-    if isoform_filename.endswith(".fa") or isoform_filename.endswith(".fasta"):
+    dummy_prefix, _suffix = parse_ds_filename(isoform_filename)
+    if _suffix == "fasta":
         fd = FastaRandomReader(isoform_filename)
-    elif isoform_filename.endswith(".fq") or isoform_filename.endswith(".fastq"):
+    elif _suffix == "fastq":
         fd = FastqRandomReader(isoform_filename)
         is_fq = True
-    elif isoform_filename.endswith(".xml"):
+    elif _suffix == "contigset.xml":
         fd = ContigSet(isoform_filename)
         _fns = fd.toExternalFiles()
         if len(_fns) == 1 and _fns[0].endswith(".fq") or _fns[0].endswith(".fastq"):
@@ -678,23 +679,19 @@ def pick_rep(isoform_filename, gff_filename,
 
     fa_out_fn, fq_out_fn, ds_out_fn = None, None, None
 
-    if output_filename.endswith(".fasta") or output_filename.endswith(".fa"):
+    _prefix, _suffix = parse_ds_filename(output_filename)
+    if _suffix == "fasta":
         fa_out_fn = output_filename
-    elif output_filename.endswith(".fastq") or output_filename.endswith(".fq"):
+    elif _suffix == "fastq":
         if not is_fq:
             raise ValueError("Input file %s is not FASTQ while output is." % isoform_filename)
         else:
             fq_out_fn = output_filename
-    elif output_filename.endswith(".contigset.xml"): # output is contigset.xml
+    elif _suffix == "contigset.xml": # output is contigset.xml
         ds_out_fn = output_filename
-        fa_out_fn = output_filename[:-14] + ".fasta"
+        fa_out_fn = _prefix + ".fasta"
         if is_fq:
-            fq_out_fn = output_filename[:-14] + ".fastq"
-    elif output_filename.endswith(".xml"): # .xml
-        ds_out_fn = output_filename
-        fa_out_fn = output_filename[:-4] + ".fasta"
-        if is_fq:
-            fq_out_fn = output_filename[:-4] + ".fastq"
+            fq_out_fn = _prefix + ".fastq"
     else:
         raise IOError("Unable to recognize file type of %s." % output_filename)
 
@@ -747,6 +744,5 @@ def pick_rep(isoform_filename, gff_filename,
         fa_writer.close()
     if fq_writer is not None:
         fq_writer.close()
-
     if ds_out_fn is not None:
         as_contigset(fa_out_fn, ds_out_fn)

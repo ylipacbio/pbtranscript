@@ -15,3 +15,4 @@ from .GroupIO import *
 from .GffIO import *
 from .ReadStatIO import *
 from .AbundanceIO import *
+from .common import *

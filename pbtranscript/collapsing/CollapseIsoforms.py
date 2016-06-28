@@ -23,52 +23,19 @@ import os.path as op
 
 from pbtranscript.Utils import ln
 from pbtranscript.io import iter_gmap_sam, ContigSetReaderWrapper, \
-        CollapseGffWriter, GroupWriter
+        CollapseGffWriter, GroupWriter, parse_ds_filename
+from pbtranscript.collapsing.common import CollapsedFiles
 from pbtranscript.collapsing.CollapsingUtils import collapse_sam_records, \
         collapse_fuzzy_junctions, pick_rep
 
+
 __all__ = ["Branch",
-           "CollapsedFiles",
            "CollapseIsoformsRunner"]
 
 
 __author__ = 'etseng@pacificbiosciences.com'
 
 log = logging.getLogger(__name__)
-
-class Constants(object):
-    """Constants used in tool contract."""
-    TOOL_ID = "pbtranscript.tasks.collapse_mapped_isoforms"
-    DRIVER_EXE = "python -m %s --resolved-tool-contract " % TOOL_ID
-    PARSER_DESC = __doc__
-
-    MIN_ALN_COVERAGE_ID = "pbtranscript.task_options.min_gmap_aln_coverage"
-    MIN_ALN_COVERAGE_DEFAULT = 0.99
-    MIN_ALN_COVERAGE_DESC = "Min query coverage to analyze a GMAP alignment (default: %s)" % \
-                            MIN_ALN_COVERAGE_DEFAULT
-
-    MIN_ALN_IDENTITY_ID = "pbtranscript.task_options.min_gmap_aln_identity"
-    MIN_ALN_IDENTITY_DEFAULT = 0.95
-    MIN_ALN_IDENTITY_DESC = "Min identity to analyze a GMAP alignment (default: %s)" % \
-                            MIN_ALN_IDENTITY_DEFAULT
-
-    MAX_FUZZY_JUNCTION_ID = "pbtranscript.task_options.max_fuzzy_junction"
-    MAX_FUZZY_JUNCTION_DEFAULT = 5
-    MAX_FUZZY_JUNCTION_DESC = "Max edit distance between merge-able fuzzy junctions " + \
-                              "(default: %s bp)" % MAX_FUZZY_JUNCTION_DEFAULT
-
-    MIN_FLNC_COVERAGE_DEFAULT = 2
-    MIN_FLNC_COVERAGE_DESC = "Minimum number of FLNC reads (default: %s), " % \
-                             MIN_FLNC_COVERAGE_DEFAULT + \
-                             "only used for aligned FLNC reads, otherwise, result undefined."
-
-    ALLOW_EXTRA_5EXON_ID = "pbtranscript.task_options.allow_extra_5exon"
-    ALLOW_EXTRA_5EXON_DEFAULT = False
-    ALLOW_EXTRA_5EXON_DESC = "True: Collapse shorter 5' transcripts. " + \
-                             "False: Don't collapse shorter 5' transcripts " + \
-                             "(default: %s)" % ALLOW_EXTRA_5EXON_DEFAULT
-
-    SKIP_5_EXON_ALT_DEFAULT = False
 
 
 class Branch(object):
@@ -91,9 +58,7 @@ class Branch(object):
           ignored_ids_fn, good_gff_fn, bad_gff_fn, group_fn)
     """
     def __init__(self, isoform_filename, sam_filename,
-                 cov_threshold=Constants.MIN_FLNC_COVERAGE_DEFAULT,
-                 min_aln_coverage=Constants.MIN_ALN_COVERAGE_DEFAULT,
-                 min_aln_identity=Constants.MIN_ALN_IDENTITY_DEFAULT):
+                 cov_threshold, min_aln_coverage, min_aln_identity):
         self.exons = None
         self.isoform_filename = isoform_filename
         self.isoform_len_dict = ContigSetReaderWrapper.name_to_len_dict(isoform_filename)
@@ -147,98 +112,6 @@ class Branch(object):
                 writer.close()
 
 
-class CollapsedFiles(object):
-    """
-    Class defines output files produced by CollapseIsoformsRunner.
-    """
-    def __init__(self, prefix, allow_extra_5exon):
-        self.prefix = prefix
-        self.allow_extra_5exon = allow_extra_5exon
-
-    @property
-    def has_5merge_str(self):
-        """Return whether or not merge shorter 5 exons."""
-        return "5merge" if self.allow_extra_5exon else "no5merge"
-
-    @property
-    def good_gff_fn(self):
-        """
-        File to save good collapsed transcript in GFF, regardless
-        of whether or not fuzzy-matching transcripts are further collapsed.
-        """
-        return "%s.%s.collapsed.good.gff" % (self.prefix, self.has_5merge_str)
-
-    @property
-    def bad_gff_fn(self):
-        """
-        File to save bad collapsed transcripts in GFF, regardless
-        of whether or not fuzzy-matching transcripts are further collapsed.
-        """
-        return "%s.%s.collapsed.bad.gff" % (self.prefix, self.has_5merge_str)
-
-    @property
-    def group_fn(self):
-        """
-        File to save collapsed transcripts and associated isoforms, regardless
-        of whether or not fuzzy-matching transcripts are further collapsed
-        """
-        return "%s.%s.collapsed.group.txt" % (self.prefix, self.has_5merge_str)
-
-    @property
-    def ignored_ids_txt_fn(self):
-        """File to save ignored isoforms which do not meet
-        min_aln_coverage, or min_aln_identity."""
-        return "%s.%s.ignored_ids.txt" % (self.prefix, self.has_5merge_str)
-
-    @property
-    def good_fuzzy_gff_fn(self):
-        """
-        File to save good transcripts, of which
-        fuzzy-matching transcripts are further collapsed.
-        """
-        return self.good_gff_fn + ".fuzzy"
-
-    @property
-    def good_unfuzzy_gff_fn(self):
-        """
-        File to save good transcripts, of which
-        fuzzy-matching transcripts are NOT further collapsed.
-        """
-        return self.good_gff_fn + ".unfuzzy"
-
-    @property
-    def bad_fuzzy_gff_fn(self):
-        """
-        File to save bad transcripts, of which
-        fuzzy-matching transcripts are further collapsed.
-        """
-        return self.bad_gff_fn + ".fuzzy"
-
-    @property
-    def bad_unfuzzy_gff_fn(self):
-        """
-        File to save bad transcripts, of which
-        fuzzy-matching transcripts are NOT further collapsed.
-        """
-        return self.bad_gff_fn + ".unfuzzy"
-
-    @property
-    def fuzzy_group_fn(self):
-        """
-        File to save collapsed transcripts and associated isoforms, of which
-        fuzzy-matching transcripts are further collapsed
-        """
-        return self.group_fn + ".fuzzy"
-
-    @property
-    def unfuzzy_group_fn(self):
-        """
-        File to save collapsed transcripts and associated isoforms, of which
-        fuzzy-matching transcripts are NOT further collapsed
-        """
-        return self.group_fn + ".unfuzzy"
-
-
 class CollapseIsoformsRunner(CollapsedFiles):
     """
     Collapse isoforms into gene families, requiring
@@ -250,35 +123,31 @@ class CollapseIsoformsRunner(CollapsedFiles):
     Then collapses redundant isoforms into transcripts (families).
     Next, merges transcripts with merge-able fuzzy junctions.
     Writes collapsed isoforms in GFF to good|bad_gff_fn, writes
-    representative reads of collapsed isoforms to collapsed_isoform_filename, and
+    representative reads of collapsed isoforms to rep_fn, and
     writes isoform groups into group_fn.
     """
-    def __init__(self, isoform_filename, sam_filename, collapsed_isoform_filename,
-                 min_aln_coverage=Constants.MIN_ALN_COVERAGE_DEFAULT,
-                 min_aln_identity=Constants.MIN_ALN_IDENTITY_DEFAULT,
-                 min_flnc_coverage=Constants.MIN_FLNC_COVERAGE_DEFAULT,
-                 max_fuzzy_junction=Constants.MAX_FUZZY_JUNCTION_DEFAULT,
-                 allow_extra_5exon=Constants.ALLOW_EXTRA_5EXON_DEFAULT,
-                 skip_5_exon_alt=Constants.SKIP_5_EXON_ALT_DEFAULT):
+    def __init__(self, isoform_filename, sam_filename, output_prefix,
+                 min_aln_coverage, min_aln_identity, min_flnc_coverage,
+                 max_fuzzy_junction, allow_extra_5exon, skip_5_exon_alt):
         """
         Parameters:
           isoform_filename -- input file containing isoforms, as fastq|fasta|contigset
           sam_filename -- input sam file produced by mapping fastq_filename to reference and sorted.
-          collapsed_isoform_filename -- file to output collapsed isoforms as fasta|fastq|contigset
+          #collapsed_isoform_filename -- file to output collapsed isoforms as fasta|fastq|contigset
           min_aln_coverage -- min coverage over reference to collapse a group of isoforms
           min_aln_identity -- min identity aligning to reference to collapse a group of isoforms
-          dun_merge_5_shorter -- False, merge isoforms which are only shorter on 5' to longer ones;
-          max_fuzzy_junction -- max fuzzy junction
+          min_flnc_coverage -- min supportive flnc reads to not ignore an isoform
+          max_fuzzy_junction -- max edit distance between fuzzy-matching exons
+          allow_extra_5exon -- whether or not to allow shorter 5' exons
+          skip_5_exon_alt -- whether or not to skip alternative 5' exons
         """
-        prefix = op.join(op.dirname(collapsed_isoform_filename),
-                         op.basename(collapsed_isoform_filename).split(".")[0])
-
-        super(CollapseIsoformsRunner, self).__init__(prefix=prefix,
+        self.suffix = parse_ds_filename(isoform_filename)[1]
+        super(CollapseIsoformsRunner, self).__init__(prefix=output_prefix,
                                                      allow_extra_5exon=allow_extra_5exon)
 
         self.isoform_filename = isoform_filename # input, uncollapsed fa|fq|ds
         self.sam_filename = sam_filename # input, sorted, gmap sam
-        self.collapsed_isoform_filename = collapsed_isoform_filename # output, collapsed, fa|fq|ds
+        #self.collapsed_isoform_filename = collapsed_isoform_filename # output, collapsed, fa|fq|ds
 
         self.min_aln_coverage = float(min_aln_coverage)
         self.min_aln_identity = float(min_aln_identity)
@@ -304,7 +173,7 @@ class CollapseIsoformsRunner(CollapsedFiles):
     def __str__(self):
         return ("<Map isoforms %s to %s and write collapsed isoforms to %s>, args=%s\n" %
                 (self.isoform_filename, self.sam_filename,
-                 self.collapsed_isoform_filename, self.arg_str))
+                 self.rep_fn(self.suffix), self.arg_str))
 
     def validate_inputs(self):
         """Validate existence of input files. Enusre input reads have unique ids."""
@@ -366,15 +235,16 @@ class CollapseIsoformsRunner(CollapsedFiles):
         # Pick up representative
         logging.info("Picking up representative record.")
         pick_least_err_instead = not self.allow_extra_5exon # 5merge, pick longest
+
         pick_rep(isoform_filename=self.isoform_filename,
                  gff_filename=self.good_gff_fn,
                  group_filename=self.group_fn,
-                 output_filename=self.collapsed_isoform_filename,
+                 output_filename=self.rep_fn(self.suffix),
                  pick_least_err_instead=pick_least_err_instead,
                  bad_gff_filename=self.bad_gff_fn)
 
         logging.info("Ignored IDs written to: %s", self.ignored_ids_txt_fn)
         logging.info("Output GFF written to: %s", self.good_gff_fn)
         logging.info("Output Group TXT written to: %s", self.group_fn)
-        logging.info("Output collapsed isoforms written to: %s", self.collapsed_isoform_filename)
+        logging.info("Output collapsed isoforms written to: %s", self.rep_fn(self.suffix))
         logging.info("Arguments: %s", self.arg_str())
