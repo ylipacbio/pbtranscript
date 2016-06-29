@@ -2,10 +2,12 @@ from setuptools import setup, find_packages
 from distutils.extension import Extension
 import os.path
 import sys
+# FIXME this fails in our build system
 try:
     import numpy
 except ImportError:
-    numpy_include_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../prebuilt.tmpout/pythonpkgs/numpy/numpy_1.9.2/lib/python2.7/site-packages/numpy/core/include"))
+    p4_workspace = os.environ["WORKSPACE"]
+    numpy_include_dir = os.path.join(p4_workspace, "software/smrtanalysis/prebuilt.tmpout/pythonpkgs/numpy/numpy_1.9.2/lib/python2.7/site-packages/numpy/core/include")
 else:
     numpy_include_dir = numpy.get_include()
 
