@@ -5,7 +5,7 @@ import sys
 try:
     import numpy
 except ImportError:
-    numpy_include_dir = "../../../../prebuilt.tmpout/pythonpkgs/numpy/numpy_1.9.2/lib/python2.7/site-packages"
+    numpy_include_dir = "../../../../prebuilt.tmpout/pythonpkgs/numpy/numpy_1.9.2/lib/python2.7/site-packages/numpy/core/include"
 else:
     numpy_include_dir = numpy.get_include()
 
