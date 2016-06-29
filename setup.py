@@ -2,7 +2,12 @@ from setuptools import setup, find_packages
 from distutils.extension import Extension
 import os.path
 import sys
-import numpy
+try:
+    import numpy
+except ImportError:
+    numpy_include_dir = "../../../../prebuilt.tmpout/pythonpkgs/numpy/numpy_1.9.2/lib/python2.7/site-packages"
+else:
+    numpy_include_dir = numpy.get_include()
 
 # icedagcon has been replaced by pbdagcon since SMRTAnalysis 2.3.
 # The pseudo namespace 'pbtools' has been removed and the main entry
@@ -29,7 +34,7 @@ ext_modules = [Extension("pbtranscript.findECE",
                          ["pbtranscript/collapsing/C/intersection.pyx"], language="c++"),
                Extension("pbtranscript.collapsing.c_branch",
                          ["pbtranscript/collapsing/C/c_branch.pyx"], language="c++",
-                         include_dirs=[numpy.get_include()])
+                         include_dirs=[numpy_include_dir])
               ]
 
 
@@ -90,7 +95,7 @@ setup(
     author_email='devnet@pacificbiosciences.com',
     license='LICENSE.txt',
     ext_modules = ext_modules,
-    include_dirs=[numpy.get_include()],
+    include_dirs=[numpy_include_dir],
     scripts=['pbtranscript/ice_pbdagcon.py',
              'pbtranscript/ice_partial.py',
              'pbtranscript/ice_quiver.py',
