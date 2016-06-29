@@ -32,6 +32,11 @@ clean: doc-clean
 	find . -name "*.pyc" | xargs rm -f
 	rm -rf dist/
 	rm -f nostests.xml
+	rm -f pbtranscript/collapsing/C/c_branch.cpp
+	rm -f pbtranscript/collapsing/C/intersection.cpp
+	rm -f pbtranscript/collapsing/C/intersection_unique.cpp
+	rm -f pbtranscript/io/C/SAMReaders.cpp
+
 doc-clean:
 	rm -f doc/*.html
 
