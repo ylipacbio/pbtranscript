@@ -136,26 +136,32 @@ class TestSeparateFLNCBySize(unittest.TestCase):
 
 def test_end_to_end():
     """Call separate_flnc.py from command line, end to end must exit gracefully."""
-    cmd = "separate_flnc.py %s %s --bin_by_primer" % \
-          (FLNC_FASTA, op.join(OUT_DIR, "separate_flnc_by_primer_fasta_input_e2e"))
+    cmd = "separate_flnc.py %s %s %s --bin_by_primer" % \
+          (FLNC_FASTA, op.join(OUT_DIR, "separate_flnc_by_primer_fasta_input_e2e"),
+           op.join(OUT_DIR, "end_to_end1.pickle"))
     execute(cmd)
 
-    cmd = "separate_flnc.py %s %s --bin_by_primer" % \
-          (FLNC_DATASET, op.join(OUT_DIR, "separate_flnc_by_primer_xml_input_e2e"))
+    cmd = "separate_flnc.py %s %s %s --bin_by_primer" % \
+          (FLNC_DATASET, op.join(OUT_DIR, "separate_flnc_by_primer_xml_input_e2e"),
+           op.join(OUT_DIR, "end_to_end2.pickle"))
     execute(cmd)
 
-    cmd = "separate_flnc.py %s %s --bin_size_kb 1" % \
-          (FLNC_FASTA, op.join(OUT_DIR, "separate_flnc_by_size_fasta_input_e2e"))
+    cmd = "separate_flnc.py %s %s %s --bin_size_kb 1" % \
+          (FLNC_FASTA, op.join(OUT_DIR, "separate_flnc_by_size_fasta_input_e2e"),
+           op.join(OUT_DIR, "end_to_end3.pickle"))
     execute(cmd)
 
-    cmd = "separate_flnc.py %s %s --bin_size_kb 1" % \
-          (FLNC_DATASET, op.join(OUT_DIR, "separate_flnc_by_size_xml_input_e2e"))
+    cmd = "separate_flnc.py %s %s %s --bin_size_kb 1" % \
+          (FLNC_DATASET, op.join(OUT_DIR, "separate_flnc_by_size_xml_input_e2e"),
+           op.join(OUT_DIR, "end_to_end4.pickle"))
     execute(cmd)
 
-    cmd = "separate_flnc.py %s %s --bin_manual '[0,3,4,6]'" % \
-          (FLNC_FASTA, op.join(OUT_DIR, "separate_flnc_by_size_fasta_input_manual_e2e"))
+    cmd = "separate_flnc.py %s %s %s --bin_manual '[0,3,4,6]'" % \
+          (FLNC_FASTA, op.join(OUT_DIR, "separate_flnc_by_size_fasta_input_manual_e2e"),
+           op.join(OUT_DIR, "end_to_end5.pickle"))
     execute(cmd)
 
-    cmd = "separate_flnc.py %s %s --bin_manual '[0,3,4,6]'" % \
-          (FLNC_DATASET, op.join(OUT_DIR, "separate_flnc_by_size_xml_input_manual_e2e"))
+    cmd = "separate_flnc.py %s %s %s --bin_manual '[0,3,4,6]'" % \
+          (FLNC_DATASET, op.join(OUT_DIR, "separate_flnc_by_size_xml_input_manual_e2e"),
+           op.join(OUT_DIR, "end_to_end6.pickle"))
     execute(cmd)

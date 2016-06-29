@@ -27,7 +27,7 @@ CCS_DATASET = "m131018_081703_42161_c100585152550000001823088404281404_s1_p0.1.c
 FLNC_DATASET = "isoseq_flnc.contigset.xml"
 NFL_DATASET = "isoseq_nfl.contigset.xml"
 GMAP_INPUT_DATASET = op.join(MNT_DATA, "test_collapsing", "gmap-input.fastq.contigset.xml")
-GMAP_REF_DATASET = op.join(MNT_DATA, "test_map_isoforms", "sirv.gmapreferenceset.xml")
+GMAP_REF_DATASET = op.join(MNT_DATA, "gmap-referenceset-root-dir/SIRV/gmapreferenceset.xml")
 SORTED_GMAP_OUTPUT = op.join(MNT_DATA, "test_branch", "sorted-gmap-output.sam")
 
 

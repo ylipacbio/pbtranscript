@@ -5,6 +5,7 @@ Map isoforms to reference genomes and sort.
 """
 import sys
 import logging
+import os.path as op
 
 from pbcore.io import GmapReferenceSet
 
@@ -72,7 +73,11 @@ def add_gmap_arguments(arg_parser):
 def gmap_db_and_name_from_ds(gmap_ds_filename):
     """Return gmap db dir and gmap db name"""
     gmap_ds = GmapReferenceSet(gmap_ds_filename)
-    return (gmap_ds.gmap.resourceId, gmap_ds.gmap.name)
+    try:
+       json_fn = gmap_ds.externalResources.resources[0].externalResources.resources[0].resourceId
+       return (op.dirname(op.dirname(json_fn)), op.basename(op.dirname(json_fn)))
+    except (ValueError, IndexError):
+        raise IOError("Could not get gmap_build.json file from %s" % gmap_ds_filename)
 
 
 def args_runner(args):

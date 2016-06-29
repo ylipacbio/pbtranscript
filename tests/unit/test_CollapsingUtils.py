@@ -18,8 +18,8 @@ GMAP_INPUT_FASTA_DS = op.join(_SIV_DIR_, 'gmap-input.fasta.contigset.xml')
 GMAP_INPUT_FASTQ_DS = op.join(_SIV_DIR_, 'gmap-input.fastq.contigset.xml')
 GMAP_SAM = op.join(SIV_DATA_DIR, 'test_SAMReader', 'gmap-output.sam')
 
-GMAP_DB = op.join(SIV_DATA_DIR, 'gmap_db')
-GMAP_NAME = 'SIRV'
+GMAP_DB = op.join(SIV_DATA_DIR, 'gmap-referenceset-root-dir/SIRV/')
+GMAP_NAME = 'gmap_db'
 
 
 class TEST_CollapsingUtils(unittest.TestCase):
