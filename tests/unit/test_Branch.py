@@ -215,8 +215,8 @@ class TEST_Branch(unittest.TestCase):
         rmpath(bad_gff_fn)
         rmpath(group_fn)
 
-        b = Branch(isoform_filename=READS_DS,
-                   sam_filename=SORTED_GMAP_SAM)
+        b = Branch(isoform_filename=READS_DS, sam_filename=SORTED_GMAP_SAM,
+                   cov_threshold=2, min_aln_coverage=0.99, min_aln_identity=0.95)
 
         b.run(allow_extra_5exon=True, skip_5_exon_alt=False,
               ignored_ids_fn=None,
