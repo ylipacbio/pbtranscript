@@ -8,7 +8,7 @@ Class CollapsedFiles defines files produced by
 (4) FIltering by subset
 """
 
-__all__ = ["CollapsedFiles"]
+__all__ = ["CollapsedFiles", "FilteredFiles"]
 
 
 class CollapsedFiles(object):
@@ -33,6 +33,11 @@ class CollapsedFiles(object):
         """Return FASTA/FASTQ/ContigSet file of collapsed (unfiltered) isoforms"""
         assert suffix in ("fasta", "fastq", "contigset.xml")
         return "%s.rep.%s" % (self._collapsed_prefix, suffix)
+
+    @property
+    def gff_fn(self):
+        """Return a GFF file, final GFF output, pointing to good_gff_fn."""
+        return "%s.gff" % self._collapsed_prefix
 
     @property
     def good_gff_fn(self):
@@ -108,10 +113,22 @@ class CollapsedFiles(object):
         NOT further collapsed."""
         return self.group_fn + ".unfuzzy"
 
+
+class FilteredFiles(CollapsedFiles):
+    """
+    Class defines collapsed, filtered output files using filter_by_count
+    and filter_out_subsets.
+    """
+    def __init__(self, prefix, allow_extra_5exon, min_count, filter_out_subsets):
+        super(FilteredFiles, self).__init__(prefix, allow_extra_5exon=allow_extra_5exon)
+        self.min_count = int(min_count)
+        self.filter_out_subsets = bool(filter_out_subsets)
+
     @property
     def _filtered_prefix(self):
         """Return prefix for collapsed, filtered isoforms."""
-        return "%s.filtered" % self._collapsed_prefix
+        _prefix = ".".join([self._collapsed_prefix, "min_fl_%d" % self.min_count])
+        return _prefix + ".no_subsets" if self.filter_out_subsets else _prefix
 
     def filtered_rep_fn(self, suffix):
         """Return a FASTA/FASTQ/ContigSet file of collapsed, filtered isoforms"""

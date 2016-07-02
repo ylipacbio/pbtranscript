@@ -427,6 +427,13 @@ def ln(src, dst):
                       format(dst=dst, src=src))
         os.symlink(src, dst)
 
+
+def mv(src, dst):
+    """move src file to dst"""
+    if realpath(src) != realpath(dst):
+        execute("mv %s %s" % (src, dst))
+
+
 def make_pbi(bam_fn, force_make=True):
     """Make *.bam.pbi from *.bam."""
     pbi_fn = "{bam}.pbi".format(bam=bam_fn)
