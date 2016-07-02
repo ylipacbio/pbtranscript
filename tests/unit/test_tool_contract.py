@@ -245,5 +245,25 @@ class TestMapIsoforms(pbcommand.testkit.PbTestApp):
             assert(len(reads) == 984)
 
 
-if __name__ == "__main__":
-    unittest.main()
+@unittest.skipUnless(op.isdir(MNT_DATA), "Missing %s" % MNT_DATA)
+class TestPostMappingToGenome(pbcommand.testkit.PbTestApp):
+    """Call python -m pbtranscript.tasks.post_mapping_to_genome --resolved-tool-contract rtc.json"""
+    DRIVER_BASE = "python -m pbtranscript.tasks.post_mapping_to_genome"
+    d = op.join(MNT_DATA, 'test_make_abundance', 'combined')
+    INPUT_FILES = [op.join(d, "all.polished_hq.fastq"), # hq_isoforms.fq
+                   op.join(d, "../sorted_gmap_alignments.sam"), # sorted gmap sam
+                   op.join(d, "hq_lq_prefix_dict.pickle")] # sample_prefix_dict.pickle
+
+    def run_after(self, rtc, output_dir):
+        rep_fn = rtc.task.output_files[0]
+        gff_fn = rtc.task.output_files[1]
+        abundance_fn = rtc.task.output_files[2]
+        group_fn = rtc.task.output_files[3]
+        read_stat_fn = rtc.task.output_files[4]
+        from pbcore.io import FastqReader
+        from pbtranscript.io import CollapseGffReader, AbundanceReader, GroupReader, ReadStatReader
+        assert(len([r for r in FastqReader(rep_fn)]) == 35)
+        assert(len([r for r in CollapseGffReader(gff_fn)]) == 35)
+        assert(len([r for r in AbundanceReader(abundance_fn)]) == 35)
+        assert(len([r for r in GroupReader(group_fn)]) == 38)
+        assert(len([r for r in ReadStatReader(read_stat_fn)]) == 10415)

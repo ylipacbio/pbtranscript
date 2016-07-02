@@ -1,4 +1,4 @@
-#Test make_abundance.py
+#Test post_mapping_to_genome.py
 
   $ . $TESTDIR/setup.sh
 
@@ -13,27 +13,14 @@
   $ rm -rf $OD && mkdir -p $OD
 
 # Test post_mapping_to_genome.py
+# Test fasta input
+  $ O_fa=$OD/output_mapped.fasta
   $ O_fq=$OD/output_mapped.fastq
   $ O_gff=$OD/output_mapped.gff
   $ O_abundance=$OD/output_mapped.abundance.txt
   $ O_group=$OD/output_mapped.group.txt
   $ O_read_stat=$OD/output_mapped.read_stat.txt
-  $ post_mapping_to_genome.py --quiet $in_hq $in_sam $in_pickle $O_fq $O_gff && echo $?
-  0
 
-  $ cat $O_fq | wc -l
-  152
-
-  $ cat $O_gff | wc -l
-  262
-
-  $ head -1 $O_gff 
-  SIRV1\tPacBio\ttranscript\t10713\t11643\t.\t+\t.\tgene_id "PB.1"; transcript_id "PB.1.1"; (esc)
-
-  $ rm -f $OD/output_mapped.*
-
-# Test fasta input
-  $ O_fa=$OD/output_mapped.fasta
   $ post_mapping_to_genome.py --quiet $in_ha $in_sam $in_pickle $O_fa $O_gff --abundance_fn $O_abundance --group_fn $O_group --read_stat_fn $O_read_stat && echo $?
   0
 
@@ -48,3 +35,18 @@
   id\tlength\tis_fl\tstat\tpbid (esc)
   m54006_160328_233933/17957574/30_1837_CCS\t1807\tY\tunique\tPB.5.4 (esc)
 
+
+# Test fasta input  
+  $ post_mapping_to_genome.py --quiet $in_hq $in_sam $in_pickle $O_fq $O_gff && echo $?
+  0
+
+  $ cat $O_fq | wc -l
+  140
+
+  $ cat $O_gff | wc -l
+  244
+
+  $ head -1 $O_gff 
+  SIRV1\tPacBio\ttranscript\t10713\t11643\t.\t+\t.\tgene_id "PB.1"; transcript_id "PB.1.1"; (esc)
+
+  $ rm -f $OD/output_mapped.*

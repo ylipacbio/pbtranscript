@@ -28,12 +28,12 @@ from pbcommand.utils import setup_log
 from pbtranscript.Utils import ln
 from pbtranscript.io import parse_ds_filename
 from pbtranscript.PBTranscriptOptions import get_base_contract_parser
-from pbtranscript.collapsing import CollapsedFiles, CollapseIsoformsRunner
+from pbtranscript.collapsing import CollapsedFiles, FilteredFiles, CollapseIsoformsRunner
 from pbtranscript.counting import CountRunner
-from pbtranscript.filtering import filter_by_count
+from pbtranscript.filtering import filter_by_count, filter_out_subsets
 
 import pbtranscript.tasks.collapse_mapped_isoforms as cmi
-import pbtranscript.tasks.filter_by_count as fbc
+import pbtranscript.tasks.filter_collapsed_isoforms as fci
 
 
 log = logging.getLogger(__name__)
@@ -82,15 +82,14 @@ def  add_post_mapping_to_genome_io_arguments(arg_parser):
 def add_post_mapping_to_genome_arguments(arg_parser):
     """Add option arguments to parser."""
     cmi.add_collapse_mapped_isoforms_arguments(arg_parser)
-    # no option arguments added to make_abundance
-    fbc.add_filter_by_count_arguments(arg_parser)
+    fci.add_filter_collapsed_isoforms_arguments(arg_parser)
     return arg_parser
 
 
 def add_post_mapping_to_genome_tcp_options(tcp):
     """Add post mapping to genome tcp options"""
     cmi.add_collapse_mapped_isoforms_tcp_options(tcp)
-    fbc.add_filter_by_count_tcp_options(tcp)
+    fci.add_filter_collapsed_isoforms_tcp_options(tcp)
     return tcp
 
 
@@ -102,7 +101,8 @@ def post_mapping_to_genome_runner(in_isoforms, in_sam, in_pickle,
                                   max_fuzzy_junction=cmi.Constants.MAX_FUZZY_JUNCTION_DEFAULT,
                                   allow_extra_5exon=cmi.Constants.ALLOW_EXTRA_5EXON_DEFAULT,
                                   skip_5_exon_alt=cmi.Constants.SKIP_5_EXON_ALT_DEFAULT,
-                                  min_count=fbc.Constants.MIN_COUNT_DEFAULT):
+                                  min_count=fci.Constants.MIN_COUNT_DEFAULT,
+                                  to_filter_out_subsets=True):
     """
     (1) Collapse isoforms and merge fuzzy junctions if needed.
     (2) Generate read stat file and abundance file
@@ -137,32 +137,49 @@ def post_mapping_to_genome_runner(in_isoforms, in_sam, in_pickle,
                      output_abundance_filename=cf.abundance_fn)
     cr.run()
 
-    # (3) Based on abundance file, filter collapsed isoforms by min FL count
+    # (3) Filter collapsed isoforms by min FL count based on abundance file.
+    fff = FilteredFiles(prefix=out_prefix, allow_extra_5exon=allow_extra_5exon,
+                        min_count=min_count, filter_out_subsets=False)
     filter_by_count(in_group_filename=cf.group_fn, in_abundance_filename=cf.abundance_fn,
                     in_gff_filename=cf.good_gff_fn, in_rep_filename=cf.rep_fn(out_suffix),
-                    out_abundance_filename=cf.filtered_abundance_fn,
-                    out_gff_filename=cf.filtered_gff_fn,
-                    out_rep_filename=cf.filtered_rep_fn(out_suffix),
+                    out_abundance_filename=fff.filtered_abundance_fn,
+                    out_gff_filename=fff.filtered_gff_fn,
+                    out_rep_filename=fff.filtered_rep_fn(out_suffix),
                     min_count=min_count)
 
-    # (4) ln outputs
-    ln(cf.filtered_rep_fn(out_suffix), out_isoforms)
-    ln(cf.filtered_gff_fn, out_gff)
-    if out_abundance is not None:
-        ln(cf.filtered_abundance_fn, out_abundance)
-    if out_group is not None:
-        ln(cf.group_fn, out_group)
-    if out_read_stat is not None:
-        ln(cf.read_stat_fn, out_read_stat)
+    fft = FilteredFiles(prefix=out_prefix, allow_extra_5exon=allow_extra_5exon,
+                        min_count=min_count, filter_out_subsets=True)
+    # (4) Remove collapsed isoforms which are a subset of another isoform
+    if to_filter_out_subsets is True:
+        filter_out_subsets(in_abundance_filename=fff.filtered_abundance_fn,
+                           in_gff_filename=fff.filtered_gff_fn,
+                           in_rep_filename=fff.filtered_rep_fn(out_suffix),
+                           out_abundance_filename=fft.filtered_abundance_fn,
+                           out_gff_filename=fft.filtered_gff_fn,
+                           out_rep_filename=fft.filtered_rep_fn(out_suffix),
+                           max_fuzzy_junction=max_fuzzy_junction)
+        fff = fft
 
+    # (5) ln outputs
+    ln(fff.filtered_rep_fn(out_suffix), out_isoforms)
+    ln(fff.filtered_gff_fn, out_gff)
+    if out_abundance is not None:
+        ln(fff.filtered_abundance_fn, out_abundance)
+    if out_group is not None:
+        ln(fff.group_fn, out_group)
+    if out_read_stat is not None:
+        ln(fff.read_stat_fn, out_read_stat)
+
+    logging.info("Filter arguments: min_count = %s, filter_out_subsets=%s",
+                 min_count, filter_out_subsets)
     logging.info("Collapsed and filtered isoform sequences written to %s", out_isoforms)
     logging.info("Collapsed and filtered isoform annotations written to %s", out_gff)
     logging.info("Collapsed and filtered isoform abundance info written to %s",
-                 out_abundance if out_abundance is not None else cf.filtered_abundance_fn)
+                 out_abundance if out_abundance is not None else fff.filtered_abundance_fn)
     logging.info("Collapsed isoform groups written to %s",
-                 out_group if out_group is not None else cf.group_fn)
+                 out_group if out_group is not None else fff.group_fn)
     logging.info("Read status of FL and nFL reads written to %s",
-                 out_read_stat if out_read_stat is not None else cf.read_stat_fn)
+                 out_read_stat if out_read_stat is not None else fff.read_stat_fn)
 
 
 def args_runner(args):
@@ -190,7 +207,8 @@ def resolved_tool_contract_runner(rtc):
         min_aln_identity=rtc.task.options[cmi.Constants.MIN_ALN_IDENTITY_ID],
         max_fuzzy_junction=rtc.task.options[cmi.Constants.MAX_FUZZY_JUNCTION_ID],
         allow_extra_5exon=rtc.task.options[cmi.Constants.ALLOW_EXTRA_5EXON_ID],
-        min_count=rtc.task.options[fbc.Constants.MIN_COUNT_ID])
+        min_count=rtc.task.options[fci.Constants.MIN_COUNT_ID],
+        to_filter_out_subsets=fci.Constants.FILTER_OUT_SUBSETS_DEFAULT)
     return 0
 
 
