@@ -15,10 +15,10 @@
   $ rm -rf $OD && mkdir -p $OD
 
 # Test map_isoforms
-  $ map_isoforms_to_genome.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_name=SIRV --gmap_db=/pbi/dept/secondary/siv/testdata/pbtranscript-unittest/data/gmap_db --gmap_nproc=10 && echo $?
+  $ map_isoforms_to_genome.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_name=gmap_db --gmap_db=$SIVDATDIR/gmap-referenceset-root-dir/SIRV/ --gmap_nproc=10 && echo $?
   0
 
-  $ map_isoforms_to_genome.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_ds=$SIVDATDIR/test_map_isoforms/sirv.gmapreferenceset.xml --gmap_nproc=10 && echo $?
+  $ map_isoforms_to_genome.py --quiet $ISOFORM_FA $OD/gmap-output.sam --gmap_ds=$SIVDATDIR/gmap-referenceset-root-dir/SIRV/gmapreferenceset.xml --gmap_nproc=10 && echo $?
   0
 
 # Test collapse_mapped_isoforms
