@@ -226,10 +226,12 @@ class CollapseIsoformsRunner(CollapsedFiles):
             logging.info("Bad fuzzy isoforms written to: %s", self.bad_fuzzy_gff_fn)
             logging.info("Fuzzy isoform groups written to: %s", self.fuzzy_group_fn)
             ln(self.good_fuzzy_gff_fn, self.good_gff_fn)
+            ln(self.good_fuzzy_gff_fn, self.gff_fn)
             ln(self.fuzzy_group_fn, self.group_fn)
         else:
             logging.info("No need to further collapse fuzzy junctions.")
             ln(self.good_unfuzzy_gff_fn, self.good_gff_fn)
+            ln(self.good_unfuzzy_gff_fn, self.gff_fn)
             ln(self.unfuzzy_group_fn, self.group_fn)
 
         # Pick up representative
@@ -244,7 +246,7 @@ class CollapseIsoformsRunner(CollapsedFiles):
                  bad_gff_filename=self.bad_gff_fn)
 
         logging.info("Ignored IDs written to: %s", self.ignored_ids_txt_fn)
-        logging.info("Output GFF written to: %s", self.good_gff_fn)
+        logging.info("Output GFF written to: %s", self.gff_fn)
         logging.info("Output Group TXT written to: %s", self.group_fn)
         logging.info("Output collapsed isoforms written to: %s", self.rep_fn(self.suffix))
         logging.info("Arguments: %s", self.arg_str())
