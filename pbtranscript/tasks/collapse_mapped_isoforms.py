@@ -189,14 +189,16 @@ def get_contract_parser():
     tcp.add_input_file_type(FileTypes.SAM, "sorted_gmap_sam", "SAM In",
                             "Sorted GMAP SAM file") # input 1
     tcp.add_output_file_type(FileTypes.DS_CONTIG, "collapsed_isoforms_rep_ds",
-                             name="ContigSet file",
+                             name="Collapsed isoforms",
                              description="Representative reads of collapsed isoforms",
                              default_name="output") # output 0
     tcp.add_output_file_type(FileTypes.GFF, "collapsed_isoforms_gff",
-                             name="GFF file", description="Collapsed isoforms gff",
+                             name="Collapsed isoforms GFF",
+                             description="Collapsed isoforms gff",
                              default_name="output") # output 1
     tcp.add_output_file_type(FileTypes.TXT, "groups_txt",
-                             name="TXT file", description="Collapsed isoform groups",
+                             name="TXT file",
+                             description="Collapsed isoform groups",
                              default_name="output_groups") # output 2
 
     add_collapse_mapped_isoforms_tcp_options(tcp)

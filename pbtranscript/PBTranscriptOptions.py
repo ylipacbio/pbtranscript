@@ -59,7 +59,7 @@ def add_classify_arguments(parser):
         name="ConsensusReadSet", description=helpstr)
 
     parser.add_output_file_type(FileTypes.DS_CONTIG, "outReadsFN", # idx 0
-        name="Output ContigSet",
+        name="Draft isoforms",
         description="Output FASTA or ContigSet file",
         default_name="isoseq_draft")
     tcp = parser.tool_contract_parser
@@ -67,7 +67,7 @@ def add_classify_arguments(parser):
     parser = parser.arg_parser.parser
     helpstr = "Output full-length non-chimeric reads in FASTA or ContigSet"
     tcp.add_output_file_type(FileTypes.DS_CONTIG, "flnc", # idx 1
-        name="FASTA or ContigSet file",
+        name="Full-length non-chimeric reads",
         description=helpstr,
         default_name="isoseq_flnc")
     parser.add_argument("--flnc",
@@ -83,7 +83,7 @@ def add_classify_arguments(parser):
                         default=None,
                         help=helpstr)
     tcp.add_output_file_type(FileTypes.DS_CONTIG, "nfl", # idx 2
-        name="FASTA or ContigSet file",
+        name="Non-full-length reads",
         description=helpstr,
         default_name="isoseq_nfl")
 
@@ -126,7 +126,7 @@ def add_classify_arguments(parser):
                            help="CSV file to output primer info (" +
                                 "default: *.primer_info.csv")
     tcp.add_output_file_type(FileTypes.CSV, "report",
-        name="CSV file",
+        name="Primer info",
         description="CSV file to output primer info",
         default_name="isoseq_primer_info")
 
@@ -418,19 +418,19 @@ def add_ice_post_quiver_hq_lq_arguments(parser):
                         "in FASTQ, default: root_dir/output/all_quivered_lq.fastq")
 
     tcp.add_output_file_type(FileTypes.DS_CONTIG, "hq_isoforms_fa",
-        name="ContigSet",
+        name="High-quality isoforms",
         description="High-quality isoform sequences",
         default_name="hq_isoforms")
     tcp.add_output_file_type(FileTypes.FASTQ, "hq_isoforms_fq",
-        name="FASTQ",
+        name="High-quality isoforms (FASTQ)",
         description="High-quality isoform sequences with quality scores",
         default_name="hq_isoforms")
     tcp.add_output_file_type(FileTypes.DS_CONTIG, "lq_isoforms_fa",
-        name="ContigSet",
+        name="Low-quality isoforms",
         description="Low-quality isoform sequences",
         default_name="lq_isoforms")
     tcp.add_output_file_type(FileTypes.FASTQ, "lq_isoforms_fq",
-        name="FASTQ",
+        name="Low-quality isoforms (FASTQ)",
         description="Low-quality isoform sequences with quality scores",
         default_name="lq_isoforms")
     return arg_parser
@@ -536,7 +536,7 @@ def add_cluster_summary_report_arguments(parser):
 
     # FIXME make this a REPORT instead?
     p1.add_output_file_type(FileTypes.CSV, "cluster_report",
-        name="CSV file",
+        name="Cluster report",
         description=helpstr,
         default_name="cluster_report")
     p2.add_argument("--report", default=None, type=str,
@@ -575,7 +575,7 @@ def add_cluster_arguments(parser):
     parser = add_flnc_fa_argument(parser, positional=True)
 
     parser.add_output_file_type(FileTypes.DS_CONTIG, "consensusFa",
-        name="FASTA ContigSet file",
+        name="Unpolished consensus isoforms",
         description="Output predicted (unpolished) consensus isoforms in "+
                     "FASTA or ContigSet file.",
         default_name="consensus_isoforms")

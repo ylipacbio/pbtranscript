@@ -63,7 +63,7 @@ def get_contract_parser():
 
     # output idx 0, consensus_isoforms.contigset,
     p.add_output_file_type(FileTypes.DS_CONTIG, "consensus_isoforms",
-                           name="PacBio ContigSet file",
+                           name="Unpolished consensus isoforms",
                            description="Output unpolished consensus isoforms",
                            default_name="consensus_isoforms")
 

@@ -82,7 +82,8 @@ def get_contract_parser():
     add_fofn_arguments(p.arg_parser.parser, bas_fofn=True,
                        tool_contract_parser=tcp)
     tcp.add_input_file_type(FileTypes.DS_CONTIG, "consensus_fa",
-                            name="ContigSet", description="Consensus isoforms")
+                            name="Consensus isoforms",
+                            description="ContigSet of consensus isoforms")
     tcp.add_input_file_type(FileTypes.PICKLE, "cluster_pickle",
                             name="Clusters",
                             description="Cluster pickle file")
