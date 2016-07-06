@@ -31,7 +31,7 @@ def get_contract_parser():
     add_cluster_arguments(p)
     p.tool_contract_parser.add_output_file_type(
         FileTypes.PICKLE, "pickle_fn",
-        name="Pickle file",
+        name="Clusters pickle file",
         description="Python pickle file of clusters",
         default_name="final_clusters")
     # rtc has 4 inputs:

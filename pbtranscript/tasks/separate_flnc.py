@@ -122,7 +122,7 @@ def get_contract_parser():
                             description="FLNC reads ContigSet")
     tcp.add_output_file_type(FileTypes.PICKLE, "out_pickle",
                              default_name="separate_flnc",
-                             name="Pickle file", description="output bins in pickle.")
+                             name="Binned transcripts pickle file", description="output bins in pickle.")
     add_separate_flnc_tcp_options(tcp)
     return p
 
