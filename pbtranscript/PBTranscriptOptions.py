@@ -115,7 +115,7 @@ def add_classify_arguments(parser):
                            help="TXT file to output classsify summary (" +
                                 "default: *.classify_summary.txt")
     tcp.add_output_file_type(FileTypes.JSON, "json_summary",
-        name="JSON summary",
+        name="Transcript classification report",
         description="JSON summary",
         default_name="summary")
 
@@ -530,7 +530,7 @@ def add_cluster_summary_report_arguments(parser):
     p2.add_argument("--summary", default=None, type=str,
                         dest="summary_fn", help=helpstr)
     p1.add_output_file_type(FileTypes.JSON, "json_summary",
-        name="JSON summary",
+        name="Transcript clustering report",
         description="JSON summary",
         default_name="summary")
 
