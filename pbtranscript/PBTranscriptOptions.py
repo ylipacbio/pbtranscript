@@ -5,9 +5,7 @@ import argparse
 import random
 
 from pbcommand.cli.core import get_default_argparser_with_base_opts
-from pbcommand.models import FileTypes, SymbolTypes, ResourceTypes, get_pbparser
-from pbcommand.common_options import add_resolved_tool_contract_option, \
-    add_log_debug_option
+from pbcommand.models import FileTypes, SymbolTypes, ResourceTypes, get_pbparser, PbParser
 
 from pbtranscript.Utils import validate_fofn
 from pbtranscript.__init__ import get_version
@@ -36,6 +34,9 @@ class BaseConstants(object):
     IGNORE_POLYA_DEFAULT = False
     HQ_QUIVER_MIN_ACCURACY_ID = "pbtranscript.task_options.hq_quiver_min_accuracy"
     HQ_QUIVER_MIN_ACCURACY_DEFAULT = 0.99
+    HQ_QUIVER_MIN_ACCURACY_DESC = "Minimum allowed quiver accuracy to classify an isoform " + \
+                                  "as hiqh-quality (default: %s)" % HQ_QUIVER_MIN_ACCURACY_DEFAULT
+
     QV_TRIM_FIVEPRIME_ID = "pbtranscript.task_options.qv_trim_5p"
     QV_TRIM_FIVEPRIME_DEFAULT = 100
     QV_TRIM_FIVEPRIME_DESC = "Ignore QV of n bases in the 5' end " + \
@@ -345,54 +346,33 @@ def add_sge_arguments(arg_parser, blasr_nproc=False, quiver_nproc=False, gcon_np
     return arg_parser
 
 
-# FIXME the way the two parsers are being handled is not optimal - this is due
-# to argument re-use in pbtranscript cmd and ice_quiver.py, but the tool
-# contracts are much different
-def add_ice_post_quiver_hq_lq_arguments(parser):
-    """
-    Add quiver QV threshold to mark an isoform as
-    high-quality or low-quality.
+def add_ice_post_quiver_hq_lq_io_arguments(parser):
+    """Add polished high-quality|low-quality isoforms in FASTA|FASTQ files."""
+    if isinstance(parser, PbParser):
+        # parser = _wrap_parser(parser)
+        arg_parser = parser.arg_parser.parser
+        tcp = parser.tool_contract_parser
+        tcp.add_output_file_type(FileTypes.DS_CONTIG, "hq_isoforms_fa",
+                                 name="High-quality isoforms",
+                                 description="High-quality isoform sequences",
+                                 default_name="hq_isoforms")
+        tcp.add_output_file_type(FileTypes.FASTQ, "hq_isoforms_fq",
+                                 name="High-quality isoforms (FASTQ)",
+                                 description="High-quality isoform sequences with quality scores",
+                                 default_name="hq_isoforms")
+        tcp.add_output_file_type(FileTypes.DS_CONTIG, "lq_isoforms_fa",
+                                 name="Low-quality isoforms",
+                                 description="Low-quality isoform sequences",
+                                 default_name="lq_isoforms")
+        tcp.add_output_file_type(FileTypes.FASTQ, "lq_isoforms_fq",
+                                 name="Low-quality isoforms (FASTQ)",
+                                 description="Low-quality isoform sequences with quality scores",
+                                 default_name="lq_isoforms")
+    else:
+        assert isinstance(parser, argparse.ArgumentParser)
+        arg_parser = parser
 
-    Add polished high-quality|low-quality isoforms in
-    FASTA|FASTQ files.
-    """
-    if parser.__class__ is argparse.ArgumentParser:
-        parser = _wrap_parser(parser)
-    arg_parser = parser.arg_parser.parser
-    tcp = parser.tool_contract_parser
-    icq_gp = arg_parser.add_argument_group("IceQuiver High QV/Low QV arguments")
-    helpstr = "Minimum allowed quiver accuracy to " +\
-              "classify an isoform as hiqh-quality."
-    icq_gp.add_argument("--hq_quiver_min_accuracy",
-                        type=float,
-                        default=BaseConstants.HQ_QUIVER_MIN_ACCURACY_DEFAULT,
-                        dest="hq_quiver_min_accuracy",
-                        help=helpstr)
-    tcp.add_float(BaseConstants.HQ_QUIVER_MIN_ACCURACY_ID,
-        "hq_quiver_min_accuracy",
-        default=BaseConstants.HQ_QUIVER_MIN_ACCURACY_DEFAULT,
-        name="Minimum Quiver Accuracy",
-        description=helpstr)
-    icq_gp.add_argument("--qv_trim_5",
-                        type=int,
-                        default=BaseConstants.QV_TRIM_FIVEPRIME_DEFAULT,
-                        dest="qv_trim_5",
-                        help="Ignore QV of n bases in the 5' end.")
-    tcp.add_int(BaseConstants.QV_TRIM_FIVEPRIME_ID, "qv_trim_5",
-        default=BaseConstants.QV_TRIM_FIVEPRIME_DEFAULT,
-        name="Trim QVs 5'",
-        description="Ignore QV of n bases in the 5' end.")
-
-    icq_gp.add_argument("--qv_trim_3",
-                        type=int,
-                        default=BaseConstants.QV_TRIM_THREEPRIME_DEFAULT,
-                        dest="qv_trim_3",
-                        help="Ignore QV of n bases in the 3' end.")
-    tcp.add_int(BaseConstants.QV_TRIM_THREEPRIME_ID, "qv_trim_3",
-        default=BaseConstants.QV_TRIM_THREEPRIME_DEFAULT,
-        name="Trim QVs 3'",
-        description="Ignore QV of n bases in the 3' end.")
-
+    icq_gp = arg_parser.add_argument_group("IceQuiver HQ/LQ IO arguments")
     icq_gp.add_argument("--hq_isoforms_fa",
                         default=None,
                         type=str,
@@ -420,30 +400,58 @@ def add_ice_post_quiver_hq_lq_arguments(parser):
                         dest="lq_isoforms_fq",
                         help="Quiver polished, low quality isoforms " +
                         "in FASTQ, default: root_dir/output/all_quivered_lq.fastq")
-
-    tcp.add_output_file_type(FileTypes.DS_CONTIG, "hq_isoforms_fa",
-        name="High-quality isoforms",
-        description="High-quality isoform sequences",
-        default_name="hq_isoforms")
-    tcp.add_output_file_type(FileTypes.FASTQ, "hq_isoforms_fq",
-        name="High-quality isoforms (FASTQ)",
-        description="High-quality isoform sequences with quality scores",
-        default_name="hq_isoforms")
-    tcp.add_output_file_type(FileTypes.DS_CONTIG, "lq_isoforms_fa",
-        name="Low-quality isoforms",
-        description="Low-quality isoform sequences",
-        default_name="lq_isoforms")
-    tcp.add_output_file_type(FileTypes.FASTQ, "lq_isoforms_fq",
-        name="Low-quality isoforms (FASTQ)",
-        description="Low-quality isoform sequences with quality scores",
-        default_name="lq_isoforms")
-    return arg_parser
+    return parser
 
 
-def add_fofn_arguments(arg_parser, ccs_fofn=False, bas_fofn=False,
+def add_ice_post_quiver_hq_lq_arguments(parser):
+    """Add quiver QV threshold to mark an isoform as high-quality or low-quality.
+    Add quiver output arguments."""
+    parser = add_ice_post_quiver_hq_lq_qv_arguments(parser)
+    return add_ice_post_quiver_hq_lq_io_arguments(parser)
+
+
+def add_ice_post_quiver_hq_lq_qv_arguments(parser):
+    """Add quiver QV threshold to mark an isoform as high-quality or low-quality."""
+    if isinstance(parser, PbParser):
+        #parser = _wrap_parser(parser)
+        arg_parser = parser.arg_parser.parser
+        tcp = parser.tool_contract_parser
+        tcp.add_float(BaseConstants.HQ_QUIVER_MIN_ACCURACY_ID, "hq_quiver_min_accuracy",
+                      default=BaseConstants.HQ_QUIVER_MIN_ACCURACY_DEFAULT,
+                      name="Minimum Quiver Accuracy", description=BaseConstants.HQ_QUIVER_MIN_ACCURACY_DESC)
+        tcp.add_int(BaseConstants.QV_TRIM_FIVEPRIME_ID, "qv_trim_5",
+                    default=BaseConstants.QV_TRIM_FIVEPRIME_DEFAULT,
+                    name="Trim QVs 5'", description=BaseConstants.QV_TRIM_FIVEPRIME_DESC)
+        tcp.add_int(BaseConstants.QV_TRIM_THREEPRIME_ID, "qv_trim_3",
+                    default=BaseConstants.QV_TRIM_THREEPRIME_DEFAULT,
+                    name="Trim QVs 3'", description=BaseConstants.QV_TRIM_THREEPRIME_DESC)
+    else:
+        assert isinstance(parser, argparse.ArgumentParser)
+        arg_parser = parser
+
+    icq_gp = arg_parser.add_argument_group("IceQuiver High QV/Low QV arguments")
+    icq_gp.add_argument("--hq_quiver_min_accuracy",
+                        type=float,
+                        default=BaseConstants.HQ_QUIVER_MIN_ACCURACY_DEFAULT,
+                        dest="hq_quiver_min_accuracy",
+                        help=BaseConstants.HQ_QUIVER_MIN_ACCURACY_DESC)
+    icq_gp.add_argument("--qv_trim_5",
+                        type=int,
+                        default=BaseConstants.QV_TRIM_FIVEPRIME_DEFAULT,
+                        dest="qv_trim_5",
+                        help=BaseConstants.QV_TRIM_FIVEPRIME_DESC)
+    icq_gp.add_argument("--qv_trim_3",
+                        type=int,
+                        default=BaseConstants.QV_TRIM_THREEPRIME_DEFAULT,
+                        dest="qv_trim_3",
+                        help=BaseConstants.QV_TRIM_THREEPRIME_DESC)
+    return parser
+
+
+def add_fofn_arguments(arg_parser, ccs_fofn=False, bas_fofn=False, fasta_fofn=False,
                        tool_contract_parser=None):
     """Add ccs_fofn, bas_fofn, fasta_fofn arguments."""
-    helpstr = "A FOFN of ccs.h5, bam or dataset xml (e.g., ccs.fofn|bam|consensusreadset.xml), " + \
+    helpstr = "A FOFN of ccs.bam or dataset xml (e.g., ccs.fofn|bam|consensusreadset.xml), " + \
               "which contain quality values of consensus (CCS) reads. " + \
               "If not given, assume there is no QV information available."
     if ccs_fofn is True:
@@ -457,7 +465,7 @@ def add_fofn_arguments(arg_parser, ccs_fofn=False, bas_fofn=False,
             tool_contract_parser.add_input_file_type(FileTypes.DS_CCS,
                 "ccs_fofn", "CCS dataset", helpstr)
 
-    helpstr = "A FOFN of bax/bas.h5, bam or dataset xml (e.g., input.fofn|bam|subreadset.xml), " + \
+    helpstr = "A FOFN of bam or dataset xml (e.g., input.fofn|bam|subreadset.xml), " + \
               "which contain quality values of raw reads and subreads"
     if bas_fofn is True:
         arg_parser.add_argument("--bas_fofn",
@@ -515,10 +523,6 @@ def add_nfl_fa_argument(arg_parser, positional=False, required=False,
         assert(required is True or required is False)
         arg_parser.add_argument("--nfl_fa", type=str, dest="nfl_fa",
                                 required=required, help=helpstr)
-
-    arg_parser.add_argument("--nfl_reads_per_split", type=int,
-                            dest="nfl_reads_per_split", default=60000,
-                            help="Number of nFL reads per split file (default: 60000)")
 
     if tool_contract_parser is not None:
         tool_contract_parser.add_input_file_type(FileTypes.DS_CONTIG,
@@ -721,7 +725,6 @@ def get_argument_parser():
     return ap
 
 def get_base_contract_parser(Constants=BaseConstants, default_level="WARN"):
-    resources = ()
     p = get_pbparser(
         tool_id=Constants.TOOL_ID,
         version=get_version(),
