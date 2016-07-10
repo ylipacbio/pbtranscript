@@ -470,6 +470,13 @@ def add_fofn_arguments(arg_parser, ccs_fofn=False, bas_fofn=False,
             tool_contract_parser.add_input_file_type(FileTypes.DS_SUBREADS,
                 "subreads_fofn", "SubreadSet", helpstr)
 
+    helpstr = "A FOFN of trimmed subreads fasta (e.g. input.fasta.fofn)"
+    if fasta_fofn is True:
+        arg_parser.add_argument("--fasta_fofn",
+                                dest="fasta_fofn",
+                                type=validate_fofn,
+                                default=None,
+                                help=helpstr)
     return arg_parser
 
 
@@ -508,6 +515,11 @@ def add_nfl_fa_argument(arg_parser, positional=False, required=False,
         assert(required is True or required is False)
         arg_parser.add_argument("--nfl_fa", type=str, dest="nfl_fa",
                                 required=required, help=helpstr)
+
+    arg_parser.add_argument("--nfl_reads_per_split", type=int,
+                            dest="nfl_reads_per_split", default=60000,
+                            help="Number of nFL reads per split file (default: 60000)")
+
     if tool_contract_parser is not None:
         tool_contract_parser.add_input_file_type(FileTypes.DS_CONTIG,
             "nfl_fa", "FASTA or ContigSet file", helpstr)
@@ -589,7 +601,7 @@ def add_cluster_arguments(parser):
     arg_parser = add_nfl_fa_argument(arg_parser, positional=False,
                                      required=False,
                                      tool_contract_parser=tool_contract_parser)
-    arg_parser = add_fofn_arguments(arg_parser, ccs_fofn=True, bas_fofn=True,
+    arg_parser = add_fofn_arguments(arg_parser, ccs_fofn=True, bas_fofn=True, fasta_fofn=True,
                                     tool_contract_parser=tool_contract_parser)
 
     helpstr = "Directory to store temporary and output cluster files." + \
@@ -609,7 +621,7 @@ def add_cluster_arguments(parser):
 
     # Add Sge options
     arg_parser = add_sge_arguments(arg_parser, blasr_nproc=True,
-                                   quiver_nproc=True)
+                                   quiver_nproc=True, gcon_nproc=True)
 
     # Add IceQuiver HQ/LQ options.
     arg_parser = add_ice_post_quiver_hq_lq_arguments(arg_parser)
@@ -622,7 +634,7 @@ def add_subset_arguments(parser):
         name="ContigSet",
         description="Input FASTA file (usually isoseq_draft.fasta)")
     parser.add_output_file_type(FileTypes.DS_CONTIG, "outFN",
-        name="Output ContigSet",
+        name="Output FASTA or ContigSet",
         description="Output FASTA file",
         default_name="pbtranscript_subset_out")
 
