@@ -152,10 +152,11 @@ class IceQuiverPostprocess(IceFiles):
 
     def __init__(self, root_dir, ipq_opts,
                  use_sge=False, quit_if_not_done=True,
-                 summary_fn=None, report_fn=None):
+                 summary_fn=None, report_fn=None,
+                 no_log_f=False, make_dirs=True):
         super(IceQuiverPostprocess, self).__init__(
                 prog_name="ice_quiver_postprocess",
-                root_dir=root_dir)
+                root_dir=root_dir, no_log_f=no_log_f, make_dirs=make_dirs)
         self.use_sge = use_sge
         self.quit_if_not_done = quit_if_not_done
 
@@ -190,8 +191,6 @@ class IceQuiverPostprocess(IceFiles):
 
         self.report_fn = report_fn
         self.summary_fn = summary_fn
-
-        self.validate_inputs()
 
     def get_existing_binned_quivered_fq(self):
         """Return all existing quivered fq files for binned clusters."""
@@ -421,6 +420,8 @@ class IceQuiverPostprocess(IceFiles):
         """Check all quiver jobs are running, failed or done. Write high-quality
         consensus and low-quality consensus to all_quivered.good|bad.fasta|fastq.
         """
+        self.validate_inputs()
+
         job_stats = self.check_quiver_jobs_completion()
         self.add_log("quiver job status: {s}".format(s=job_stats))
 
