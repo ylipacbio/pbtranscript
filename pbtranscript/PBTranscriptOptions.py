@@ -38,8 +38,12 @@ class BaseConstants(object):
     HQ_QUIVER_MIN_ACCURACY_DEFAULT = 0.99
     QV_TRIM_FIVEPRIME_ID = "pbtranscript.task_options.qv_trim_5p"
     QV_TRIM_FIVEPRIME_DEFAULT = 100
+    QV_TRIM_FIVEPRIME_DESC = "Ignore QV of n bases in the 5' end " + \
+            "(default %s)." % QV_TRIM_FIVEPRIME_DEFAULT
     QV_TRIM_THREEPRIME_ID = "pbtranscript.task_options.qv_trim_3p"
     QV_TRIM_THREEPRIME_DEFAULT = 30
+    QV_TRIM_THREEPRIME_DESC = "Ignore QV of n bases in the 3' end " + \
+            "(default %s)." % QV_TRIM_THREEPRIME_DEFAULT
     SAMPLE_NAME_ID = "pbtranscript.task_options.sample_name"
     SAMPLE_NAME_DEFAULT = ""
 
@@ -439,7 +443,7 @@ def add_ice_post_quiver_hq_lq_arguments(parser):
 def add_fofn_arguments(arg_parser, ccs_fofn=False, bas_fofn=False,
                        tool_contract_parser=None):
     """Add ccs_fofn, bas_fofn, fasta_fofn arguments."""
-    helpstr = "A FOFN of ccs.h5 or ccs.bam (e.g., ccs.fofn), " + \
+    helpstr = "A FOFN of ccs.h5, bam or dataset xml (e.g., ccs.fofn|bam|consensusreadset.xml), " + \
               "which contain quality values of consensus (CCS) reads. " + \
               "If not given, assume there is no QV information available."
     if ccs_fofn is True:
@@ -453,7 +457,7 @@ def add_fofn_arguments(arg_parser, ccs_fofn=False, bas_fofn=False,
             tool_contract_parser.add_input_file_type(FileTypes.DS_CCS,
                 "ccs_fofn", "CCS dataset", helpstr)
 
-    helpstr = "A FOFN of bax/bas.h5 or bam files (e.g., input.fofn), " + \
+    helpstr = "A FOFN of bax/bas.h5, bam or dataset xml (e.g., input.fofn|bam|subreadset.xml), " + \
               "which contain quality values of raw reads and subreads"
     if bas_fofn is True:
         arg_parser.add_argument("--bas_fofn",
