@@ -37,24 +37,24 @@ class Constants(object):
 
     MIN_ALN_COVERAGE_ID = "pbtranscript.task_options.min_gmap_aln_coverage"
     MIN_ALN_COVERAGE_DEFAULT = 0.99
-    MIN_ALN_COVERAGE_DESC = "Min query coverage to analyze a GMAP alignment"
+    MIN_ALN_COVERAGE_DESC = "Min query coverage to analyze a GMAP alignment (default: %s)" % MIN_ALN_COVERAGE_DEFAULT
 
     MIN_ALN_IDENTITY_ID = "pbtranscript.task_options.min_gmap_aln_identity"
     MIN_ALN_IDENTITY_DEFAULT = 0.95
-    MIN_ALN_IDENTITY_DESC = "Min identity to analyze a GMAP alignment"
+    MIN_ALN_IDENTITY_DESC = "Min identity to analyze a GMAP alignment (default: %s)" % MIN_ALN_IDENTITY_DEFAULT
 
     MAX_FUZZY_JUNCTION_ID = "pbtranscript.task_options.max_fuzzy_junction"
     MAX_FUZZY_JUNCTION_DEFAULT = 5
-    MAX_FUZZY_JUNCTION_DESC = "Max edit distance between merge-able fuzzy junctions "
+    MAX_FUZZY_JUNCTION_DESC = "Max edit distance between merge-able fuzzy junctions (default: %s)" % MAX_FUZZY_JUNCTION_DEFAULT
 
     MIN_FLNC_COVERAGE_DEFAULT = 2
     MIN_FLNC_COVERAGE_DESC = "Minimum number of supportive FLNC reads " + \
-                             "only used for aligned FLNC reads, otherwise, result undefined."
+                             "only used for aligned FLNC reads, otherwise, result undefined (default: %s)" % MIN_FLNC_COVERAGE_DEFAULT
 
     ALLOW_EXTRA_5EXON_ID = "pbtranscript.task_options.allow_extra_5exon"
     ALLOW_EXTRA_5EXON_DEFAULT = False
     ALLOW_EXTRA_5EXON_DESC = "True: Collapse shorter 5' transcripts. " + \
-                             "False: Don't collapse shorter 5' transcripts "
+                             "False: Don't collapse shorter 5' transcripts (default: %s)" % ALLOW_EXTRA_5EXON_DEFAULT
 
     SKIP_5_EXON_ALT_DEFAULT = False
 
@@ -78,7 +78,7 @@ def add_collapse_mapped_isoforms_io_arguments(arg_parser):
 
 def add_collapse_mapped_isoforms_arguments(arg_parser):
     """Add arguments for collapse isoforms."""
-    coll_group = arg_parser.add_argument_group("collapse isoforms arguments")
+    coll_group = arg_parser.add_argument_group("Collapse isoforms arguments")
     coll_group.add_argument("-c", "--min_coverage", dest="min_aln_coverage",
                             default=Constants.MIN_ALN_COVERAGE_DEFAULT,
                             type=float, help=Constants.MIN_ALN_COVERAGE_DESC)
