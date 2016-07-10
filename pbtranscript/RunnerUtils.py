@@ -242,7 +242,7 @@ def sge_job_runner(cmds_list, script_files,
 
       rescue - whether or not to rescue a qdel-ed job.
                None - no rescue
-               locall - yes, run it locally exactly once
+               locally - yes, run it locally exactly once
                sge - yes, run it through sge, try multiple times until suceed
       rescue_times - maximum times of rescuing a qdel-ed job.
 
