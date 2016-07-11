@@ -22,6 +22,7 @@ Procedure:
 """
 
 import os.path as op
+import subprocess
 
 import sys
 import argparse
@@ -32,7 +33,8 @@ from pbcommand.utils import setup_log
 from pbcommand.cli.core import pacbio_args_runner
 
 from pbtranscript.__init__ import get_version
-from pbtranscript.Utils import ln, mkdir, realpath, get_sample_name
+from pbtranscript.Utils import ln, mkdir, realpath, get_sample_name, \
+    rmpath, guess_file_format, FILE_FORMATS
 from pbtranscript.ClusterOptions import IceOptions, SgeOptions, IceQuiverHQLQOptions
 from pbtranscript.PBTranscriptOptions import add_nfl_fa_argument, \
     add_fofn_arguments, add_ice_arguments, add_sge_arguments, \
@@ -42,8 +44,8 @@ from pbtranscript.Cluster import Cluster
 from pbtranscript.CombineUtils import CombinedFiles, CombineRunner
 from pbtranscript.separate_flnc import SeparateFLNCRunner, SeparateFLNCBase
 
+from pbtranscript.ice.IceUtils import check_blasr
 from pbtranscript.ice.IceQuiverPostprocess import IceQuiverPostprocess
-from pbtranscript.ice.IceUtils import convert_fofn_to_fasta
 from pbtranscript.collapsing.CollapsingUtils import map_isoforms_and_sort
 from pbtranscript.tasks.map_isoforms_to_genome import gmap_db_and_name_from_ds
 from pbtranscript.tasks.post_mapping_to_genome import add_post_mapping_to_genome_arguments, \
@@ -65,7 +67,7 @@ def _sanity_check_args(args):
     if args.bas_fofn is None:
         raise ValueError("--bas_fofn must be provided for polishing isoforms. Quit.")
     if not args.quiver: # overwrite --quiver
-        logging.warning("--quiver must be turned on for tofu_wrap.")
+        logging.warning("Overwrite --quiver to True for tofu_wrap. Continue.")
         args.quiver = True
 
     # check gmap reference genome
@@ -80,10 +82,19 @@ def _sanity_check_args(args):
     if not op.exists(op.join(args.gmap_db, args.gmap_name)):
         raise IOError("GMAP name not valid: %s. Quit.", args.gmap_name)
 
+    # check input format: bax.h5/bas.h5 must.
+    if guess_file_format(args.bas_fofn) != FILE_FORMATS.BAM:
+        raise ValueError("--bas_fofn %s must be either BAM or subreadset.xml." % args.bas_fofn +
+                         "Bax.h5 must be converted to BAM using bax2bam first! " +
+                         "Multiple BAM files can be merged to a BAM FOFN or dataset xml.")
+
     # check output file format
     if not any(args.collapsed_filtered_fn.endswith(ext) for ext in
                (".fa", ".fasta", ".fq", ".fastq")):
         raise ValueError("Output file %s must be FASTA or FASTQ!" % args.collapsed_filtered_fn)
+
+    # check blasr version
+    check_blasr()
 
 
 def add_tofu_output_arguments(parser):
@@ -111,7 +122,7 @@ def add_tofu_output_arguments(parser):
     out_group.add_argument("--read_stat", default=None, type=str, dest="read_stat_fn", help=helpstr)
     helpstr = "Output cluster summary JSON file (default: <tofu_dir>/combined/all.cluster_summary.json)"
     out_group.add_argument("--summary", default=None, type=str, dest="summary_fn", help=helpstr)
-    helpstr = "Output cluster report CSV file (default: <tofu_dir>/combined/all.cluster_report.csv)."
+    helpstr = "Output cluster report CSV file (default: <tofu_dir>/combined/all.cluster_report.csv)"
     out_group.add_argument("--report", default=None, type=str, dest="report_fn", help=helpstr)
 
     return parser
@@ -128,6 +139,9 @@ def get_parser():
     parser.add_argument("collapsed_filtered_fn", type=str, help=helpstr)
 
     parser = add_nfl_fa_argument(parser, positional=False, required=True)
+    parser.add_argument("--nfl_reads_per_split", type=int,
+                        dest="nfl_reads_per_split", default=60000,
+                        help="Number of nFL reads per split file (default: 60000)")
     parser = add_fofn_arguments(parser, ccs_fofn=True, bas_fofn=True, fasta_fofn=True)
 
     # tofu output arguments
@@ -143,7 +157,9 @@ def get_parser():
 
     misc_group = parser.add_argument_group("Misc arguments")
     misc_group.add_argument("--mem_debug", default=False, action="store_true",
-            help=argparse.SUPPRESS)
+                            help=argparse.SUPPRESS)
+    misc_group.add_argument("--keep_tmp_files", default=False, action="store_true",
+                            help="False: delete tmp files; True: keep tmp files (default: False).")
     misc_group.add_argument("--version", action='version', version='%(prog)s ' + str(get_version()))
     return parser
 
@@ -183,9 +199,12 @@ class TofuFiles(CombinedFiles):
 
 def args_runner(args):
     """args runner"""
+    logging.info("%s arguments are:\n%s\n", __file__, args)
+
     # sanity check arguments
     _sanity_check_args(args)
 
+    # make option objects
     ice_opts = IceOptions(quiver=args.quiver, use_finer_qv=args.use_finer_qv,
                           targeted_isoseq=args.targeted_isoseq,
                           ece_penalty=args.ece_penalty, ece_min_len=args.ece_min_len,
@@ -197,31 +216,6 @@ def args_runner(args):
     ipq_opts = IceQuiverHQLQOptions(qv_trim_5=args.qv_trim_5, qv_trim_3=args.qv_trim_3,
                                     hq_quiver_min_accuracy=args.hq_quiver_min_accuracy)
 
-    # FIXME: convert *.bas.h5|bax.h5|dataset.xml to fofn
-#    # (2) if fasta_fofn already is there, use it; otherwise make it first
-#    if args.quiver and args.fasta_fofn is None:
-#        # FIXME
-#        print >> sys.stderr, "Making fasta_fofn now"
-#        nfl_dir = op.abspath(op.join(args.root_dir, "fasta_fofn_files"))
-#        if not op.exists(nfl_dir):
-#            os.makedirs(nfl_dir)
-#        args.fasta_fofn = op.join(nfl_dir, 'input.fasta.fofn')
-#        print >> sys.stderr, "fasta_fofn", args.fasta_fofn
-#        print >> sys.stderr, "nfl_dir", nfl_dir
-#        #FIXME
-#        convert_fofn_to_fasta(fofn_filename=args.bas_fofn, out_filename=args.fasta_fofn,
-#                              fasta_out_dir=nfl_dir)
-#    else:
-#        if not op.exists(args.fasta_fofn):
-#            raise Exception, "fasta_fofn {0} does not exist!".format(args.fasta_fofn)
-#        for line in open(args.fasta_fofn):, "cluster_out")
-#            line = line.strip()
-#            if len(line) > 0 and not op.exists(line):
-#                raise Exception, "File {0} does not exists in {1}".format(line, args.fasta_fofn)
-
-    print "%s arguments are:\n%s\n" % (__file__, args)
-    logging.info("%s arguments are:\n%s\n", __file__, args)
-
     # (1) separate flnc reads into bins
     logging.info("Separating FLNC reads into bins.")
     tofu_f = TofuFiles(tofu_dir=args.tofu_dir)
@@ -232,7 +226,7 @@ def args_runner(args):
     s.run()
 
     flnc_files = SeparateFLNCBase.convert_pickle_to_sorted_flnc_files(tofu_f.separate_flnc_pickle)
-    print flnc_files
+    logging.info("Separated FLNC reads bins are %s", flnc_files)
 
     # (2) apply 'pbtranscript cluster' to each bin
     # run ICE/Quiver (the whole thing), providing the fasta_fofn
@@ -250,6 +244,7 @@ def args_runner(args):
             continue
         else:
             logging.info("Running ICE/Quiver on %s", split_dir)
+            rmpath(cur_out_cons)
 
         obj = Cluster(root_dir=split_dir, flnc_fa=flnc_file,
                       nfl_fa=args.nfl_fa,
@@ -271,6 +266,12 @@ def args_runner(args):
                 f.write("Memory usage: {0}\n".format(mem_usage))
         else:
             obj.run()
+
+        if not args.keep_tmp_files: # by deafult, delete all tempory files.
+            logging.info("Deleting %s", ipq_f.tmp_dir)
+            subprocess.Popen(['rm', '-rf', '%s' % ipq_f.tmp_dir])
+            logging.info("Deleting %s", ipq_f.quivered_dir)
+            subprocess.Popen(['rm', '-rf', '%s' % ipq_f.quivered_dir])
 
     # (3) merge polished isoform cluster from all bins
     logging.info("Merging isoforms from all bins to %s.", tofu_f.combined_dir)
