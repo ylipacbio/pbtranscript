@@ -162,7 +162,7 @@ def add_ice_quiver_all_arguments(parser):
     arg_parser = add_fofn_arguments(arg_parser, bas_fofn=True,
         tool_contract_parser=parser.tool_contract_parser)
     tcp_parser = add_cluster_summary_report_arguments(_wrap_parser(arg_parser))
-    arg_parser = add_ice_post_quiver_hq_lq_arguments(_wrap_parser(arg_parser))
+    arg_parser = add_ice_post_quiver_hq_lq_arguments(arg_parser)
     arg_parser = add_sge_arguments(arg_parser, quiver_nproc=True,
                                    blasr_nproc=True)
     arg_parser = add_tmp_dir_argument(arg_parser)

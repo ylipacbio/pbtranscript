@@ -25,10 +25,10 @@ class Constants(object):
     PARSER_DESC = __doc__
 
     GMAP_NAME_ID = "pbtranscript.task_options.gmap_name"
-    GMAP_NAME_DEFAULT = "SIRV"
+    GMAP_NAME_DEFAULT = None #"SIRV"
 
     GMAP_DB_ID = "pbtranscript.task_options.gmap_db"
-    GMAP_DB_DEFAULT = "/pbi/dept/secondary/siv/testdata/pbtranscript-unittest/data/gmap_db"
+    GMAP_DB_DEFAULT = None #"/pbi/dept/secondary/siv/testdata/isoseq/gmap_db"
 
     GMAP_NPROC_ID = "pbtranscript.task_options.gmap_nproc"
     GMAP_NPROC_DEFAULT = 24
@@ -52,15 +52,14 @@ def add_gmap_arguments(arg_parser):
     gmap_group = arg_parser.add_argument_group("GMAP arguments")
 
     helpstr = "GMAP DB name (default: %s)" % Constants.GMAP_NAME_DEFAULT
-    gmap_group.add_argument("--gmap_name", type=str,
-                            default=Constants.GMAP_NAME_DEFAULT,
+    gmap_group.add_argument("--gmap_name", type=str, default=Constants.GMAP_NAME_DEFAULT,
                             help=helpstr)
 
     helpstr = "GMAP DB location (default: %s)" % Constants.GMAP_DB_DEFAULT
     gmap_group.add_argument("--gmap_db", type=str,
                             default=Constants.GMAP_DB_DEFAULT, help=helpstr)
 
-    helpstr = "GMAP Reference Set file to overwrite GMAP DB name and location."
+    helpstr = "GMAP Reference Set file to overwrite GMAP DB name and location (default: None)."
     gmap_group.add_argument("--gmap_ds", type=str, default=None, help=helpstr)
 
     helpstr = "GMAP nproc (default: %s)" % Constants.GMAP_NPROC_DEFAULT

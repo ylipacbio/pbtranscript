@@ -19,7 +19,7 @@ from pbcommand.models import FileTypes
 from pbcommand.utils import setup_log
 
 from pbtranscript.PBTranscriptOptions import get_base_contract_parser
-from pbtranscript.Utils import rmpath, mv
+from pbtranscript.Utils import rmpath, mv, realpath
 from pbtranscript.filtering import filter_by_count, filter_out_subsets
 
 import pbtranscript.tasks.collapse_mapped_isoforms as ci
@@ -120,9 +120,9 @@ def args_runner(args):
         mv(tmp_out_gff_filename, out_gff_filename)
         mv(tmp_out_fq, out_fq)
 
-    logging.info("Filtered collapsed isoforms sequences written to %s", out_fq)
-    logging.info("Filtered collapsed isoforms abundance written to %s", out_abundance_filename)
-    logging.info("Filtered collapsed isoforms gff written to %s", out_gff_filename)
+    logging.info("Filtered collapsed isoforms sequences written to %s", realpath(out_fq))
+    logging.info("Filtered collapsed isoforms abundance written to %s", realpath(out_abundance_filename))
+    logging.info("Filtered collapsed isoforms gff written to %s", realpath(out_gff_filename))
     return 0
 
 

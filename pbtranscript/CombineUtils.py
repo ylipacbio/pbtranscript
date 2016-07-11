@@ -11,13 +11,17 @@ import cPickle
 from pbcore.io import FastqReader, FastqWriter, FastaWriter
 
 from pbtranscript.io.ContigSetReaderWrapper import ContigSetReaderWrapper
-from pbtranscript.Utils import mkdir
+from pbtranscript.Utils import mkdir, realpath
+from pbtranscript.ice.IceQuiverPostprocess import IceQuiverPostprocess
+from pbtranscript.ice.IceFiles import write_cluster_summary
 
 
 class CombinedFiles(object):
+
     """Combine cluster bin output files and save to combined_dir."""
+
     def __init__(self, combined_dir):
-        self.combined_dir = combined_dir
+        self.combined_dir = realpath(combined_dir)
         mkdir(self.combined_dir)
 
     @property
@@ -71,22 +75,22 @@ def combined_cid_ice_name(name, cluster_bin_index, sample_name):
     """e.g., c1 --> i0_ICE_sample1|c1
     """
     return "{p}|{n}".format(p=combined_prefix(cluster_bin_index=cluster_bin_index,
-                                             isoform_type="ICE",
-                                             sample_name=sample_name), n=name)
+                                              isoform_type="ICE",
+                                              sample_name=sample_name), n=name)
 
 def combined_cid_hq_name(name, cluster_bin_index, sample_name):
     """e.g., c1 --> i0_HQ_sample1|c1
     """
     return "{p}|{n}".format(p=combined_prefix(cluster_bin_index=cluster_bin_index,
-                                             isoform_type="HQ",
-                                             sample_name=sample_name), n=name)
+                                              isoform_type="HQ",
+                                              sample_name=sample_name), n=name)
 
 def combined_cid_lq_name(name, cluster_bin_index, sample_name):
     """e.g., c1 --> i0_LQ_sample1|c1
     """
     return "{p}|{n}".format(p=combined_prefix(cluster_bin_index=cluster_bin_index,
-                                             isoform_type="LQ",
-                                             sample_name=sample_name), n=name)
+                                              isoform_type="LQ",
+                                              sample_name=sample_name), n=name)
 
 
 def combine_polished_isoforms(split_indices, split_hq_fns, split_lq_fns,
@@ -193,7 +197,7 @@ def write_combined_cluster_report(split_indices, split_uc_pickles,
         for i, uc_pickle, partial_uc_pickle in zip(split_indices,
                                                    split_uc_pickles,
                                                    split_partial_uc_pickles):
-            logging.info("Processing uc pickle %s and partial uc pickle %s",
+            logging.info("Combining uc pickle %s and partial uc pickle %s",
                          uc_pickle, partial_uc_pickle)
             uc = cPickle.load(open(uc_pickle, 'rb'))['uc']
             partial_uc = cPickle.load(open(partial_uc_pickle, 'rb'))['partial_uc']
@@ -206,3 +210,70 @@ def write_combined_cluster_report(split_indices, split_uc_pickles,
                 if partial_uc is not None and c in partial_uc.keys():
                     for r in partial_uc[c]:
                         f.write("{cid},{r},NonFL\n".format(cid=cid, r=r))
+
+
+class CombineRunner(CombinedFiles):
+    """
+    Merge outputs of ICE cluster in split_dirs into combined_dir, including
+    unpolished consensus isoforms, HQ/LQ polished isoforms in FASTA/FASTQ files,
+    cluster summary files and cluster reports.
+    Note that HQ|LQ polished isoform c<cid>/f?p?/len in split dir <sid>, will be
+    renamed as
+      i<sid>_HQ_<sample_prefix>|c<cid>/f?p?/len
+      i<sid>_LQ_<sample_prefix>|c<cid>/f?p?/len
+    """
+    def __init__(self, combined_dir, sample_name, split_dirs, ipq_opts):
+        super(CombineRunner, self).__init__(combined_dir=combined_dir)
+
+        self.sample_name = sample_name
+        self.split_dirs = split_dirs
+        self.split_indices = range(0, len(split_dirs))
+
+        self.hq_fq_fns, self.hq_fa_fns = [], []
+        self.lq_fq_fns, self.lq_fa_fns = [], []
+        self.consensus_isoforms_fns = [] # unpolished consensus isoforms in split dirs.
+        self.uc_pickle_fns, self.partial_uc_pickle_fns = [], [] # uc pickles and partial pickles
+        for split_dir in self.split_dirs:
+            ipq_f = IceQuiverPostprocess(root_dir=split_dir, ipq_opts=ipq_opts,
+                                         no_log_f=True, make_dirs=False)
+            self.hq_fq_fns.append(ipq_f.quivered_good_fq)
+            self.hq_fa_fns.append(ipq_f.quivered_good_fa)
+            self.lq_fq_fns.append(ipq_f.quivered_bad_fq)
+            self.lq_fa_fns.append(ipq_f.quivered_bad_fa)
+            self.consensus_isoforms_fns.append(ipq_f.final_consensus_fa)
+            self.uc_pickle_fns.append(ipq_f.final_pickle_fn)
+            self.partial_uc_pickle_fns.append(ipq_f.nfl_all_pickle_fn)
+
+    def run(self):
+        """Run"""
+        logging.info("Combining results of all cluster bins to %s.", self.combined_dir)
+        logging.info("Merging HQ|LQ isoforms from all cluster bins.")
+        logging.info("HQ isoforms are: %s.", ",".join(self.hq_fq_fns))
+        logging.info("LQ isoforms are: %s.", ",".join(self.lq_fq_fns))
+        combine_polished_isoforms(split_indices=self.split_indices,
+                                  split_hq_fns=self.hq_fq_fns,
+                                  split_lq_fns=self.lq_fq_fns,
+                                  combined_hq_fa=self.all_hq_fa,
+                                  combined_hq_fq=self.all_hq_fq,
+                                  combined_lq_fa=self.all_lq_fa,
+                                  combined_lq_fq=self.all_lq_fq,
+                                  hq_lq_prefix_dict_pickle=self.hq_lq_prefix_dict_pickle,
+                                  sample_name=self.sample_name)
+
+        logging.info("Merging consensus isoforms from all cluster bins.")
+        combine_consensus_isoforms(split_indices=self.split_indices,
+                                   split_files=self.consensus_isoforms_fns,
+                                   combined_consensus_isoforms_fa=self.all_consensus_isoforms_fa,
+                                   sample_name=self.sample_name)
+
+        logging.info("Writing cluster summary to %s", self.all_cluster_summary_fn)
+        write_cluster_summary(summary_fn=self.all_cluster_summary_fn,
+                              isoforms_fa=self.all_consensus_isoforms_fa,
+                              hq_fa=self.all_hq_fa, lq_fa=self.all_lq_fa)
+
+        logging.info("Writing cluster report to %s", self.all_cluster_report_fn)
+        write_combined_cluster_report(split_indices=self.split_indices,
+                                      split_uc_pickles=self.uc_pickle_fns,
+                                      split_partial_uc_pickles=self.partial_uc_pickle_fns,
+                                      report_fn=self.all_cluster_report_fn,
+                                      sample_name=self.sample_name)

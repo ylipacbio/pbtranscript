@@ -19,7 +19,7 @@ class IceFiles(object):
 
     def __init__(self, prog_name, root_dir,
                  bas_fofn=None, ccs_fofn=None, fasta_fofn=None,
-                 no_log_f=False, tmp_dir=None):
+                 no_log_f=False, tmp_dir=None, make_dirs=True):
         """
         prog_name --- name of a sub-class
         root_dir --- root directory of the whole project. There will be
@@ -52,11 +52,12 @@ class IceFiles(object):
         self.ccs_fofn = real_ppath(ccs_fofn)
         self.fasta_fofn = real_ppath(fasta_fofn)
 
-        mkdir(self.root_dir)
-        mkdir(self.tmp_dir)
-        mkdir(self.log_dir)
-        mkdir(self.script_dir)
-        mkdir(self.out_dir)
+        if make_dirs is True:
+            mkdir(self.root_dir)
+            mkdir(self.tmp_dir)
+            mkdir(self.log_dir)
+            mkdir(self.script_dir)
+            mkdir(self.out_dir)
 
         self.no_log_f = no_log_f
         if not no_log_f:

@@ -25,7 +25,7 @@ from pbcommand.cli.core import pbparser_runner
 from pbcommand.models import FileTypes
 from pbcommand.utils import setup_log
 
-from pbtranscript.Utils import ln
+from pbtranscript.Utils import ln, realpath
 from pbtranscript.io import parse_ds_filename
 from pbtranscript.PBTranscriptOptions import get_base_contract_parser
 from pbtranscript.collapsing import CollapsedFiles, FilteredFiles, CollapseIsoformsRunner
@@ -160,26 +160,31 @@ def post_mapping_to_genome_runner(in_isoforms, in_sam, in_pickle,
                            max_fuzzy_junction=max_fuzzy_junction)
         fff = fft
 
-    # (5) ln outputs
-    ln(fff.filtered_rep_fn(out_suffix), out_isoforms)
-    ln(fff.filtered_gff_fn, out_gff)
-    if out_abundance is not None:
-        ln(fff.filtered_abundance_fn, out_abundance)
-    if out_group is not None:
-        ln(fff.group_fn, out_group)
-    if out_read_stat is not None:
-        ln(fff.read_stat_fn, out_read_stat)
+    # (5) ln outputs files
+    ln_pairs = [(fff.filtered_rep_fn(out_suffix), out_isoforms), # rep isoforms
+                (fff.filtered_gff_fn, out_gff), # gff annotation
+                (fff.filtered_abundance_fn, out_abundance), # abundance info
+                (fff.group_fn, out_group), # groups
+                (fff.read_stat_fn, out_read_stat)] # read stat info
+    for src, dst in ln_pairs:
+        if dst is not None:
+            ln(src, dst)
 
     logging.info("Filter arguments: min_count = %s, filter_out_subsets=%s",
                  min_count, filter_out_subsets)
-    logging.info("Collapsed and filtered isoform sequences written to %s", out_isoforms)
-    logging.info("Collapsed and filtered isoform annotations written to %s", out_gff)
+    logging.info("Collapsed and filtered isoform sequences written to %s",
+                 realpath(out_isoforms) if out_isoforms is not None else
+                 realpath(fff.filtered_rep_fn(out_suffix)))
+    logging.info("Collapsed and filtered isoform annotations written to %s",
+                 realpath(out_gff) if out_gff is not None else realpath(fff.filtered_gff_fn))
     logging.info("Collapsed and filtered isoform abundance info written to %s",
-                 out_abundance if out_abundance is not None else fff.filtered_abundance_fn)
+                 realpath(out_abundance) if out_abundance is not None else
+                 realpath(fff.filtered_abundance_fn))
     logging.info("Collapsed isoform groups written to %s",
-                 out_group if out_group is not None else fff.group_fn)
+                 realpath(out_group) if out_group is not None else realpath(fff.group_fn))
     logging.info("Read status of FL and nFL reads written to %s",
-                 out_read_stat if out_read_stat is not None else fff.read_stat_fn)
+                 realpath(out_read_stat) if out_read_stat is not None else
+                 realpath(fff.read_stat_fn))
 
 
 def args_runner(args):

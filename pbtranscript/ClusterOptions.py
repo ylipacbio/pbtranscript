@@ -235,7 +235,7 @@ class IceQuiverHQLQOptions(object):
 
     """Define HQ/LQ isoforms related options"""
 
-    def __init__(self, qv_trim_5=200, qv_trim_3=50, hq_quiver_min_accuracy=0.99,
+    def __init__(self, qv_trim_5=100, qv_trim_3=30, hq_quiver_min_accuracy=0.99,
                  hq_isoforms_fa=None, hq_isoforms_fq=None,
                  lq_isoforms_fa=None, lq_isoforms_fq=None,
                  hq_min_full_length_reads=2):
