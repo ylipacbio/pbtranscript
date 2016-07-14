@@ -19,9 +19,9 @@
   $ cat $O_READ_STAT |wc -l
   10416
 
-  $ head -2 $O_READ_STAT 
-  id	length	is_fl	stat	pbid
-  m54006_160328_233933/17957574/30_1837_CCS	1807	Y	unique	PB.5.4
+$ head -2 $O_READ_STAT 
+id	length	is_fl	stat	pbid
+m54006_160328_233933/17957574/30_1837_CCS	1807	Y	unique	PB.5.4
 
   $ cat $O_ABUNDANCE | grep -v ^# | wc -l
   39
