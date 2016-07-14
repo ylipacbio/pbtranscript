@@ -32,6 +32,9 @@ class BaseConstants(object):
     MIN_SCORE_DEFAULT = 10
     IGNORE_POLYA_ID = "pbtranscript.task_options.ignore_polya"
     IGNORE_POLYA_DEFAULT = False
+    PRIMER_SEQUENCES_ID = "pbtranscript.task_options.primer_sequences"
+    PRIMER_SEQUENCES_DEFAULT = ""
+
     HQ_QUIVER_MIN_ACCURACY_ID = "pbtranscript.task_options.hq_quiver_min_accuracy"
     HQ_QUIVER_MIN_ACCURACY_DEFAULT = 0.99
     HQ_QUIVER_MIN_ACCURACY_DESC = "Minimum allowed quiver accuracy to classify an isoform " + \
@@ -106,6 +109,11 @@ def add_classify_arguments(parser):
                            dest="primerFN",
                            default=None,
                            help="Primer FASTA file (default: primers.fasta)")
+
+    tcp.add_str(BaseConstants.PRIMER_SEQUENCES_ID, "customer_primers",
+                default=BaseConstants.PRIMER_SEQUENCES_DEFAULT,
+                name="Customer primer sequences",
+                description="Customer primer sequences.")
 
     hmm_group.add_argument("--cpus",
                            default=8,
