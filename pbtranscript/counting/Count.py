@@ -107,7 +107,7 @@ class CountRunner(object):
             fl_fn = IceFiles(prog_name="Count", root_dir=cluster_out_d, no_log_f=True).final_pickle_fn
             if not op.exists(fl_fn):
                 raise IOError("FL pickle %s of sample prefix %s does not exist." %
-                              fl_fn, sample_prefix)
+                              (fl_fn, sample_prefix))
             ret.append((sample_prefix, fl_fn))
         return ret
 
@@ -120,7 +120,7 @@ class CountRunner(object):
             nfl_fn = IceFiles(prog_name="Count", root_dir=cluster_out_d, no_log_f=True).nfl_all_pickle_fn
             if not op.exists(nfl_fn):
                 raise IOError("NFL pickle %s of sample prefix %s does not exist." %
-                              nfl_fn, sample_prefix)
+                              (nfl_fn, sample_prefix))
             ret.append((sample_prefix, nfl_fn))
         return ret
 
