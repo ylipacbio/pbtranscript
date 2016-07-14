@@ -59,7 +59,6 @@ def parse_primer_sequences(primers_str):
 
 
 class Constants(BaseConstants):
-    """Define constants used in pbtranscript.tasks.classify"""
     TOOL_ID = "pbtranscript.tasks.classify"
     DRIVER_EXE = "python -m %s --resolved-tool-contract" % TOOL_ID
     PARSER_DESC = __doc__
