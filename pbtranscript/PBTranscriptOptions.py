@@ -68,12 +68,12 @@ def add_classify_arguments(parser):
 
     parser.add_output_file_type(FileTypes.DS_CONTIG, "outReadsFN", # idx 0
         name="Draft isoforms",
-        description="Output FASTA or ContigSet file",
+        description="Intermediate dataset used to get full-length reads",
         default_name="isoseq_draft")
     tcp = parser.tool_contract_parser
 
     parser = parser.arg_parser.parser
-    helpstr = "Output full-length non-chimeric reads in FASTA or ContigSet"
+    helpstr = "Full-length non-chimeric reads generated from pbtranscript classify"
     tcp.add_output_file_type(FileTypes.DS_CONTIG, "flnc", # idx 1
         name="Full-length non-chimeric reads",
         description=helpstr,
@@ -84,7 +84,7 @@ def add_classify_arguments(parser):
                         default=None,
                         help=helpstr)
 
-    helpstr = "Output non-full-length reads in FASTA or ContigSet"
+    helpstr = "Non-full-length reads generated from pbtranscript classify"
     parser.add_argument("--nfl",
                         dest="nfl_fa",
                         type=str,
@@ -140,7 +140,7 @@ def add_classify_arguments(parser):
                                 "default: *.primer_info.csv")
     tcp.add_output_file_type(FileTypes.CSV, "report",
         name="Primer info",
-        description="CSV file to output primer info",
+        description="Per-CCS read annotation and classification results",
         default_name="isoseq_primer_info")
 
     chi_group = parser.add_argument_group("Chimera detection options")
@@ -361,20 +361,20 @@ def add_ice_post_quiver_hq_lq_io_arguments(parser):
         arg_parser = parser.arg_parser.parser
         tcp = parser.tool_contract_parser
         tcp.add_output_file_type(FileTypes.DS_CONTIG, "hq_isoforms_fa",
-                                 name="High-quality isoforms",
-                                 description="High-quality isoform sequences",
+                                 name="High-Quality Isoforms",
+                                 description="Isoforms with high consensus accuracy",
                                  default_name="hq_isoforms")
         tcp.add_output_file_type(FileTypes.FASTQ, "hq_isoforms_fq",
-                                 name="High-quality isoforms (FASTQ)",
-                                 description="High-quality isoform sequences with quality scores",
+                                 name="High-Quality Isoforms",
+                                 description="Isoforms with high consensus accuracy",
                                  default_name="hq_isoforms")
         tcp.add_output_file_type(FileTypes.DS_CONTIG, "lq_isoforms_fa",
-                                 name="Low-quality isoforms",
-                                 description="Low-quality isoform sequences",
+                                 name="Low-Quality Isoforms",
+                                 description="Isoforms with low consensus accuracy",
                                  default_name="lq_isoforms")
         tcp.add_output_file_type(FileTypes.FASTQ, "lq_isoforms_fq",
-                                 name="Low-quality isoforms (FASTQ)",
-                                 description="Low-quality isoform sequences with quality scores",
+                                 name="Low-Quality Isoforms",
+                                 description="Isoforms with low consensus accuracy",
                                  default_name="lq_isoforms")
     else:
         assert isinstance(parser, argparse.ArgumentParser)
@@ -564,8 +564,8 @@ def add_cluster_summary_report_arguments(parser):
 
     # FIXME make this a REPORT instead?
     p1.add_output_file_type(FileTypes.CSV, "cluster_report",
-        name="Cluster report",
-        description=helpstr,
+        name="Clustering Results",
+        description="Clustering results for each CCS read",
         default_name="cluster_report")
     p2.add_argument("--report", default=None, type=str,
                     dest="report_fn", help=helpstr)
@@ -603,9 +603,8 @@ def add_cluster_arguments(parser):
     parser = add_flnc_fa_argument(parser, positional=True)
 
     parser.add_output_file_type(FileTypes.DS_CONTIG, "consensusFa",
-        name="Unpolished consensus isoforms",
-        description="Output predicted (unpolished) consensus isoforms in "+
-                    "FASTA or ContigSet file.",
+        name="Unpolished Consensus Isoforms",
+        description="Consensus isoforms which have not been polished",
         default_name="consensus_isoforms")
 
     arg_parser = parser.arg_parser.parser
