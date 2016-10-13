@@ -361,20 +361,20 @@ def add_ice_post_quiver_hq_lq_io_arguments(parser):
         arg_parser = parser.arg_parser.parser
         tcp = parser.tool_contract_parser
         tcp.add_output_file_type(FileTypes.DS_CONTIG, "hq_isoforms_fa",
-                                 name="High-quality isoforms",
-                                 description="High-quality isoform sequences",
+                                 name="High-Quality Isoforms",
+                                 description="Isoforms with high consensus accuracy",
                                  default_name="hq_isoforms")
         tcp.add_output_file_type(FileTypes.FASTQ, "hq_isoforms_fq",
-                                 name="High-quality isoforms (FASTQ)",
-                                 description="High-quality isoform sequences with quality scores",
+                                 name="High-Quality Isoforms",
+                                 description="Isoforms with high consensus accuracy",
                                  default_name="hq_isoforms")
         tcp.add_output_file_type(FileTypes.DS_CONTIG, "lq_isoforms_fa",
-                                 name="Low-quality isoforms",
-                                 description="Low-quality isoform sequences",
+                                 name="Low-Quality Isoforms",
+                                 description="Isoforms with low consensus accuracy",
                                  default_name="lq_isoforms")
         tcp.add_output_file_type(FileTypes.FASTQ, "lq_isoforms_fq",
-                                 name="Low-quality isoforms (FASTQ)",
-                                 description="Low-quality isoform sequences with quality scores",
+                                 name="Low-Quality Isoforms",
+                                 description="Isoforms with low consensus accuracy",
                                  default_name="lq_isoforms")
     else:
         assert isinstance(parser, argparse.ArgumentParser)
@@ -564,8 +564,8 @@ def add_cluster_summary_report_arguments(parser):
 
     # FIXME make this a REPORT instead?
     p1.add_output_file_type(FileTypes.CSV, "cluster_report",
-        name="Cluster report",
-        description=helpstr,
+        name="Clustering Results",
+        description="Clustering results for each CCS read",
         default_name="cluster_report")
     p2.add_argument("--report", default=None, type=str,
                     dest="report_fn", help=helpstr)
@@ -603,9 +603,8 @@ def add_cluster_arguments(parser):
     parser = add_flnc_fa_argument(parser, positional=True)
 
     parser.add_output_file_type(FileTypes.DS_CONTIG, "consensusFa",
-        name="Unpolished consensus isoforms",
-        description="Output predicted (unpolished) consensus isoforms in "+
-                    "FASTA or ContigSet file.",
+        name="Unpolished Consensus Isoforms",
+        description="Consensus isoforms which have not been polished",
         default_name="consensus_isoforms")
 
     arg_parser = parser.arg_parser.parser
