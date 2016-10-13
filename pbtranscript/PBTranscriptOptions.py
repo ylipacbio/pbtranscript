@@ -68,12 +68,12 @@ def add_classify_arguments(parser):
 
     parser.add_output_file_type(FileTypes.DS_CONTIG, "outReadsFN", # idx 0
         name="Draft isoforms",
-        description="Output FASTA or ContigSet file",
+        description="Intermediate dataset used to get full-length reads",
         default_name="isoseq_draft")
     tcp = parser.tool_contract_parser
 
     parser = parser.arg_parser.parser
-    helpstr = "Output full-length non-chimeric reads in FASTA or ContigSet"
+    helpstr = "Full-length non-chimeric reads generated from pbtranscript classify"
     tcp.add_output_file_type(FileTypes.DS_CONTIG, "flnc", # idx 1
         name="Full-length non-chimeric reads",
         description=helpstr,
@@ -84,7 +84,7 @@ def add_classify_arguments(parser):
                         default=None,
                         help=helpstr)
 
-    helpstr = "Output non-full-length reads in FASTA or ContigSet"
+    helpstr = "Non-full-length reads generated from pbtranscript classify"
     parser.add_argument("--nfl",
                         dest="nfl_fa",
                         type=str,
@@ -140,7 +140,7 @@ def add_classify_arguments(parser):
                                 "default: *.primer_info.csv")
     tcp.add_output_file_type(FileTypes.CSV, "report",
         name="Primer info",
-        description="CSV file to output primer info",
+        description="Per-CCS read annotation and classification results",
         default_name="isoseq_primer_info")
 
     chi_group = parser.add_argument_group("Chimera detection options")
