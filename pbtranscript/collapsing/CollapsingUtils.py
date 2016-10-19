@@ -8,6 +8,7 @@ of an isoform as np.array, and provides function to_exons() in order to
 convert np.array to exons.
 """
 
+from os import stat
 import os.path as op
 import logging
 from collections import defaultdict
@@ -89,7 +90,10 @@ def map_isoforms_and_sort(input_filename, sam_filename,
 
     # Call sort to sort gmap output sam file
     cmd_args = ['sort', '-k 3,3', '-k 4,4n', unsorted_sam_filename,
-                '| grep -v \'^@\'', '>>', sam_filename]
+                '| grep -v \'^@\' ', ' >> ', sam_filename]
+
+    if stat(unsorted_sam_filename).st_size == 0: # overwrite cmds if file is empty
+        cmd_args = ['touch', sam_filename]
 
     execute(' '.join(cmd_args))
 
