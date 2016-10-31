@@ -132,6 +132,8 @@ Description:
         ice_partial.py i root_dir {i} --ccs_fofn=ccs_fofn \
                          --blasr_nproc=blasr_nproc
 
+Alternative way to call:
+    python -m pbtranscript.ice_partial i
 """
 
 import logging

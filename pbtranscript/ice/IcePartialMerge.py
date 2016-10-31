@@ -110,6 +110,9 @@ Description:
 
     Example:
         ice_partial.py merge root_dir N
+
+Alternative way to call this script:
+    python -m pbtranscript.ice_partial merge
 """
 
 import logging
