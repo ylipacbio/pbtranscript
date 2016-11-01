@@ -12,7 +12,7 @@ import numpy as np
 import pysam
 from pbcore.util.Process import backticks
 from pbcore.io import FastaReader, FastaWriter, FastqWriter, \
-        BasH5Reader
+        BasH5Reader, ContigSet
 from pbtranscript.Utils import realpath, mkdir, execute, \
         write_files_to_fofn, real_upath, \
         get_files_from_file_or_fofn, \
@@ -805,6 +805,12 @@ def blasr_for_quiver(query_fn, ref_fasta, out_fn, bam=False,
 
 def num_reads_in_fasta(in_fa):
     """Return the number of reads in the in_fa fasta file."""
+    if (not in_fa.endswith(".fa")) or (not in_fa.endswith(".fasta")):
+        # if not a fasta file, must be a contigset xml
+        if not in_fa.endswith(".xml"):
+            raise IOError("%s must be a FASTA or ContigSet file." % in_fa)
+        return ContigSet(in_fa).numRecords
+
     if not op.exists(in_fa):
         raise IOError("fasta file {f} does not exist.".format(f=in_fa))
     cmd = "grep '>' {f} | wc -l ".format(f=in_fa)
