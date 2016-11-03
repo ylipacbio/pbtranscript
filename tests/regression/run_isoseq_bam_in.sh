@@ -15,4 +15,4 @@ OUTFA=$BAM_OUTDIR/cluster_out.fasta
 
 echo Running pbtranscript cluster with --quiver
 rm -rf $BAM_OUTDIR $OUTFA
-pbtranscript cluster $FLNC $OUTFA -d $BAM_OUTDIR --bas_fofn $BAM --ccs_fofn $CCS --quiver --nfl $NFL --use_finer_qv --blasr_nproc 8 --quiver_nproc 8 || (echo pbtranscript FAILED WITH CODE $? && exit 1)
+pbtranscript cluster $FLNC $OUTFA -d $BAM_OUTDIR --bas_fofn $BAM --ccs_fofn $CCS --quiver --nfl_fa $NFL --use_finer_qv --blasr_nproc 8 --quiver_nproc 8 || (echo pbtranscript FAILED WITH CODE $? && exit 1)

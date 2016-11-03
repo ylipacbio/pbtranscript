@@ -17,5 +17,5 @@
 
 # Test pbtranscript cluster, dataset input, using finer qvs, quiver.
   $ rm -rf $OFA $OD && mkdir -p $OD
-  $ pbtranscript cluster $FLNC $OFA -d $OD --bas_fofn $BAS --ccs_fofn $CCS  --use_finer_qv --quiver --nfl $NFL
+  $ pbtranscript cluster $FLNC $OFA -d $OD --bas_fofn $BAS --ccs_fofn $CCS  --use_finer_qv --quiver --nfl_fa $NFL
   $ wc $OFA > /dev/null
