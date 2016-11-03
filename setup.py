@@ -96,7 +96,7 @@ setup(
              'pbtranscript/ice_quiver.py',
              'pbtranscript/ice_fa2fq.py',
              'pbtranscript/ice_daligner.py',
-             'pbtranscript/ice_combine_cluster_bins.py'
+             'pbtranscript/ice_combine_cluster_bins.py',
             ],
     entry_points={'console_scripts': [
         'pbtranscript = pbtranscript.PBTranscriptRunner:main',
@@ -105,6 +105,7 @@ setup(
         'ice_polish.py = pbtranscript.Polish:main',
         'ice_make_input_fasta_fofn.py = pbtranscript.ice.make_input_fasta_fofn:main',
         'separate_flnc.py = pbtranscript.tasks.separate_flnc:main',
+        'picking_up_ice.py = pbtranscript.picking_up_ice:main',
         'map_isoforms_to_genome.py = pbtranscript.tasks.map_isoforms_to_genome:main',
         'collapse_mapped_isoforms.py = pbtranscript.tasks.collapse_mapped_isoforms:main',
         'make_abundance.py = pbtranscript.tasks.make_abundance:main',
