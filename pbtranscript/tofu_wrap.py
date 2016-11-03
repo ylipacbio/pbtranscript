@@ -208,6 +208,7 @@ def args_runner(args):
     ice_opts = IceOptions(quiver=args.quiver, use_finer_qv=args.use_finer_qv,
                           targeted_isoseq=args.targeted_isoseq,
                           ece_penalty=args.ece_penalty, ece_min_len=args.ece_min_len,
+                          flnc_reads_per_split=args.flnc_reads_per_split,
                           nfl_reads_per_split=args.nfl_reads_per_split)
     sge_opts = SgeOptions(unique_id=args.unique_id, use_sge=args.use_sge,
                           max_sge_jobs=args.max_sge_jobs, blasr_nproc=args.blasr_nproc,

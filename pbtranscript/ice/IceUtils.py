@@ -805,7 +805,7 @@ def blasr_for_quiver(query_fn, ref_fasta, out_fn, bam=False,
 
 def num_reads_in_fasta(in_fa):
     """Return the number of reads in the in_fa fasta file."""
-    if (not in_fa.endswith(".fa")) or (not in_fa.endswith(".fasta")):
+    if (not in_fa.endswith(".fa")) and (not in_fa.endswith(".fasta")):
         # if not a fasta file, must be a contigset xml
         if not in_fa.endswith(".xml"):
             raise IOError("%s must be a FASTA or ContigSet file." % in_fa)

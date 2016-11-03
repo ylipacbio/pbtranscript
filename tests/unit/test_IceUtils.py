@@ -243,8 +243,14 @@ class Test_ICEUtils(unittest.TestCase):
                                         prob_model_from="fastq")
 
     @unittest.skipUnless(backticks('qstat')[1] == 0, "sge disabled")
-    def tes_daligner_against_ref_use_sge(self):
+    def test_daligner_against_ref_use_sge(self):
         """Test daligner_against_ref() using fake prob model on sge."""
         test_name = "test_daligner_against_ref_use_sge"
-        self._test_daligner_against_ref(test_name=test_name, use_sge=True, sge_opts=SgeOptions())
+        self._test_daligner_against_ref(test_name=test_name, use_sge=True, sge_opts=SgeOptions(100))
 
+    def test_num_reads_in_fasta(self):
+        """Test num_reads_in_fasta"""
+        in_fa = op.join(self.sivDataDir, "flnc.fasta")
+        in_xml = op.join(self.sivDataDir, "test_tool_contract_chunks/isoseq_flnc.contigset.xml")
+        self.assertEqual(226, num_reads_in_fasta(in_fa))
+        self.assertEqual(161, num_reads_in_fasta(in_xml))

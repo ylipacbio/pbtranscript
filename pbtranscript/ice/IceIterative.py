@@ -165,6 +165,8 @@ class IceIterative(IceFiles):
         else:
             if self.use_finer_qv: # use multi-QVs from ccs.h5
                 pass # no need to convert FASTA to FASTQ
+            elif ccs_fofn is None:
+                pass # get prob QVs from a fixed model
             else: # use a single Qv from FASTQ, convert FASTA to FASTQ first
                 self.fastq_filename = fafn2fqfn(self.fasta_filename)
                 self.add_log("Converting input {fa} + {ccs} --> {fq}.",

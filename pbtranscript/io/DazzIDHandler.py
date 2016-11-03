@@ -184,14 +184,13 @@ class DazzIDHandler(object):
         if not op.exists(self.db_filename):
             self.make_db()
 
-        with open(self.db_filename) as f:
-            f.readline()
-            f.readline()
-            x = f.readline().strip()
-            if not x.startswith('blocks ='):
-                raise ValueError("Could not get number of blocks in DAZZ DB %s"
-                                 % self.db_filename)
-        return int(x.split('=')[1])
+        bs = [line.strip() for line in open(self.db_filename, 'r')
+              if line.strip().startswith("blocks =")]
+        if len(bs) == 1:
+            return int(bs[0].split('=')[1])
+        raise ValueError("Could not get number of blocks in DAZZ DB %s"
+                         % self.db_filename)
+
 
     def __getitem__(self, key):
         """

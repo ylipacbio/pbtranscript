@@ -22,10 +22,10 @@
 
 # Test pbtranscript cluster, bam input, no finer qvs, no quiver.
   $ rm -rf $OFA $OD && mkdir -p $OD
-  $ pbtranscript cluster $FLNC $OFA -d $OD --bas_fofn $BAS --ccs_fofn $CCS  --quiver --nfl $NFL
+  $ pbtranscript cluster $FLNC $OFA -d $OD --bas_fofn $BAS --ccs_fofn $CCS  --quiver --nfl_fa $NFL
   $ ls $OFA > /dev/null
 
 # Test pbtranscript cluster, bam input, using finer qvs, quiver.
   $ rm -rf $OFA $OD && mkdir -p $OD
-  $ pbtranscript cluster $FLNC $OFA -d $OD --bas_fofn $BAS --ccs_fofn $CCS  --use_finer_qv --quiver --nfl $NFL
+  $ pbtranscript cluster $FLNC $OFA -d $OD --bas_fofn $BAS --ccs_fofn $CCS  --use_finer_qv --quiver --nfl_fa $NFL
   $ ls $OFA > /dev/null

@@ -175,8 +175,12 @@ class IceOptions(object):
     def _write_config(self, fasta_filename):
         """Write daligner sensitive config to fasta_filename.sensitive.config."""
         lens = [len(r.sequence) for r in ContigSetReaderWrapper(fasta_filename)]
-        self.low_cDNA_size  = int(np.percentile(lens, 10))
-        self.high_cDNA_size = int(np.percentile(lens, 90))
+        self.low_cDNA_size, self.high_cDNA_size = 0, 0
+        if len(lens) == 1:
+            self.low_cDNA_size, self.high_cDNA_size = lens[0], lens[0]
+        if len(lens) >= 2:
+            self.low_cDNA_size  = int(np.percentile(lens, 10))
+            self.high_cDNA_size = int(np.percentile(lens, 90))
 
         try:
             with open(fasta_filename+'.sensitive.config', 'w') as f:
