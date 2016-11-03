@@ -627,11 +627,11 @@ def add_cluster_arguments(parser):
                                     tool_contract_parser=tool_contract_parser)
 
     helpstr = "Directory to store temporary and output cluster files." + \
-        "(default: output/)"
+        "(default: cluster_out/)"
     arg_parser.add_argument("-d", "--outDir",
                             type=str,
                             dest="root_dir",
-                            default="output",
+                            default="cluster_out",
                             help=helpstr)
 
     arg_parser = add_tmp_dir_argument(arg_parser)
