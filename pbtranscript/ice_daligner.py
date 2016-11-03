@@ -384,7 +384,7 @@ def main(query_filename, target_filename, output_dir):
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print "Usage: %s query.fasta target.fasta, output_dir" % op.basename(__file__)
+        print "Usage: %s query.fasta target.fasta output_dir" % op.basename(__file__)
         sys.exit(1)
 
     sys.exit(main(query_filename=sys.argv[1],
