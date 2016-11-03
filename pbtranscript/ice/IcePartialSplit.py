@@ -113,6 +113,9 @@ Description:
 
     Example:
         ice_partial_split.py nfl_fa root_dir N
+
+Alternative way to call this script:
+    python -m pbtranscript.ice_partial split
 """
 
 import logging
@@ -141,9 +144,9 @@ class IcePartialSplit(object):
 
     """ice_partial split runner."""
 
-    desc = "Process the i-th chunk of non-full-length reads, align " + \
-           "and assign these reads to unpolished consensus isoforms " + \
-           "and create a pickle file."
+    desc = "Split input non-full-length reads into N (N < 100) chunks, " + \
+           "so that the chunked reads can be assigned later " + \
+           "using '%s i' in paraellel." % ICE_PARTIAL_PY
 
     prog = "%s split " % ICE_PARTIAL_PY # used by cmd_str and ice_partial.py
 
@@ -198,6 +201,9 @@ class IcePartialSplit(object):
 
         # Check if inputs exist.
         errMsg = ""
+        if N <= 0 or N > 100:
+            errMsg = "Input file can not be splitted into %d chunks!" % N
+
         if not nfs_exists(nfl_fa):
             errMsg = ("The input non-full-length reads fasta file " +
                       "{f} does not exists. ".format(f=nfl_fa))

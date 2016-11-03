@@ -93,6 +93,9 @@ Overview:
         ice_quiver.py all = ice_quiver.py i + \
                             ice_quiver.py merge + \
                             ice_quiver.py postprocess
+
+Alternative way to call this suite of scripts:
+    python -m pbtranscript.ice_partial
 """
 
 import logging
@@ -116,7 +119,7 @@ from pbtranscript.ice.IcePartialMerge import IcePartialMerge, \
 
 class IcePartialRunner(PBMultiToolRunner):
 
-    """ice_partial runner, subcommands include 'all',
+    """ice_partial runner, subcommands include 'all', 'one',
     'split', 'i', and 'merge'"""
 
     def __init__(self):
@@ -149,7 +152,7 @@ class IcePartialRunner(PBMultiToolRunner):
         return get_version()
 
     def run(self):
-        """Execute ice_partial.py all|split|i|merge."""
+        """Execute ice_partial.py all|one|split|i|merge."""
         cmd = self.args.subCommand
         logging.info("Running {f} {cmd} v{v}.".format(f=op.basename(__file__),
                                                       cmd=cmd, v=get_version()))

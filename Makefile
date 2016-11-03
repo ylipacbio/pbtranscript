@@ -20,6 +20,7 @@ test:
 	find tests/unit -name "*.py" | xargs nosetests
 	# End-to-end tests
 	find tests/cram -name "*.t" | xargs cram
+	find tests/cram/test_ice_entries -name "*.t" | xargs cram
 
 
 doc:

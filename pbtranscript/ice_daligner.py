@@ -13,6 +13,11 @@ import os.path as op
 import sys
 import logging
 import time
+
+from pbcore.util.ToolRunner import PBToolRunner
+
+from pbtranscript.__init__ import get_version
+from pbtranscript.PBTranscriptOptions import add_sge_arguments
 from pbtranscript.ClusterOptions import SgeOptions
 from pbtranscript.Utils import realpath, mkdir, mknewdir
 from pbtranscript.RunnerUtils import write_cmd_to_script, \
@@ -373,20 +378,67 @@ class DalignerRunner(object):
             os.remove(f)
 
 
-def main(query_filename, target_filename, output_dir):
-    """Main function to call DalignerRunner"""
-    obj = DalignerRunner(query_filename=query_filename,
-                         target_filename=target_filename,
-                         is_FL=False, same_strand_only=True,
-                         query_converted=False, target_converted=False,
-                         use_sge=True, sge_opts=SgeOptions(100))
-    return obj.run(output_dir=output_dir)
+def add_ice_daligner_arguments(parser):
+    """Set up argument parser."""
+    helpstr = "Query reads fasta file"
+    parser.add_argument("query_fasta", type=str, help=helpstr)
+
+    helpstr = "Target reads fasta file"
+    parser.add_argument("target_fasta", type=str, help=helpstr)
+
+    helpstr = "Output directory to store daligner and LA4Ice outputs"
+    parser.add_argument("output_dir", type=str, help=helpstr)
+
+    helpstr = "Query reads are Full-Length isoforms."
+    parser.add_argument("--is_FL", default=False, action="store_true", help=helpstr)
+
+    helpstr = "Query and target reads are of the same strand"
+    parser.add_argument("--same_strand_only", default=False, action="store_true", help=helpstr)
+
+    parser = add_sge_arguments(parser, blasr_nproc=True)
+    return parser
+
+
+class IceDalignerRunner(PBToolRunner):
+
+    "Use daligner to align cDNA reads, then call LA4Ice to show alignments."
+
+    def __init__(self):
+        desc = __doc__
+        PBToolRunner.__init__(self, desc)
+        add_ice_daligner_arguments(self.parser)
+
+    def getVersion(self):
+        """Get version string."""
+        return get_version()
+
+    def run(self):
+        """ Call DalignerRunner """
+        logging.info("Running {f} v{v}.".format(f=op.basename(__file__),
+                                                v=self.getVersion()))
+        args = self.args
+        mkdir(args.output_dir)
+
+        sge_opts = SgeOptions(unique_id=args.unique_id,
+                              use_sge=args.use_sge,
+                              max_sge_jobs=args.max_sge_jobs,
+                              blasr_nproc=args.blasr_nproc,
+                              sge_env_name=args.sge_env_name,
+                              sge_queue=args.sge_queue)
+
+        obj = DalignerRunner(query_filename=args.query_fasta,
+                             target_filename=args.target_fasta,
+                             is_FL=args.is_FL, same_strand_only=args.same_strand_only,
+                             query_converted=False, target_converted=False,
+                             use_sge=args.use_sge, sge_opts=sge_opts)
+        obj.run(output_dir=args.output_dir)
+
+
+def main():
+    """Main function to call CombineClusterBinsRunner"""
+    runner = IceDalignerRunner()
+    return runner.start()
+
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print "Usage: %s query.fasta target.fasta, output_dir" % op.basename(__file__)
-        sys.exit(1)
-
-    sys.exit(main(query_filename=sys.argv[1],
-                  target_filename=sys.argv[2],
-                  output_dir=sys.argv[3]))
+    sys.exit(main())

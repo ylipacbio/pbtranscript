@@ -300,8 +300,7 @@ def add_sge_arguments(arg_parser, blasr_nproc=False, quiver_nproc=False, gcon_np
                            dest="use_sge",
                            default=False,
                            action="store_true",
-                           help="The maximum number of jobs that will " +
-                                "be submitted to SGE concurrently.")
+                           help="Use SGE computing cluster")
 
     sge_group.add_argument("--max_sge_jobs",
                            type=int,
@@ -323,7 +322,7 @@ def add_sge_arguments(arg_parser, blasr_nproc=False, quiver_nproc=False, gcon_np
                                dest="blasr_nproc",
                                action="store",
                                default=24,
-                               help="Number of cores for each BLASR job. (default: 24)")
+                               help="Number of cores for each BLASR|Daligner job. (default: 24)")
     if quiver_nproc is True:
         sge_group.add_argument("--quiver_nproc",
                                dest="quiver_nproc",
@@ -385,28 +384,28 @@ def add_ice_post_quiver_hq_lq_io_arguments(parser):
                         default=None,
                         type=str,
                         dest="hq_isoforms_fa",
-                        help="Quiver polished, high quality isoforms " +
+                        help="Quiver|Arrow polished, high quality isoforms " +
                         "in FASTA, default: root_dir/output/all_quivered_hq.fasta")
 
     icq_gp.add_argument("--hq_isoforms_fq",
                         default=None,
                         type=str,
                         dest="hq_isoforms_fq",
-                        help="Quiver polished, high quality isoforms " +
+                        help="Quiver|Arrow polished, high quality isoforms " +
                         "in FASTQ, default: root_dir/output/all_quivered_hq.fastq")
 
     icq_gp.add_argument("--lq_isoforms_fa",
                         default=None,
                         type=str,
                         dest="lq_isoforms_fa",
-                        help="Quiver polished, low quality isoforms " +
+                        help="Quiver|Arrow polished, low quality isoforms " +
                         "in FASTA, default: root_dir/output/all_quivered_lq.fasta")
 
     icq_gp.add_argument("--lq_isoforms_fq",
                         default=None,
                         type=str,
                         dest="lq_isoforms_fq",
-                        help="Quiver polished, low quality isoforms " +
+                        help="Quiver|Arrow polished, low quality isoforms " +
                         "in FASTQ, default: root_dir/output/all_quivered_lq.fastq")
     return parser
 
@@ -426,7 +425,7 @@ def add_ice_post_quiver_hq_lq_qv_arguments(parser):
         tcp = parser.tool_contract_parser
         tcp.add_float(BaseConstants.HQ_QUIVER_MIN_ACCURACY_ID, "hq_quiver_min_accuracy",
                       default=BaseConstants.HQ_QUIVER_MIN_ACCURACY_DEFAULT,
-                      name="Minimum Quiver Accuracy", description=BaseConstants.HQ_QUIVER_MIN_ACCURACY_DESC)
+                      name="Minimum Quiver|Arrow Accuracy", description=BaseConstants.HQ_QUIVER_MIN_ACCURACY_DESC)
         tcp.add_int(BaseConstants.QV_TRIM_FIVEPRIME_ID, "qv_trim_5",
                     default=BaseConstants.QV_TRIM_FIVEPRIME_DEFAULT,
                     name="Trim QVs 5'", description=BaseConstants.QV_TRIM_FIVEPRIME_DESC)
@@ -540,8 +539,8 @@ def add_nfl_fa_argument(arg_parser, positional=False, required=False,
 
 def add_cluster_root_dir_as_positional_argument(arg_parser):
     """Add root_dir as root output directory for `cluster`."""
-    helpstr = "An directory to store temporary and output cluster files." + \
-              " e.g., SMRTPipe data/clusterOutDir/"
+    helpstr = "An directory to store temporary and output cluster files" + \
+              " (e.g., in SA3.2, tasks/pbtranscript.tasks.separate_flnc-0/0to1kb_part0/cluster_out; in SA2.3, data/clusterOutDir/)"
     arg_parser.add_argument("root_dir", help=helpstr, type=str)
     return arg_parser
 

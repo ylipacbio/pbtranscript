@@ -95,7 +95,8 @@ setup(
              'pbtranscript/ice_partial.py',
              'pbtranscript/ice_quiver.py',
              'pbtranscript/ice_fa2fq.py',
-             'pbtranscript/ice_fa2fq.py',
+             'pbtranscript/ice_daligner.py',
+             'pbtranscript/ice_combine_cluster_bins.py'
             ],
     entry_points={'console_scripts': [
         'pbtranscript = pbtranscript.PBTranscriptRunner:main',

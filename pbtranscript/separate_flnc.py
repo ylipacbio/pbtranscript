@@ -16,7 +16,8 @@ from pbtranscript.io.ContigSetReaderWrapper import ContigSetReaderWrapper
 
 __author__ = "etseng@pacificbiosciences.com"
 
-__all__ = ["SeparateFLNCRunner"]
+__all__ = ["SeparateFLNCRunner",
+           "convert_pickle_to_sorted_flnc_files"]
 
 
 class SeparateFLNCBase(object):
@@ -452,3 +453,7 @@ class SeparateFLNCRunner(object):
                                     out_pickle=self.out_pickle) as obj:
                 obj.run()
         return 0
+
+
+def convert_pickle_to_sorted_flnc_files(in_pickle):
+    return SeparateFLNCBase.convert_pickle_to_sorted_flnc_files(in_pickle)

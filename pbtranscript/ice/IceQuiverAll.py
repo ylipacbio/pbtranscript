@@ -43,8 +43,8 @@ Description:
 
     Process:
         After assigning all non-full-length reads to unpolished consensus
-        isoforms, call quiver to polish these isoforms and output high QV and
-        low QV isoforms.
+        isoforms, polish these isoforms by using Quiver for RS2 data and Arrow
+        for Sequel data, and output high QV and low QV isoforms.
 
     Input:
         Positional:
@@ -78,6 +78,9 @@ Description:
 
     Example:
         ice_quiver.py all root_dir --bas_fofn=bas_fofn --fasta_fofn=fasta_fofn
+
+Alternative way to call this script:
+    python -m pbtranscript.ice_quiver all
 """
 
 from pbtranscript.PBTranscriptOptions import \
@@ -95,8 +98,8 @@ class IceQuiverAll(object):
 
     desc = "After assigning all non-full-length reads to unpolished " + \
            "consensus isoforms (e.g., 'ice_partial.py all' is done), " + \
-           "call quiver to polish these isoforms, then output " + \
-           "high QV and low QV isoforms."
+           "polish these isoforms by using Quiver for RS2 data and " + \
+           "Arrow for Sequel data, then output high QV and low QV isoforms."
 
     prog = "%s all " % ICE_QUIVER_PY
 
