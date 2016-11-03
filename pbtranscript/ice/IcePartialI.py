@@ -137,6 +137,7 @@ Alternative way to call:
 """
 
 import logging
+import os.path as op
 from pbtranscript.__init__ import get_version
 from pbtranscript.PBTranscriptOptions import add_fofn_arguments, \
     add_cluster_root_dir_as_positional_argument, add_tmp_dir_argument
@@ -218,7 +219,8 @@ class IcePartialI(object):
             cmd += "--tmp_dir={t} ".format(t=tmp_dir)
         return cmd
 
-    def _validate_inputs(self, root_dir, i, ccs_fofn, blasr_nproc, tmp_dir):
+    def _validate_inputs(self, root_dir, i, ccs_fofn, blasr_nproc, tmp_dir,
+                         ref_fasta=None):
         """
         Check inputs, write $ICE_PARTIAL_PY i command to script_file
         and return (input_fasta, ref_fasta, out_pickle, done_file)
@@ -250,15 +252,27 @@ class IcePartialI(object):
                       "fasta file {f} does not exist. ".format(f=input_fasta) +
                       "Please run $ICE_PARTIAL_PY split first.")
         elif not nfs_exists(ref_fasta):
+            # ref_fasta --- root_dir/output/final.consensus.fasta
+            # ref_dazz --- root_dir/output/final.consensus.dazz.fasta.db
+            # ref_fasta and ref_dazz must exist if ICE has run successfully in
+            # root_dir. If either one does not exist, it means ICE has not
+            # successfully run in root_dir. Then we have to throw an error message
+            # requring users to copy the root_dir/output directory manually,
+            # rather than providing an option to overwrite ref_fasta and build
+            # ref_dazz, because a race condition can happen when multiple
+            # IcePartialI tasks start to run at the same time, which can corrupt
+            # fasta and dazz db files and lead to unexpected runtime errors.
             errMsg = ("The unpolished consensus isoforms fasta file " +
                       "{f} does not exist. ".format(f=ref_fasta) +
-                      "Please make sure ICE is successfully done.")
+                      "Please make sure ICE is successfully done in root_dir, " +
+                      "or copy ICE output directory (e.g., cluster_out/output) " +
+                      "to {dst}".format(dst=op.dirname(ref_fasta)))
         elif not nfs_exists(ref_dazz):
             errMsg = ("The dazz db " +
                       "{f} does not exist. ".format(f=ref_dazz) +
                       "Please make sure it is already built.")
         if len(errMsg) != 0:
-            raise ValueError(errMsg)
+            raise IOError(errMsg)
 
         # Save cmd to script_file.
         cmd = self._cmd_str(root_dir=root_dir, i=[i],

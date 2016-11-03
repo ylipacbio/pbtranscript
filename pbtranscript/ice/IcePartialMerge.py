@@ -169,8 +169,7 @@ class IcePartialMerge(object):
         and out_pickle is the final output pickle assigning all
         nfl reads to unpolished isoforms.
         """
-        return self._validate_inputs(root_dir=self.root_dir,
-                                    N=self.N)
+        return self._validate_inputs(root_dir=self.root_dir, N=self.N)
 
     def _validate_inputs(self, root_dir, N):
         """
@@ -207,5 +206,5 @@ class IcePartialMerge(object):
 
         splitted_pickles, out_pickle = self.validate_inputs()
 
-        logging.info("Combining {N} nfl pickles.")
+        logging.info("Combining {N} nfl pickles to {o}.".format(N=self.N, o=out_pickle))
         combine_nfl_pickles(splitted_pickles, out_pickle)
