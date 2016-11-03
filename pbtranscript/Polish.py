@@ -77,9 +77,9 @@ class Polish(IceFiles):
             errMsg = "Failed to find non-full-length reads {f}!".\
                 format(f=self.nfl_fa)
         if self.bas_fofn is None:
-            errMsg = "bas_fofn must be specified."
+            errMsg = "bas_fofn (subreadset) must be specified."
         if not op.exists(self.bas_fofn):
-            errMsg = "Failed to find bas fofn {f}!".format(f=self.bas_fofn)
+            errMsg = "Failed to find bas fofn (subreadset) {f}!".format(f=self.bas_fofn)
         if errMsg != "":
             self.add_log(errMsg, level=logging.ERROR)
             raise ValueError(errMsg)
