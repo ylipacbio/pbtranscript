@@ -147,7 +147,7 @@ class IceQuiverPostprocess(IceFiles):
 
     """
 
-    desc = "Post-quiver process, pick up high QV and low QV consensus isoforms."
+    desc = "Post-polishing process, pick up high QV and low QV consensus isoforms."
     prog = "%s postprocess " % ICE_QUIVER_PY
 
     def __init__(self, root_dir, ipq_opts,
@@ -385,10 +385,12 @@ class IceQuiverPostprocess(IceFiles):
         self.add_log("-" * 60, level=logging.INFO)
         self.add_log("High-quality Quivered consensus written " +
                      "to:\n{0}\n{1}".format(self.quivered_good_fa,
-                                            self.quivered_good_fq))
+                                            self.quivered_good_fq),
+                     level=logging.INFO)
         self.add_log("Low-qulality Quivered consensus written " +
                      "to:\n{0}\n{1}".format(self.quivered_bad_fa,
-                                            self.quivered_bad_fq))
+                                            self.quivered_bad_fq),
+                     level=logging.INFO)
         self.add_log("-" * 60, level=logging.INFO)
 
     def cmd_str(self):

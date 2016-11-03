@@ -40,7 +40,7 @@ Overview:
               Align and assign nfl reads to unpolished isoforms, and
               save results to a pickle file.
       + (2.2) IceQuiver (ice_quiver.py i and ice_quiver.py merge)
-              Call quiver to polish each isoform based on alignments
+              Polish each isoform based on alignments
               created by mapping its associated fl and nfl reads to
               this isoform.
       + (2.3) IceQuiverPostprocess (ice_quiver.py postprocess)
@@ -55,8 +55,7 @@ Overview:
     (2.2) IceQuiver will be refactored to
        + (2.2.1) IceQuiverI (ice_quiver.py i)
                  Split all unpolished isoforms into N chunks and
-                 call Quiver to polish isoforms of the i-th chunk
-                 at a time
+                 polish isoforms of the i-th chunk at a time
        + (2.2.2) IceQuiverMerge (ice_quiver.py merge)
                  When all splitted quiver jobs are done,
                  collect all submitted jobs and save to
@@ -121,6 +120,9 @@ Description:
 
     Example:
         ice_quiver.py merge root_dir N
+
+Alternative way to call this script:
+    python -m pbtranscript.ice_quiver merge
 """
 
 import logging
@@ -149,8 +151,8 @@ class IceQuiverMerge(object):
     """Merge all quiver polished isoforms done by N IceQuiverI jobs."""
 
     desc = "Unpolished isoforms were divided into N chunks and " + \
-           "polished using Quiver separately. Now collect all " + \
-           "submitted Quiver jobs from " + \
+           "polished using Quiver or Arrow separately. Now collect all " + \
+           "submitted polishing jobs from " + \
            "root_dir/log/submitted_quiver_jobs.{i}of{N}.txt " + \
            "(i=0,...,N-1) to root_dir/log/submitted_quiver_jobs.txt"
 

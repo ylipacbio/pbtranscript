@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-"""Call quiver to polish consensus isoforms created by ICE."""
+"""
+Polish consensus isoforms created by ICE, using
+quiver for RS2 data, and Arrow for Sequel data.
+"""
 
 import os.path as op
 import logging
@@ -29,8 +32,8 @@ class IceQuiver(IceFiles):
     """Ice Quiver."""
 
     desc = "After assigning all non-full-length reads to unpolished " + \
-           "consensus isoforms created by ICE, call quiver to polish " + \
-           "these isoforms."
+           "consensus isoforms created by ICE, polish these consensus " + \
+           "isoforms, using quiver for RS2 data and arrow for Sequel data."
 
     def __init__(self, root_dir, bas_fofn, fasta_fofn, sge_opts,
                  tmp_dir=None, prog_name=None):

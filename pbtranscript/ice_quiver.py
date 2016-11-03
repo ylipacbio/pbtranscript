@@ -107,6 +107,9 @@ Overview:
         ice_quiver.py all = ice_quiver.py i + \
                             ice_quiver.py merge + \
                             ice_quiver.py postprocess
+
+Alternative way to call this script:
+    python -m pbtranscript.ice_quiver
 """
 import logging
 import sys

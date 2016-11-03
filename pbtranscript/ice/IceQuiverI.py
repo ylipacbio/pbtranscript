@@ -128,6 +128,8 @@ Description:
         ice_quiver.py i root_dir {i} N --bas_fofn=bas_fofn \
                         --fasta_fofn=fasta_fofn
 
+Alternative way to call this script:
+    python -m pbtranscript.ice_quiver i
 """
 
 from pbtranscript.__init__ import get_version
