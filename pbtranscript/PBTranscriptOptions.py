@@ -268,6 +268,18 @@ def add_ice_arguments(arg_parser, tc_parser=None):
                            action="store",
                            default=100,
                            help=argparse.SUPPRESS)
+    # number of flnc reads per split
+    ice_group.add_argument("--flnc_reads_per_split",
+                           type=int,
+                           action="store",
+                           default=20000,
+                           help=argparse.SUPPRESS)
+    # number of nfl reads per split
+    ice_group.add_argument("--nfl_reads_per_split",
+                           type=int,
+                           action="store",
+                           default=30000,
+                           help=argparse.SUPPRESS)
 
     desc = "Use finer classes of QV information from CCS input instead of "+\
            "a single QV from FASTQ.  This option is slower and consumes "+\

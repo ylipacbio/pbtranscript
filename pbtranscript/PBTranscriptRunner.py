@@ -122,6 +122,8 @@ class PBTranscript(PBMultiToolRunner):
                 ice_opts = IceOptions(quiver=self.args.quiver,
                                       use_finer_qv=self.args.use_finer_qv,
                                       targeted_isoseq=self.args.targeted_isoseq,
+                                      flnc_reads_per_split=self.args.flnc_reads_per_split,
+                                      nfl_reads_per_split=self.args.nfl_reads_per_split,
                                       num_clusters_per_bin=self.args.num_clusters_per_bin)
                 sge_opts = SgeOptions(unique_id=self.args.unique_id,
                                       use_sge=self.args.use_sge,
