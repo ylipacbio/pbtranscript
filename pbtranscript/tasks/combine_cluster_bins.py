@@ -1,6 +1,6 @@
 """
 Combine results from all cluster bins, including consensus isoforms,
-polished hq|lq isoforms, cluster_summary.csv and cluster_report.json
+polished HQ|LQ isoforms, cluster_summary.csv and cluster_report.json
 """
 
 import logging
@@ -29,7 +29,6 @@ log = logging.getLogger(__name__)
 
 
 class Constants(BaseConstants):
-    """Constants used TOOL_ID"""
     TOOL_ID = "pbtranscript.tasks.combine_cluster_bins"
     DRIVER_EXE = "python -m %s --resolved-tool-contract " % TOOL_ID
     PARSER_DESC = __doc__
