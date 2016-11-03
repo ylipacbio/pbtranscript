@@ -300,8 +300,7 @@ def add_sge_arguments(arg_parser, blasr_nproc=False, quiver_nproc=False, gcon_np
                            dest="use_sge",
                            default=False,
                            action="store_true",
-                           help="The maximum number of jobs that will " +
-                                "be submitted to SGE concurrently.")
+                           help="Use SGE computing cluster")
 
     sge_group.add_argument("--max_sge_jobs",
                            type=int,
@@ -323,7 +322,7 @@ def add_sge_arguments(arg_parser, blasr_nproc=False, quiver_nproc=False, gcon_np
                                dest="blasr_nproc",
                                action="store",
                                default=24,
-                               help="Number of cores for each BLASR job. (default: 24)")
+                               help="Number of cores for each BLASR|Daligner job. (default: 24)")
     if quiver_nproc is True:
         sge_group.add_argument("--quiver_nproc",
                                dest="quiver_nproc",
