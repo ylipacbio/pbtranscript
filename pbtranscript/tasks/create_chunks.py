@@ -20,7 +20,7 @@ from pbcommand.utils import setup_log
 import pbcoretools.chunking.chunk_utils as CU
 from pbcoretools.chunking.gather import get_datum_from_chunks_by_chunk_key
 
-#from pbtranscript.ice.IceFiles import IceFiles
+from pbtranscript.Utils import ln
 from pbtranscript.tasks.TPickles import ClusterChunkTask, PartialChunkTask,\
         PolishChunkTask, ChunkTasksPickle, n_reads_in_contigsets
 from pbtranscript.separate_flnc import SeparateFLNCBase
@@ -224,6 +224,13 @@ def run_main(separate_flnc_pickle_file, nfl_contigset,
     create_polish_pickle(n_polish_chunks_in_bins=n_polish_chunks_in_bins,
                          flnc_files=flnc_fns,
                          out_pickle=polish_chunk_pickle)
+
+    # Make a soft link of nfl_contigset in the same directory as separate_flnc.pickle
+    # for users' convenience
+    dst_nfl_contigset = op.join(op.dirname(separate_flnc_pickle_file),
+                                "isoseq_nfl.contigset.xml")
+    log.info("Making a soft link of %s to %s.", nfl_contigset, dst_nfl_contigset)
+    ln(nfl_contigset, dst_nfl_contigset)
 
 
 def _args_run(args):
