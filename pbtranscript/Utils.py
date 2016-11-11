@@ -487,3 +487,37 @@ def get_sample_name(input_sample_name):
         return str("sample"+binascii.b2a_hex(os.urandom(3)))
     else:
         return input_sample_name
+
+
+def get_samtools_version():
+    """
+    Return samtools version string.
+    If samtools supports '--version', return its version.
+    Otherwise, return '0.1.19' which is the one used in SA2.x, SA3.0, SA3.1 and SA3.2.
+    """
+    default_sam_version = "0.1.19"
+    cmd = 'samtools --version'
+    _out, _code, _msg = backticks(cmd)
+    try:
+        if "samtools" in _out[0]:
+            return str(_out[0][8:]).strip()
+    except Exception:
+        # samtools used in SA2.x and SA3.1, SA3.2 is
+        # version 0.1.19, which does not support --version
+        # samtools used in SA3.3 or up is 1.3.1
+        return default_sam_version
+
+
+def use_samtools_v_1_3_1():
+    """Return True if samtools major version is >= 1.3.1"""
+    try:
+        versions = get_samtools_version().split('.')
+        major, minor, last = 0, 0, 0
+        major = int(versions[0])
+        if len(versions) >= 2:
+            minor = int(versions[1])
+            if len(versions) >= 3:
+                last = int(versions[2])
+        return major >= 2 or (major == 1 and minor > 3) or (major == 1 and minor == 3 and last >= 1)
+    except:
+        return False
