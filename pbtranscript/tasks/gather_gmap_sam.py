@@ -12,7 +12,8 @@ from pbcommand.utils import setup_log
 from pbcoretools.chunking.gather import get_datum_from_chunks_by_chunk_key
 
 from pbtranscript.__init__ import get_version
-from pbtranscript.collapsing import concatenate_sam
+from pbtranscript.Utils import rmpath
+from pbtranscript.collapsing import concatenate_sam, sort_sam
 
 log = logging.getLogger(__name__)
 
@@ -57,8 +58,16 @@ def run_main(chunk_json, sam_output, chunk_key):
     log.debug("Chunked SAM files are %s.", (', '.join(sam_files)))
 
     log.info("Concatenate chunked SAM files to %s.", sam_output)
-    concatenate_sam(sam_files, sam_output)
 
+    # concatenate sam files
+    unsorted_sam_output = sam_output + ".unsorted.sam"
+    concatenate_sam(sam_files, unsorted_sam_output)
+
+    # then sort
+    sort_sam(unsorted_sam_output, sam_output)
+
+    # remove intermediate file
+    rmpath(unsorted_sam_output)
     return 0
 
 

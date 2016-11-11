@@ -23,6 +23,7 @@ from pbtranscript.collapsing import c_branch, IntervalTree
 __all__ = ["ContiVec",
            "copy_sam_header",
            "map_isoforms_and_sort",
+           "sort_sam",
            "concatenate_sam",
            "transfrag_to_contig",
            "exons_match_sam_record",
@@ -84,21 +85,28 @@ def map_isoforms_and_sort(input_filename, sam_filename,
     # Call gmap to map isoforms to reference and output sam.
     execute(' '.join(cmd_args))
 
-    # Copy SAM headers
-    copy_sam_header(in_sam=unsorted_sam_filename,
-                    out_sam=sam_filename)
-
-    # Call sort to sort gmap output sam file
-    cmd_args = ['sort', '-k 3,3', '-k 4,4n', unsorted_sam_filename,
-                '| grep -v \'^@\' ', ' >> ', sam_filename]
-
-    if stat(unsorted_sam_filename).st_size == 0: # overwrite cmds if file is empty
-        cmd_args = ['touch', sam_filename]
-
-    execute(' '.join(cmd_args))
+    # sort sam file
+    sort_sam(in_sam=unsorted_sam_filename, out_sam=sam_filename)
 
     # remove intermediate unsorted sam file.
     rmpath(unsorted_sam_filename)
+
+
+def sort_sam(in_sam, out_sam):
+    """
+    Sort input sam file and write to output sam file.
+    """
+    # Copy SAM headers
+    copy_sam_header(in_sam=in_sam, out_sam=out_sam)
+
+    # Call sort to sort gmap output sam file
+    cmd_args = ['sort', '-k 3,3', '-k 4,4n', in_sam,
+                '| grep -v \'^@\' ', ' >> ', out_sam]
+
+    if stat(in_sam).st_size == 0: # overwrite cmds if file is empty
+        cmd_args = ['touch', out_sam]
+
+    execute(' '.join(cmd_args))
 
 
 def concatenate_sam(in_sam_files, sam_out):
