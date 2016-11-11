@@ -17,7 +17,8 @@ from pbtranscript.ClusterOptions import IceQuiverOptions
 from pbtranscript.PBTranscriptOptions import  add_fofn_arguments, \
     add_sge_arguments, add_cluster_root_dir_as_positional_argument
 from pbtranscript.Utils import mkdir, real_upath, nfs_exists, \
-    get_files_from_file_or_fofn, guess_file_format, FILE_FORMATS
+    get_files_from_file_or_fofn, guess_file_format, FILE_FORMATS, \
+    use_samtools_v_1_3_1
 from pbtranscript.ice.IceUtils import get_the_only_fasta_record, \
     is_blank_sam, concat_sam, blasr_for_quiver, trim_subreads_and_write, \
     is_blank_bam, concat_bam
@@ -43,6 +44,7 @@ class IceQuiver(IceFiles):
                                         root_dir=root_dir, bas_fofn=bas_fofn,
                                         fasta_fofn=fasta_fofn, tmp_dir=tmp_dir)
         self.sge_opts = sge_opts
+        self.use_samtools_v_1_3_1 = use_samtools_v_1_3_1()
 
     def validate_inputs(self):
         """Validate input fofns, and root_dir, log_dir, tmp_dir,
@@ -346,9 +348,17 @@ class IceQuiver(IceFiles):
                         format(bas_fofn=real_upath(self.bas_fofn),
                                cmph5=real_upath(bin_cmph5)))
         else:
-            cmds.append("samtools sort {f} {d}".format(
-                f=real_upath(bin_unsorted_bam_file),
-                d=real_upath(bin_bam_prefix)))
+            if not self.use_samtools_v_1_3_1:
+                # SA2.*, SA3.0, SA3.1 and SA3.2 use v0.1.19
+                cmds.append("samtools sort {f} {d}".format(
+                    f=real_upath(bin_unsorted_bam_file),
+                    d=real_upath(bin_bam_prefix)))
+            else:
+                # SA3.3 and up use v1.3.1
+                cmds.append("samtools sort {f} -o {d}.bam".format(
+                    f=real_upath(bin_unsorted_bam_file),
+                    d=real_upath(bin_bam_prefix)))
+
             cmds.append("samtools index {f}".format(f=real_upath(bin_bam_file)))
 
         cmds.append("samtools faidx {ref}".format(ref=real_upath(bin_ref_fa)))
