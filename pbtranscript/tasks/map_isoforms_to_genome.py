@@ -129,7 +129,8 @@ def get_contract_parser():
     tcp.add_input_file_type(FileTypes.DS_GMAP_REF, "gmap_referenceset", "GmapReferenceSet In",
                             "Gmap reference set file") # input 1
     tcp.add_output_file_type(FileTypes.SAM, "gmap_output_sam",
-                             name="SAM file", description="Gmap output sam",
+                             name="Gmap SAM Mapping HQ Isoforms to Genome",
+                             description="Gmap output sam mapping HQ isoforms to reference",
                              default_name="gmap_output")
 
     tcp.add_int(option_id=Constants.GMAP_NPROC_ID, option_str="gmap_nproc",

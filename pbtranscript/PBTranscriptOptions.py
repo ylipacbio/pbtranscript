@@ -37,7 +37,7 @@ class BaseConstants(object):
 
     HQ_QUIVER_MIN_ACCURACY_ID = "pbtranscript.task_options.hq_quiver_min_accuracy"
     HQ_QUIVER_MIN_ACCURACY_DEFAULT = 0.99
-    HQ_QUIVER_MIN_ACCURACY_DESC = "Minimum allowed quiver accuracy to classify an isoform " + \
+    HQ_QUIVER_MIN_ACCURACY_DESC = "Minimum allowed Quiver|Arrow accuracy to classify an isoform " + \
                                   "as hiqh-quality (default: %s)" % HQ_QUIVER_MIN_ACCURACY_DEFAULT
 
     QV_TRIM_FIVEPRIME_ID = "pbtranscript.task_options.qv_trim_5p"
