@@ -251,25 +251,27 @@ def get_contract_parser():
                             "sample prefixes to ICE cluster output directories") # input 2
 
     tcp.add_output_file_type(FileTypes.FASTQ, "collapsed_filtered_isoforms_fq",
-                             name="FASTQ file",
+                             name="Collapsed Filtered Isoforms",
                              description="Representative sequences of collapsed filtered isoforms",
                              default_name="output_mapped") # output 0
 
     tcp.add_output_file_type(FileTypes.GFF, "collapsed_filtered_isoforms_gff",
-                             name="GFF file", description="Collapsed filtered isoforms gff",
+                             name="Collapsed Filtered Isoforms",
+                             description="Collapsed filtered isoforms gff",
                              default_name="output_mapped") # output 1
 
     tcp.add_output_file_type(FileTypes.TXT, "abundance_txt",
-                             name="TXT file", description="Abundance file",
+                             name="Isoform Abundance", description="Abundance file",
                              default_name="output_mapped_abundance") # output 2
 
     tcp.add_output_file_type(FileTypes.TXT, "groups_txt",
-                             name="TXT file", description="Collapsed isoform groups",
+                             name="Collapsed Isoform Groups",
+                             description="Collapsed isoform groups",
                              default_name="output_mapped_groups") # output 3
 
     tcp.add_output_file_type(FileTypes.TXT, "read_stat_txt",
-                             name="TXT file", description="Read status of FL and nFL reads",
-                             default_name="output_mapped_read_stat") # output 3
+                             name="FL nFL Reads Status", description="Read status of FL and nFL reads",
+                             default_name="output_mapped_read_stat") # output 4
 
     # Add tcp options
     add_post_mapping_to_genome_tcp_options(tcp)

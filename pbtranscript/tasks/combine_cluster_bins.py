@@ -62,7 +62,7 @@ def get_contract_parser():
 
     # output idx 0, consensus_isoforms.contigset,
     p.add_output_file_type(FileTypes.DS_CONTIG, "consensus_isoforms",
-                           name="Unpolished consensus isoforms",
+                           name="Unpolished Consensus Isoforms",
                            description="Output unpolished consensus isoforms",
                            default_name="consensus_isoforms")
 
@@ -76,8 +76,8 @@ def get_contract_parser():
 
     # output idx 7, hq_lq_prefix_dict.pickle
     p.add_output_file_type(FileTypes.PICKLE, "hq_lq_prefix_dict",
-                           name="Pickle",
-                           description="Pickle mapping HQ (LQ) sample prefixes with ICE dir",
+                           name="HQ LQ Sample Prefix Dict",
+                           description="Pickle mapping HQ (LQ) sample prefixes to ICE dir",
                            default_name="hq_lq_prefix_dict")
 
     # user specified sample name.
