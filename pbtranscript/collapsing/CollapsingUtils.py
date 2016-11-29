@@ -8,13 +8,13 @@ of an isoform as np.array, and provides function to_exons() in order to
 convert np.array to exons.
 """
 
-from os import stat
+import os
 import os.path as op
 import logging
 from collections import defaultdict
 import numpy as np
 from pbcore.io import FastaWriter, FastqWriter, ContigSet
-from pbtranscript.Utils import execute, rmpath, as_contigset
+from pbtranscript.Utils import execute, rmpath, as_contigset, realpath
 from pbtranscript.io import ContigSetReaderWrapper, FastaRandomReader, FastqRandomReader, \
     CollapseGffRecord, CollapseGffReader, CollapseGffWriter, \
     GroupRecord, GroupReader, GroupWriter, parse_ds_filename
@@ -72,6 +72,11 @@ def map_isoforms_and_sort(input_filename, sam_filename,
     if not op.exists(gmap_input_filename):
         raise IOError("Gmap input file %s does not exists" % gmap_input_filename)
 
+    # In order to prevent mount issues, cd to ${gmap_db_dir} and ls ${gmap_db_name}.* files
+    cwd = realpath(os.getcwd())
+    cmd_args = ['cd %s' % op.join(gmap_db_dir, gmap_db_name), 'ls',  'cd %s' % cwd]
+    execute(' && '.join(cmd_args))
+
     cmd_args = ['gmap', '-D {d}'.format(d=gmap_db_dir),
                 '-d {name}'.format(name=gmap_db_name),
                 '-t {nproc}'.format(nproc=gmap_nproc),
@@ -103,7 +108,7 @@ def sort_sam(in_sam, out_sam):
     cmd_args = ['sort', '-k 3,3', '-k 4,4n', in_sam,
                 '| grep -v \'^@\' ', ' >> ', out_sam]
 
-    if stat(in_sam).st_size == 0: # overwrite cmds if file is empty
+    if os.stat(in_sam).st_size == 0: # overwrite cmds if file is empty
         cmd_args = ['touch', out_sam]
 
     execute(' '.join(cmd_args))
