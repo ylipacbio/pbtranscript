@@ -74,7 +74,8 @@ def map_isoforms_and_sort(input_filename, sam_filename,
 
     # In order to prevent mount issues, cd to ${gmap_db_dir} and ls ${gmap_db_name}.* files
     cwd = realpath(os.getcwd())
-    cmd_args = ['cd %s' % op.join(gmap_db_dir, gmap_db_name), 'ls',  'cd %s' % cwd]
+    cmd_args = ['cd %s' % op.join(gmap_db_dir, gmap_db_name),
+                'ls *.iit *meta', 'sleep 3', 'cd %s' % cwd]
     execute(' && '.join(cmd_args))
 
     cmd_args = ['gmap', '-D {d}'.format(d=gmap_db_dir),
