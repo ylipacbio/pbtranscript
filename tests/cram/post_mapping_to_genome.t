@@ -43,10 +43,10 @@
   $ cat $O_fq | wc -l
   140
 
-  $ cat $O_gff | wc -l
+  $ cat $O_gff | grep -v '^##' |wc -l
   244
 
-  $ head -1 $O_gff 
+  $ cat $O_gff | grep -v '^##' |head -1
   SIRV1\tPacBio\ttranscript\t10713\t11643\t.\t+\t.\tgene_id "PB.1"; transcript_id "PB.1.1"; (esc)
 
   $ rm -f $OD/output_mapped.*

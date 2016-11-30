@@ -189,10 +189,11 @@ class TEST_Branch(unittest.TestCase):
             return Gff3Record(seqid=fields[0], start=fields[3], end=fields[4],
                               type=fields[2], attributes=attributes)
 
-        bad_gff_records = [str_to_gffrecord(line) for line in open(bad_gff_fn, 'r')]
+        bad_gff_records = [str_to_gffrecord(line) for line in open(bad_gff_fn, 'r') if not line.startswith('##')]
         self.assertEqual(len(bad_gff_records), 0)
 
-        good_gff_records = [str_to_gffrecord(line) for line in open(good_gff_fn, 'r')]
+        good_gff_records = [str_to_gffrecord(line) for line in open(good_gff_fn, 'r') if not line.startswith('##')]
+
         self.assertEqual(len(good_gff_records), 4)
         self.assertEqual([(int(r.start), int(r.end), r.type, r.attributes['gene_id'], r.attributes['transcript_id']) for r in good_gff_records],
                          [(10711, 11641, 'transcript', "PB.0", "PB.0.1"),
