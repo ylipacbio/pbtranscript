@@ -12,6 +12,7 @@ reference dataset to chunk.json.
 
 import logging
 import sys
+import os
 import os.path as op
 
 from pbcommand.pb_io.common import load_pipeline_chunks_from_json
@@ -72,6 +73,11 @@ def run_main(fastq_file, gmap_ref_file, output_json_file, max_nchunks):
       gmap_ref_file -- GMAP reference set xml
       output_json -- chunk.json
     """
+    # Check size of fastq_file before scattering, so that a meaningful
+    # error message can be displayed instead of 'float division by zero'
+    if os.stat(fastq_file).st_size == 0:
+        raise IOError("Fastq file %s is empty, exiting." % fastq_file)
+
     # Chunk FASTQ
     output_fastq_json = output_json_file + ".fastq.json"
     output_dir = op.dirname(output_json_file)
