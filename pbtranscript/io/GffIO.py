@@ -131,6 +131,7 @@ class CollapseGffWriter(WriterBase):
     """
     def __init__(self, f):
         super(CollapseGffWriter, self).__init__(f)
+        self.writeHeader("##gff-version 3")
 
     def writeHeader(self, headerLine):
         """Write header"""

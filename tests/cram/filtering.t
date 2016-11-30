@@ -30,7 +30,7 @@
   PB.10.42
   PB.12.1
 
-  $ cut -f 9 $out_gff |cut -f 2 -d ';'|uniq
+  $ cut -f 9 $out_gff |cut -f 2 -d ';'|grep -v '^##' |uniq
    transcript_id "PB.2.5"
    transcript_id "PB.5.1"
    transcript_id "PB.7.1"
@@ -65,7 +65,7 @@
   PB.10.42
   PB.12.1
 
-  $ cut -f 9 $out_gff |cut -f 2 -d ';'|uniq
+  $ cut -f 9 $out_gff |cut -f 2 -d ';'|grep -v '^##' |uniq
    transcript_id "PB.2.5"
    transcript_id "PB.5.1"
    transcript_id "PB.7.1"
