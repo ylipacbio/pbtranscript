@@ -89,7 +89,12 @@ def map_isoforms_and_sort(input_filename, sam_filename,
                 '>', unsorted_sam_filename,
                 '2>{log}'.format(log=log_filename)]
     # Call gmap to map isoforms to reference and output sam.
-    execute(' '.join(cmd_args))
+    try:
+        execute(' '.join(cmd_args))
+    except Exception:
+        logging.debug("gmap failed, try again.")
+        execute('sleep 3')
+        execute(' '.join(cmd_args))
 
     # sort sam file
     sort_sam(in_sam=unsorted_sam_filename, out_sam=sam_filename)
