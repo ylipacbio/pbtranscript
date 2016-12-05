@@ -117,7 +117,7 @@ def create_partial_pickle(flnc_files, chunked_nfl_files, out_pickle):
       out_pickle -- output pickle for saving PolishChunkTask objects
     """
     n_bins = len(flnc_files)
-    n_nfl_chunks = len(chunked_nfl_files)
+    n_nfl_chunks = max(1, len(chunked_nfl_files))
 
     log.info("Writing %s ice_partial chunk tasks to %s.", str(n_bins * n_nfl_chunks), out_pickle)
     p = ChunkTasksPickle()
@@ -175,7 +175,7 @@ def chunk_contigset(in_file, n_chunks, out_dir, out_chunk_json):
     Chunk input contigset into n_chunks under out_dir, and
     write chunk info to out_chunk_json, return chunked files.
     """
-    log.info("Splitting %s into %s chunks", in_file, str(n_chunks))
+    log.info("Splitting %s into at most %s chunks", in_file, str(n_chunks))
     CU.write_contigset_chunks_to_file(out_chunk_json, in_file, n_chunks,
                                       out_dir, "scattered-nfl", "contigset.xml")
 
