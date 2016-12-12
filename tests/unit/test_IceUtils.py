@@ -114,6 +114,12 @@ class Test_ICEUtils(unittest.TestCase):
         self.assertFalse(is_blank_bam(non_blank_bam))
         self.assertFalse(is_blank_sam(non_blank_sam))
 
+    def cmp_sam(self, sam1, sam2):
+        """Compare sam1 with sam2, ignore tag order differences."""
+        s1 = sorted(['\t'.join(sorted(r.split('\t'))) for r in open(sam1)])
+        s2 = sorted(['\t'.join(sorted(r.split('\t'))) for r in open(sam2)])
+        self.assertTrue(s1 == s2)
+
     def test_concat_bam_header(self):
         """Test concat_bam_header"""
         from pbtranscript.ice.IceUtils import concat_bam_header
@@ -122,7 +128,7 @@ class Test_ICEUtils(unittest.TestCase):
         stdout_fn =  op.join(self.sivStdoutDir, "test_concat_bam_header.sam")
         concat_bam_header(fns, out_fn)
         self.assertTrue(op.exists(out_fn))
-        self.assertTrue(filecmp.cmp(out_fn, stdout_fn))
+        self.cmp_sam(out_fn, stdout_fn)
 
     def test_concat_bam(self):
         """Test concat_bam, unaligned and aligned."""
@@ -145,7 +151,7 @@ class Test_ICEUtils(unittest.TestCase):
         stdout_sam = op.join(self.sivStdoutDir, "test_concat_bam_2.sam")
         cmd="samtools view -h %s -o %s" % (out_fn, out_sam)
         execute(cmd=cmd)
-        self.assertTrue(filecmp.cmp(out_sam, stdout_sam))
+        self.cmp_sam(out_sam, stdout_sam)
 
     def test_trim_subreads_and_write(self):
         """
