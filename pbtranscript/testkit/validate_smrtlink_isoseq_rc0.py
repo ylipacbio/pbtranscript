@@ -4,7 +4,6 @@
 Validate a smrtlink RC0 isoseq job with reference and gencode.
 """
 
-
 import argparse
 import sys
 import logging
@@ -65,8 +64,9 @@ def collapse_to_reference(hq_fq, hq_lq_prefix_pickle, out_dir, args, out_prefix=
 
     First map HQ isoforms against reference ($gmap_db_dir/$gmap_db_name),
     next collapse HQ isoforms to representative isoforms based on mapping,
-    and finally map representative isoforms to reference and return sorted
-    SAM output.
+    and finally map representative isoforms to reference.
+
+    Return (collapsed isoforms FASTQ, sorted SAM output)
     """
     gmap_db, gmap_name = args.gmap_db, args.gmap_name
     # Map HQ isoforms to GMAP reference genome
@@ -99,7 +99,7 @@ def collapse_to_reference(hq_fq, hq_lq_prefix_pickle, out_dir, args, out_prefix=
     # Map representitive isoforms to reference
     map_isoforms_and_sort(input_filename=rep_fq, sam_filename=rep_sam,
                           gmap_db_dir=gmap_db, gmap_db_name=gmap_name, gmap_nproc=GMAP_NPROC)
-    return rep_sam
+    return rep_fq, rep_sam
 
 
 def validate_with_Gencode(sorted_rep_sam, gencode_gtf, match_out):
@@ -133,19 +133,16 @@ def check_matchAnnot_out(match_out, min_percentage):
         raise ValueError("MatchAnnot %s (%s isoforms read != %s isoforms classified)"
                          % (match_out, total_n, sum(ns)))
 
-    if total_n * min_percentage / 100.0 > ns[5] + ns[4]:
-        # isoforms with score are 4 or 5 is less than min_percentage
-        log.info("There are %s out of %s isoforms with scores equal 4 or 5 < %s percent.",
-                 ns[5]+ns[4], total_n, min_percentage)
-        return False
-    else:
-        log.info("There are %s out of %s isoforms with scores equal 4 or 5 >= %s percent.",
-                 ns[5]+ns[4], total_n, min_percentage)
-        return True
+    # collpased isoforms with HIGH matchAnnot score (4 or 5) ? min_percentage
+    ok = (ns[5] + ns[4] >= total_n * min_percentage / 100.0)
 
+    msg = "%s out of %s collapsed isoforms have HIGH MatchAnnot score (>=4), %s %s" % \
+          (ns[5]+ns[4], total_n, ('>=' if ok else '<'), "%.2f" % min_percentage + "%")
+    log.info(msg)
+    return ok, msg
 
 def make_sane(args):
-    """Make sane of input output"""
+    """Sanity check inputs and outputs"""
     args.smrtlink_job_dir = realpath(args.smrtlink_job_dir)
     args.out_dir = realpath(args.out_dir)
 
@@ -182,8 +179,9 @@ def run(args):
 
     # Collapse HQ isoforms (hq_fq) to representive isoforms, then map
     # representative isoforms to gmap reference, and sort output SAM (sorted_rep_sam).
-    sorted_rep_sam = collapse_to_reference(hq_fq=hq_fq, hq_lq_prefix_pickle=hq_lq_prefix_pickle,
-                                           out_dir=args.out_dir, args=args)
+    rep_fq, sorted_rep_sam = collapse_to_reference(hq_fq=hq_fq,
+                                                   hq_lq_prefix_pickle=hq_lq_prefix_pickle,
+                                                   out_dir=args.out_dir, args=args)
 
     # Run matchAnnot.py to compare sorted_rep_sam against gencode gtf.
     match_out = sorted_rep_sam + ".matchAnnot.txt"
@@ -191,7 +189,21 @@ def run(args):
                           match_out=match_out)
 
     # Check from matchAnnot.txt % of isoforms with scores 4 or 5
-    res = check_matchAnnot_out(match_out, args.min_percentage)
+    res, msg = check_matchAnnot_out(match_out, args.min_percentage)
+
+    # Write to report
+    report_fn = op.join(args.out_dir, "validation_report.txt")
+    log.info("Writing validation report to %s" % report_fn)
+    with open(report_fn, 'w') as writer:
+        writer.write("SMRTLink job dir: %s\n" % args.smrtlink_job_dir)
+        writer.write("Valiation Output directory: %s\n" % args.out_dir)
+        writer.write("HQ Isoforms FASTQ: %s\n" % hq_fq)
+        writer.write("Collapsed Isoforms FASTQ: %s\n" % rep_fq)
+        writer.write("GMAP Reference: %s\n" % op.join(args.gmap_db, args.gmap_name))
+        writer.write("GMAP SAM Mapping Collapsed Isoforms to Reference: %s\n" % (sorted_rep_sam))
+        writer.write("Gencode Annotation: %s\n" % (args.gencode_gtf))
+        writer.write("MatchAnnot Output: %s\n" % (match_out))
+        writer.write("\nValidation Results: %s\n" % (msg))
 
     if res:
         log.info("Test PASSED.")
@@ -202,13 +214,13 @@ def run(args):
 
 def get_parser():
     """Get argument parser."""
-    helpstr = "Validate SMRTLink Iso-Seq (w/wo Genome) output against GenCode"
+    helpstr = "Validate RC0 sample SMRTLink Iso-Seq output against GenCode"
     parser = argparse.ArgumentParser(helpstr)
 
-    helpstr = "Smrtlink Iso-Seq (w/wo Genome) job directory"
+    helpstr = "Smrtlink Iso-Seq job directory"
     parser.add_argument("smrtlink_job_dir", help=helpstr)
 
-    helpstr = "Validation output directory"
+    helpstr = "Validation out directory"
     parser.add_argument("out_dir", help=helpstr)
 
     helpstr = "min percentage of isoforms whose matchAnnot scores are 4 or 5 (default: 80)"

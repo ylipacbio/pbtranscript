@@ -97,6 +97,7 @@ setup(
              'pbtranscript/ice_fa2fq.py',
              'pbtranscript/ice_daligner.py',
              'pbtranscript/ice_combine_cluster_bins.py',
+             'pbtranscript/testkit/validate_smrtlink_isoseq_rc0.py'
             ],
     entry_points={'console_scripts': [
         'pbtranscript = pbtranscript.PBTranscriptRunner:main',
