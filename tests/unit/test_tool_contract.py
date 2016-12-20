@@ -242,7 +242,7 @@ class TestMapIsoforms(pbcommand.testkit.PbTestApp):
         from pbtranscript.io import GMAPSAMReader
         with GMAPSAMReader(gmap_sam_out) as reader:
             reads = [r for r in reader]
-            assert(len(reads) == 984)
+            assert(len(reads) >= 983 and len(reads) <= 984)
 
 
 @unittest.skipUnless(op.isdir(MNT_DATA), "Missing %s" % MNT_DATA)
