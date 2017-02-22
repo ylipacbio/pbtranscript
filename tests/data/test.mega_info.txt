@@ -1,0 +1,5 @@
+pbid	SF3BI	NTI
+PB.1.1	NA	PB.2.1
+PB.1.2	PB.1.1	NA
+PB.2.1	NA	PB.5.1
+PB.3.1	PB.4.1	PB.7.1
