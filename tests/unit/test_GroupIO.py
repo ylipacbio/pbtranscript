@@ -35,3 +35,12 @@ class TEST_GroupIO(unittest.TestCase):
                     writer.writeRecord(r)
 
             self.assertTrue(filecmp.cmp(out_fn, GROUP_FN_2))
+
+    def test_init_with_prefix(self):
+        """Test init with prefix"""
+        expected_r = GroupRecord(name="group1",
+                                 members=["myprefix|member0", "myprefix|member1", "myprefix|member2"])
+        with GroupReader(GROUP_FN_1, prefix="myprefix") as reader:
+            records = [r for r in reader]
+            self.assertEqual(len(records), 1)
+            self.assertEqual(records[0], expected_r)
