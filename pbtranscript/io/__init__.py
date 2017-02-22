@@ -1,4 +1,4 @@
-#from __future__ import absolute_import
+#*from __future__ import absolute_import
 
 from .FastaRandomReader import *
 from .FastqRandomReader import *
@@ -16,3 +16,5 @@ from .GffIO import *
 from .ReadStatIO import *
 from .AbundanceIO import *
 from .common import *
+from .ChainIO import *
+from .MergeGroupIO import *
