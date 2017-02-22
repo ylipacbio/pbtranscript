@@ -27,6 +27,10 @@ ext_modules = [Extension("pbtranscript.findECE",
                          ["pbtranscript/collapsing/C/intersection_unique.pyx"], language="c++"),
                Extension("pbtranscript.collapsing.intersection",
                          ["pbtranscript/collapsing/C/intersection.pyx"], language="c++"),
+               Extension("pbtranscript.collapsing.cluster",
+                         ["pbtranscript/collapsing/C/cluster.pyx",
+                          "pbtranscript/collapsing/C/src/cluster.c"], language="c",
+                          include_dirs=['pbtranscript/collapsing/C/src']),
                Extension("pbtranscript.collapsing.c_branch",
                          ["pbtranscript/collapsing/C/c_branch.pyx"], language="c++",
                          include_dirs=[numpy.get_include()])
@@ -97,7 +101,7 @@ setup(
              'pbtranscript/ice_fa2fq.py',
              'pbtranscript/ice_daligner.py',
              'pbtranscript/ice_combine_cluster_bins.py',
-             'pbtranscript/testkit/validate_smrtlink_isoseq_rc0.py'
+             'pbtranscript/counting/chain_samples.py'
             ],
     entry_points={'console_scripts': [
         'pbtranscript = pbtranscript.PBTranscriptRunner:main',
