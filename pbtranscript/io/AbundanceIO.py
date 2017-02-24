@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """Streaming IO support for Abundance files."""
+#FIXME: refactor Abundance classes to allow flexible combo and subsets of columns
 
 from pbcore.io import ReaderBase, WriterBase
 
@@ -32,17 +33,23 @@ class AbundanceRecord(object):
 
     def __init__(self, pbid, count_fl, count_nfl, count_nfl_amb, norm_fl, norm_nfl, norm_nfl_amb):
         self.pbid = str(pbid)
-        self.count_fl = int(count_fl)
-        self.count_nfl = int(count_nfl)
-        self.count_nfl_amb = float(count_nfl_amb)
-        self.norm_fl = float(norm_fl)
-        self.norm_nfl = float(norm_nfl)
-        self.norm_nfl_amb = float(norm_nfl_amb)
+        def type_or_na(t, x):
+            """Return x of type if not 'NA' else 0"""
+            return t(x) if not x == 'NA' else 0
+        self.count_fl = type_or_na(int, count_fl)
+        self.count_nfl = type_or_na(int, count_nfl)
+        self.count_nfl_amb = type_or_na(float, count_nfl_amb)
+        self.norm_fl = type_or_na(float, norm_fl)
+        self.norm_nfl = type_or_na(float, norm_nfl)
+        self.norm_nfl_amb = type_or_na(float, norm_nfl_amb)
 
     def __str__(self):
         return "{0}\t{1}\t{2}\t{3:.2f}\t{4:.4e}\t{5:.4e}\t{6:.4e}".format(
             self.pbid, self.count_fl, self.count_nfl, self.count_nfl_amb,
             self.norm_fl, self.norm_nfl, self.norm_nfl_amb)
+
+    def __repr__(self):
+        return self.__str__()
 
     @classmethod
     def fromString(cls, line):
@@ -50,9 +57,9 @@ class AbundanceRecord(object):
         fields = line.strip().split('\t')
         if len(fields) != 7:
             raise ValueError("Could not recognize %s as a valid AbundanceRecord." % line)
-        return AbundanceRecord(pbid=fields[0], count_fl=int(fields[1]), count_nfl=int(fields[2]),
-                               count_nfl_amb=float(fields[3]), norm_fl=float(fields[4]),
-                               norm_nfl=float(fields[5]), norm_nfl_amb=float(fields[6]))
+        return AbundanceRecord(pbid=fields[0], count_fl=fields[1], count_nfl=fields[2],
+                               count_nfl_amb=fields[3], norm_fl=fields[4],
+                               norm_nfl=fields[5], norm_nfl_amb=fields[6])
 
 
 class AbundanceReader(ReaderBase):
@@ -112,7 +119,7 @@ class AbundanceReader(ReaderBase):
 
     def __iter__(self):
         if self.firstLine:
-            if self.firstLine.strip() != AbundanceRecord.HEADER:
+            if not self.firstLine.strip().startswith('pbid\t'):
                 yield AbundanceRecord.fromString(self.firstLine)
             self.firstLine = None
         for line in self.file:
