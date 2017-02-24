@@ -23,7 +23,8 @@ def make_readlength_csv(fasta_fn, csv_fn):
     rmpath(csv_fn)
     with open(csv_fn, 'w') as writer:
         writer.write("'name'\t'readlength'\n")
-        for read in ContigSetReaderWrapper(fasta_fn):
+        cls = FastaReader if fasta_fn.endswith('.fasta.gz') else ContigSetReaderWrapper
+        for read in cls(fasta_fn):
             writer.write('%s\t%s\n' % (read.name.split()[0], len(read.sequence)))
 
 
