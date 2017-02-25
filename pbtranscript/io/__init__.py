@@ -18,3 +18,4 @@ from .AbundanceIO import *
 from .common import *
 from .ChainIO import *
 from .MergeGroupIO import *
+from .SMRTLinkIsoSeqFiles import *
