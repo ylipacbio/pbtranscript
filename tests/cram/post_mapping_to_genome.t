@@ -26,7 +26,7 @@
 
   $ cat $O_abundance | grep -v '^#' |head -2
   pbid\tcount_fl\tcount_nfl\tcount_nfl_amb\tnorm_fl\tnorm_nfl\tnorm_nfl_amb (esc)
-  PB.1.1\t30\t30\t30.83\t6.3667e-03\t3.0367e-03\t3.0637e-03 (esc)
+  PB.1.1\t30\t30\t30.83\t6.3667e-03\t3.0675e-03\t3.0637e-03 (esc)
 
   $ head -1 $O_group
   PB.1.1\ti0_HQ_sample18ba5d|c11/f3p0/458,i0_HQ_sample18ba5d|c1353/f2p0/462,i0_HQ_sample18ba5d|c152/f3p0/462,i0_HQ_sample18ba5d|c1543/f8p1/465,i0_HQ_sample18ba5d|c38/f2p0/460,i0_HQ_sample18ba5d|c563/f2p0/473,i0_HQ_sample18ba5d|c633/f2p1/462,i0_HQ_sample18ba5d|c81/f3p0/462,i0_HQ_sample18ba5d|c140/f3p0/462,i0_HQ_sample18ba5d|c204/f2p0/422 (esc)
@@ -41,10 +41,10 @@
   0
 
   $ cat $O_fq | wc -l
-  140
+  260
 
   $ cat $O_gff | grep -v '^##' |wc -l
-  244
+  468
 
   $ cat $O_gff | grep -v '^##' |head -1
   SIRV1\tPacBio\ttranscript\t10713\t11643\t.\t+\t.\tgene_id "PB.1"; transcript_id "PB.1.1"; (esc)

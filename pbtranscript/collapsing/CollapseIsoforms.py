@@ -66,6 +66,9 @@ class Branch(object):
         # Only output GTF records if >= cov_threshold supportive GMAP records.
         # Only used when running GMAP on non-clustered isoforms.
         self.cov_threshold = cov_threshold
+        if (self.cov_threshold != 1):
+            log.warning("CollapseIsoforms.Branch ONLY set cov_threshold > 1" +
+                        "when running GMAP on non-clustered isoforms")
 
         self.min_aln_coverage = min_aln_coverage
         self.min_aln_identity = min_aln_identity
@@ -136,6 +139,8 @@ class CollapseIsoformsRunner(CollapsedFiles):
           min_aln_coverage -- min coverage over reference to collapse a group of isoforms
           min_aln_identity -- min identity aligning to reference to collapse a group of isoforms
           min_flnc_coverage -- min supportive flnc reads to not ignore an isoform
+                               Must be 1 when collapsing consensus isoforms, which is the case in production isoseq.
+                               Can be >= 1 only when directly collapsing FLNC reads.
           max_fuzzy_junction -- max edit distance between fuzzy-matching exons
           allow_extra_5exon -- whether or not to allow shorter 5' exons
           skip_5_exon_alt -- whether or not to skip alternative 5' exons
