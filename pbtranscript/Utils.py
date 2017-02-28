@@ -425,7 +425,7 @@ def ln(src, dst):
             os.remove(dst)
         logging.debug("Creating a symbolic link {dst} pointing to {src}".
                       format(dst=dst, src=src))
-        os.symlink(src, dst)
+        os.symlink(realpath(src), realpath(dst))
 
 
 def mv(src, dst):

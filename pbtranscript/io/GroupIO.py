@@ -33,12 +33,17 @@ class GroupRecord(object):
         return self.name == other.name and self.members == other.members
 
     @classmethod
-    def fromString(cls, line):
+    def fromString(cls, line, prefix=None):
         """Construct and return a GroupRecord object given a string."""
         fields = line.strip().split('\t')
         if len(fields) != 2:
             raise ValueError("Could not recognize %s as a valid GroupRecord." % line)
-        return GroupRecord(name=fields[0], members=fields[1].split(','))
+
+        def _add_prefix(members, prefix=None):
+            """Add prefix to each member"""
+            return ["%s|%s" % (prefix, member) for member in members] if prefix is not None else members
+
+        return GroupRecord(name=fields[0], members=_add_prefix(fields[1].split(','), prefix))
 
 
 class GroupReader(ReaderBase):
@@ -55,6 +60,9 @@ class GroupReader(ReaderBase):
         ...     print record
         group1  member0,member1,member2
     """
+    def __init__(self, filename, prefix=None):
+        super(GroupReader, self).__init__(filename)
+        self.prefix = prefix
 
     def __iter__(self):
         try:
@@ -62,7 +70,7 @@ class GroupReader(ReaderBase):
             for line in lines:
                 line = line.strip()
                 if len(line) > 0 and line[0] != "#":
-                    yield GroupRecord.fromString(line)
+                    yield GroupRecord.fromString(line=line, prefix=self.prefix)
         except AssertionError:
             raise ValueError("Invalid Group file %s." % self.file.name)
 

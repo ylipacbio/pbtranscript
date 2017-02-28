@@ -3,6 +3,7 @@ setuptools_cython*
 .eggs
 *.o
 *.so
+pbtranscript/collapsing/C/*.cpp
 pbtranscript/ice/C/*.cpp
 pbtranscript/ice/C/*.c
 tests/out
