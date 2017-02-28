@@ -6,8 +6,6 @@ import logging
 import os.path as op
 from pbtranscript.Utils import realpath
 
-FORMATTER = op.basename(__file__) + ':%(levelname)s:'+'%(message)s'
-logging.basicConfig(level=logging.INFO, format=FORMATTER)
 log = logging.getLogger(__name__)
 
 __all__ = ["SMRTLinkIsoSeqFiles"]
