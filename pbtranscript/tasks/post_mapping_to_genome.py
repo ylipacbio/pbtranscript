@@ -108,6 +108,11 @@ def post_mapping_to_genome_runner(in_isoforms, in_sam, in_pickle,
     (2) Generate read stat file and abundance file
     (3) Based on abundance file, filter collapsed isoforms by min FL count
     """
+    args = [("min_aln_coverage", min_aln_coverage), ("min_aln_identity", min_aln_identity),
+            ("min_flnc_coverage", min_flnc_coverage), ("max_fuzzy_junction", max_fuzzy_junction),
+            ("allow_extra_5exon", allow_extra_5exon), ("skip_5_exon_alt", skip_5_exon_alt),
+            ("min_count", min_count), ("to_filter_out_subsets", to_filter_out_subsets)]
+    log.info("args: %r" % args)
     # Check input and output format
     in_suffix = parse_ds_filename(in_isoforms)[1]
     out_prefix, out_suffix = parse_ds_filename(out_isoforms)

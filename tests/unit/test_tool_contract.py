@@ -262,8 +262,8 @@ class TestPostMappingToGenome(pbcommand.testkit.PbTestApp):
         read_stat_fn = rtc.task.output_files[4]
         from pbcore.io import FastqReader
         from pbtranscript.io import CollapseGffReader, AbundanceReader, GroupReader, ReadStatReader
-        assert(len([r for r in FastqReader(rep_fn)]) == 35)
-        assert(len([r for r in CollapseGffReader(gff_fn)]) == 35)
-        assert(len([r for r in AbundanceReader(abundance_fn)]) == 35)
-        assert(len([r for r in GroupReader(group_fn)]) == 38)
-        assert(len([r for r in ReadStatReader(read_stat_fn)]) == 10415)
+        self.assertEqual(len([r for r in FastqReader(rep_fn)]), 65)
+        self.assertEqual(len([r for r in CollapseGffReader(gff_fn)]), 65)
+        self.assertEqual(len([r for r in AbundanceReader(abundance_fn)]), 65)
+        self.assertEqual(len([r for r in GroupReader(group_fn)]), 86)
+        self.assertEqual(len([r for r in ReadStatReader(read_stat_fn)]), 10873)

@@ -28,7 +28,7 @@
   $ collapse_mapped_isoforms.py --quiet $ISOFORM_FQ $SORTED_GMAP_OUTPUT $OD/fq_in --collapsed_isoforms=$OD/output_fq_in.fastq && echo $?
   0
   $ cat $OD/output_fq_in.fastq | wc -l
-  240
+  428
 
   $ collapse_mapped_isoforms.py --quiet $ISOFORM_FA_DS $SORTED_GMAP_OUTPUT $OD/fa_ds_in && echo $?
   0

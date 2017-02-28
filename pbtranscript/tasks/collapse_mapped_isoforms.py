@@ -47,7 +47,8 @@ class Constants(object):
     MAX_FUZZY_JUNCTION_DEFAULT = 5
     MAX_FUZZY_JUNCTION_DESC = "Max edit distance between merge-able fuzzy junctions (default: %s)" % MAX_FUZZY_JUNCTION_DEFAULT
 
-    MIN_FLNC_COVERAGE_DEFAULT = 2
+    # Production isoseq always collapses consensus isoforms, not FLNC reads, default value must be 1
+    MIN_FLNC_COVERAGE_DEFAULT = 1
     MIN_FLNC_COVERAGE_DESC = "Minimum number of supportive FLNC reads " + \
                              "only used for aligned FLNC reads, otherwise, result undefined (default: %s)" % MIN_FLNC_COVERAGE_DEFAULT
 
