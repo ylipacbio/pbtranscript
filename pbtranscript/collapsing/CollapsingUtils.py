@@ -139,11 +139,10 @@ def concatenate_sam(in_sam_files, sam_out):
         pgid = _get_pgid(r)
         if pgid not in pg_ids:
             return r
-        else:
-            suffix = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
-            ret = [i for i in r.split('\t') if not i.startswith('ID:')]
-            ret.insert(1, "ID:%s_%s" % (pgid, suffix))
-            return '\t'.join(ret)
+        suffix = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
+        ret = [i for i in r.split('\t') if not i.startswith('ID:')]
+        ret.insert(1, "ID:%s_%s" % (pgid, suffix))
+        return '\t'.join(ret)
 
     # First save sam headers in c_header
     c_header = []
@@ -162,7 +161,7 @@ def concatenate_sam(in_sam_files, sam_out):
                             try:
                                 c_header.append(_get_pgheader(r, pg_ids))
                                 pg_ids.add(_get_pgid(r))
-                            except Exception: # ignore bad PG
+                            except ValueError: # ignore bad PG
                                 pass
                         elif r not in c_header:
                             c_header.append(r)
