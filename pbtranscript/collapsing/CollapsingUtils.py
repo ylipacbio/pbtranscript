@@ -11,6 +11,8 @@ convert np.array to exons.
 import os
 import os.path as op
 import logging
+import random
+import string
 from collections import defaultdict
 import numpy as np
 from pbcore.io import FastaWriter, FastqWriter, ContigSet
@@ -125,9 +127,27 @@ def concatenate_sam(in_sam_files, sam_out):
     if sam_out in in_sam_files:
         raise IOError("Can not overwrite input sam file %s as output file." % sam_out)
 
+    def _get_pgid(r):
+        """return pbid from a PG header '@PG\tID:xxx\t...'"""
+        assert r.startswith('@PG')
+        return [i[3:] for i in r.split('\t') if i.startswith('ID:')][0]
+
+    def _get_pgheader(r, pg_ids):
+        """if PG ID of a PG header l is in set pg_ids, make a PG header with a new ID;
+        otherwise, return l"""
+        assert r.startswith('@PG')
+        pgid = _get_pgid(r)
+        if pgid not in pg_ids:
+            return r
+        suffix = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
+        ret = [i for i in r.split('\t') if not i.startswith('ID:')]
+        ret.insert(1, "ID:%s_%s" % (pgid, suffix))
+        return '\t'.join(ret)
+
     # First save sam headers in c_header
     c_header = []
     has_hd = False
+    pg_ids = set()
     for in_sam in in_sam_files:
         with open(in_sam, 'r') as reader:
             for r in reader:
@@ -137,7 +157,13 @@ def concatenate_sam(in_sam_files, sam_out):
                         has_hd = True
                         c_header.append(r)
                     else:
-                        if r not in c_header:
+                        if r.startswith("@PG"):
+                            try:
+                                c_header.append(_get_pgheader(r, pg_ids))
+                                pg_ids.add(_get_pgid(r))
+                            except ValueError: # ignore bad PG
+                                pass
+                        elif r not in c_header:
                             c_header.append(r)
                 else:
                     break
