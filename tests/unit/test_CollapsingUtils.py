@@ -83,7 +83,22 @@ class TEST_CollapsingUtils(unittest.TestCase):
         out_sam = op.join(_OUT_DIR_, 'concatenated.sam')
         expected_sam = op.join(_SIV_DIR_, "sorted-gmap-output.sam")
         concatenate_sam(in_sam_files, out_sam)
-        self.assertTrue(filecmp.cmp(out_sam, expected_sam))
+
+        self.assertTrue(op.exists(out_sam))
+        self.assertTrue(op.exists(expected_sam))
+
+        #self.assertTrue(filecmp.cmp(out_sam, expected_sam))
+        out = [l for l in open(out_sam, 'r') if not l.startswith('@PG')]
+        exp = [l for l in open(expected_sam, 'r') if not l.startswith('@PG')]
+        # test everything other than @PG are identical
+        self.assertEqual(out, exp)
+
+        # chunk01.sam and chunk02.sam has identical PG ID in their SAM headers
+        # test concatenated @PG IDs are not conflicting
+        pg_ids = [x[3:] for pg in [l for l in open(out_sam, 'r') if l.startswith('@PG')]
+                  for x in pg.split('\t') if x.startswith('ID:')]
+        self.assertEqual(len(pg_ids), len(set(pg_ids)))
+        self.assertEqual(len(pg_ids), 2)
 
     def test_collapse_fuzzy_junctions(self):
         """Test collapse_fuzzy_junctions, can_merge and compare_fuzzy_junctions."""
