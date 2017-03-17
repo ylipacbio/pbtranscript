@@ -16,9 +16,9 @@ cat > pbtranscript_dummy.xml << EOF
   </testcase>
 </testsuite>
 EOF
-cd pitchfork
+source pitchfork/deployment/setup-env.sh
 export PYTHONWARNINGS="ignore"
-make test-pbtranscript || true
-chmod +w -R ../repos/pbtranscript
+nosetests --verbose --with-xunit --xunit-file=pbtranscript_nose.xml \
+    ../repos/pbtranscript/tests/unit/*.py
 
-
+chmod +w -R repos/pbtranscript
