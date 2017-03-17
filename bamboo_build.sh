@@ -36,14 +36,13 @@ cat > pitchfork/settings.mk << EOF
 DISTFILES             = ${PWD}/.distfiles
 CCACHE_DIR            = ${PWD}/.ccache
 PIP_CACHE             = ${PWD}/.pip
-# from Herb
+# from MJ
 HAVE_OPENSSL      = /mnt/software/o/openssl/1.0.2a
 HAVE_PYTHON       = /mnt/software/p/python/2.7.9/bin/python
 HAVE_BOOST        = /mnt/software/b/boost/1.58.0
 HAVE_ZLIB         = /mnt/software/z/zlib/1.2.8
 HAVE_SAMTOOLS     = /mnt/software/s/samtools/1.3.1mobs
 HAVE_NCURSES      = /mnt/software/n/ncurses/5.9
-# from MJ
 HAVE_HDF5         = /mnt/software/a/anaconda2/4.2.0
 HAVE_OPENBLAS     = /mnt/software/o/openblas/0.2.14
 HAVE_CMAKE        = /mnt/software/c/cmake/3.2.2/bin/cmake
@@ -74,6 +73,4 @@ EOF
 # this doesn't work because of pysam
 # make -C pitchfork -j15 pbtranscript
 cd pitchfork
-make -j15 pbtranscript
-# disable SGE
-ln -sfn /bin/false deployment/bin/qstat
+make -j15 pbtranscript nose
