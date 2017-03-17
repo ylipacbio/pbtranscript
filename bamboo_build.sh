@@ -73,6 +73,4 @@ EOF
 # this doesn't work because of pysam
 # make -C pitchfork -j15 pbtranscript
 cd pitchfork
-make -j15 pbtranscript
-# disable SGE
-ln -sfn /bin/false deployment/bin/qstat
+make -j15 pbtranscript nose
