@@ -49,19 +49,49 @@ class SMRTLinkIsoSeqFiles(object):
         return op.join(self.tasks_dir, "pbcoretools.tasks.bam2fasta_ccs-0/ccs.gz")
 
     @property
+    def flnc_gather_dir(self):
+        """Return pbcoretools.tasks.gather_contigset for FLNC reads."""
+        return op.join(self.tasks_dir, "pbcoretools.tasks.gather_contigset-2")
+
+    @property
     def isoseq_flnc_ds(self):
         """file path to isoseq_flnc contigset xml"""
-        return op.join(self.tasks_dir, "pbcoretools.tasks.gather_contigset-3/file.contigset.xml")
+        return op.join(self.flnc_gather_dir, "file.contigset.xml")
+
+    @property
+    def isoseq_flnc_fa(self):
+        """file path to isoseq_flnc contigset fasta"""
+        return op.join(self.flnc_gather_dir, "file.contigset.fasta")
+
+    @property
+    def nfl_gather_dir(self):
+        """Return pbcoretools.tasks.gather_contigset for NFL reads."""
+        return op.join(self.tasks_dir, "pbcoretools.tasks.gather_contigset-3")
 
     @property
     def isoseq_nfl_ds(self):
         """file path to isoseq_nfl contigset xml"""
-        return op.join(self.tasks_dir, "pbcoretools.tasks.gather_contigset-2/file.contigset.xml")
+        return op.join(self.nfl_gather_dir, "file.contigset.xml")
+
+    @property
+    def isoseq_nfl_fa(self):
+        """file path to isoseq_nfl contigset fasta"""
+        return op.join(self.nfl_gather_dir, "file.contigset.fasta")
+
+    @property
+    def draft_gather_dir(self):
+        """Return pbcoretools.tasks.gather_contigset for Draft reads."""
+        return op.join(self.tasks_dir, "pbcoretools.tasks.gather_contigset-1")
 
     @property
     def isoseq_draft_ds(self):
         """file path to isoseq_draft contigset xml"""
-        return op.join(self.tasks_dir, "pbcoretools.tasks.gather_contigset-1/file.contigset.xml")
+        return op.join(self.draft_gather_dir, "file.contigset.xml")
+
+    @property
+    def isoseq_draft_fa(self):
+        """file path to isoseq_draft contigset xml"""
+        return op.join(self.draft_gather_dir, "file.contigset.fasta")
 
     @property
     def hq_isoforms_fa(self):
